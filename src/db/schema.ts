@@ -15,110 +15,107 @@ import {
 export const usersTable = pgTable(
   "users",
   {
-    user_id: serial("user_id").primaryKey(),
+    userId: serial("user_id").primaryKey(),
     email: varchar("email").notNull().unique(),
     password: varchar("password").notNull(),
     name: varchar("name"),
-    profile_picture: varchar("profile_picture"),
-    resume_file: varchar("resume_file"),
+    profilePicture: varchar("profile_picture"),
+    resumeFile: varchar("resume_file"),
     points: integer("points").default(0),
-    hearts: integer("hearts").default(0),
-    upvotes: integer("upvotes").default(0),
-    downvotes: integer("downvotes").default(0),
-    favorites: integer("favorites").default(0),
-    checkmarks: integer("checkmarks").default(0)
   }
 );
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
   posts: many(postsTable),
+  questions: many(questionsTable),
 }));
 
 
 export const postsTable = pgTable(
   "posts",
   {
-    post_id: serial("post_id").primaryKey(),
+    postId: serial("post_id").primaryKey(),
     title: varchar("title").notNull(),
     context: text("context").notNull(),
-    poster_id: integer("poster_id").notNull().references(() => usersTable.user_id),
-    total_upvotes: integer("total_upvotes").default(0),
-    total_downvotes: integer("total_downvotes").default(0),
-    total_comments: integer("total_comments").default(0),
-    total_favorites: integer("total_favorites").default(0)
+    posterId: integer("poster_id").notNull().references(() => usersTable.userId),
+    createdTime: timestamp("created_time").default(new Date()),
   }
 );
 
 export const postsRelations = relations(postsTable, ({ one, many }) => ({
   user: one(usersTable, {
-    fields: [postsTable.poster_id],
-    references: [usersTable.user_id],
+    fields: [postsTable.posterId],
+    references: [usersTable.userId],
   }),
   comments: many(commentsTable),
-  tags: many(postTagsTable)
+  tags: many(postTagsTable),
+  upvotes: many(upvotesTable),
+  downvotes: many(downvotesTable)
 }));
 
 
 export const questionsTable = pgTable(
   "questions",
   {
-    question_id: serial("question_id").primaryKey(),
+    questionId: serial("question_id").primaryKey(),
     title: varchar("title").notNull(),
     context: text("context").notNull(),
-    poster_id: integer("poster_id").notNull().references(() => usersTable.user_id),
-    total_hearts: integer("total_hearts").default(0),
-    total_comments: integer("total_comments").default(0),
-    is_solved: boolean("is_solved").default(false),
-    helpful_comment_id: integer("helpful_comment_id").references(() => commentsTable.comment_id)
+    posterId: integer("poster_id").notNull().references(() => usersTable.userId),
+    isSolved: boolean("is_solved").default(false),
+    helpfulCommentId: integer("helpful_comment_id").references(() => commentsTable.commentId)
   }
 );
 
 export const questionsRelations = relations(questionsTable, ({ one, many }) => ({
   user: one(usersTable, {
-    fields: [questionsTable.poster_id],
-    references: [usersTable.user_id],
+    fields: [questionsTable.posterId],
+    references: [usersTable.userId],
   }),
   comments: many(commentsTable),
-  tags: many(questionTagsTable)
+  tags: many(questionTagsTable),
+  upvotes: many(upvotesTable),
 }));
 
 export const commentsTable: any = pgTable(
   "comments",
   {
-    comment_id: serial("comment_id").primaryKey(),
+    commentId: serial("comment_id").primaryKey(),
     text: text("text").notNull(),
-    commenter_id: integer("commenter_id").notNull().references(() => usersTable.user_id),
-    post_id: integer("post_id").references(() => postsTable.post_id),
-    question_id: integer("question_id").references(() => questionsTable.question_id),
-    parent_comment_id: integer("parent_comment_id").references(() => commentsTable.comment_id),
-    is_helpful: boolean("is_helpful").default(false)
+    commenterId: integer("commenter_id").notNull().references(() => usersTable.userId),
+    postId: integer("post_id").references(() => postsTable.postId),
+    questionId: integer("question_id").references(() => questionsTable.questionId),
+    parentCommentId: integer("parent_comment_id").references(() => commentsTable.commentId),
+    isHelpful: boolean("is_helpful").default(false)
   }
 );
 
-export const commentsRelations = relations(commentsTable, ({ one }) => ({
+export const commentsRelations = relations(commentsTable, ({ one, many }) => ({
+  upvotes: many(upvotesTable),
+  downvotes: many(downvotesTable),
+  replies: many(commentsTable),
   user: one(usersTable, {
-    fields: [commentsTable.commenter_id],
-    references: [usersTable.user_id],
+    fields: [commentsTable.commenterId],
+    references: [usersTable.userId],
   }),
   post: one(postsTable, {
-    fields: [commentsTable.post_id],
-    references: [postsTable.post_id],
+    fields: [commentsTable.postId],
+    references: [postsTable.postId],
   }),
   question: one(questionsTable, {
-    fields: [commentsTable.question_id],
-    references: [questionsTable.question_id],
+    fields: [commentsTable.questionId],
+    references: [questionsTable.questionId],
   }),
   parentComment: one(commentsTable, {
-    fields: [commentsTable.parent_comment_id],
-    references: [commentsTable.comment_id],
-  })
+    fields: [commentsTable.parentCommentId],
+    references: [commentsTable.commentId],
+  }),
 }));
 
 
 export const tagsTable = pgTable(
   "tags",
   {
-    tag_id: serial("tag_id").primaryKey(),
+    tagId: serial("tag_id").primaryKey(),
     name: varchar("name").notNull(),
     category: varchar("category")
   }
@@ -133,52 +130,130 @@ export const tagsRelations = relations(tagsTable, ({ many }) => ({
 export const postTagsTable = pgTable(
   "post_tags",
   {
-    post_id: integer("post_id").notNull().references(() => postsTable.post_id),
-    tag_id: integer("tag_id").notNull().references(() => tagsTable.tag_id)
+    postId: integer("post_id").notNull().references(() => postsTable.postId),
+    tagId: integer("tag_id").notNull().references(() => tagsTable.tagId)
   },
   (table) => ({
-    uniqCombination: unique().on(table.post_id, table.tag_id)
+    uniqCombination: unique().on(table.postId, table.tagId)
   })
 );
 
 export const postTagsRelations = relations(postTagsTable, ({ one }) => ({
   tag: one(tagsTable, {
-    fields: [postTagsTable.tag_id],
-    references: [tagsTable.tag_id],
+    fields: [postTagsTable.tagId],
+    references: [tagsTable.tagId],
   }),
+  post: one(postsTable, {
+    fields: [postTagsTable.postId],
+    references: [postsTable.postId],
+  })
 }));
 
 
 export const questionTagsTable = pgTable(
   "question_tags",
   {
-    question_id: integer("question_id").notNull().references(() => questionsTable.question_id),
-    tag_id: integer("tag_id").notNull().references(() => tagsTable.tag_id)
+    questionId: integer("question_id").notNull().references(() => questionsTable.questionId),
+    tagId: integer("tag_id").notNull().references(() => tagsTable.tagId)
   },
   (table) => ({
-    uniqCombination: unique().on(table.question_id, table.tag_id)
+    uniqCombination: unique().on(table.questionId, table.tagId)
   })
 );
 
 export const questionTagsRelations = relations(questionTagsTable, ({ one }) => ({
   tag: one(tagsTable, {
-    fields: [questionTagsTable.tag_id],
-    references: [tagsTable.tag_id],
+    fields: [questionTagsTable.tagId],
+    references: [tagsTable.tagId],
+  }),
+  question: one(questionsTable, {
+    fields: [questionTagsTable.questionId],
+    references: [questionsTable.questionId],
+  })
+}));
+
+
+export const upvotesTable = pgTable(
+  "upvotes",
+  {
+    upvoteId: serial("upvote_id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => usersTable.userId),
+    commentId: integer("comment_id").references(() => commentsTable.commentId),
+    postId: integer("post_id").references(() => postsTable.postId),
+    questionId: integer("question_id").references(() => questionsTable.questionId)
+  }
+);
+
+export const upvoteRelations = relations(upvotesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [upvotesTable.userId],
+    references: [usersTable.userId],
+  }),
+  comment: one(commentsTable, {
+    fields: [upvotesTable.commentId],
+    references: [commentsTable.commentId],
+  }),
+  post: one(postsTable, {
+    fields: [upvotesTable.postId],
+    references: [postsTable.postId],
+  }),
+  question: one(questionsTable, {
+    fields: [upvotesTable.questionId],
+    references: [questionsTable.questionId],
   }),
 }));
 
 
-export const interactionsTable = pgTable(
-  "interactions",
+export const downvotesTable = pgTable(
+  "downvotes",
   {
-    interaction_id: serial("interaction_id").primaryKey(),
-    user_id: integer("user_id").notNull().references(() => usersTable.user_id),
-    target_id: integer("target_id").notNull(),
-    type: varchar("type").notNull(),
-    target_type: varchar("target_type").notNull(),
-    is_active: boolean("is_active").default(true)
+    downvoteId: serial("upvote_id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => usersTable.userId),
+    commentId: integer("comment_id").references(() => commentsTable.commentId),
+    postId: integer("post_id").references(() => postsTable.postId),
   }
 );
+
+export const downvoteRelations = relations(downvotesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [downvotesTable.userId],
+    references: [usersTable.userId],
+  }),
+  comment: one(commentsTable, {
+    fields: [downvotesTable.commentId],
+    references: [commentsTable.commentId],
+  }),
+  post: one(postsTable, {
+    fields: [downvotesTable.postId],
+    references: [postsTable.postId],
+  }),
+}));
+
+
+export const favoritesTable = pgTable(
+  "favorites",
+  {
+    favoriteId: serial("favorite_id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => usersTable.userId),
+    postId: integer("post_id").references(() => postsTable.postId),
+    questionId: integer("question_id").references(() => questionsTable.questionId)
+  }
+);
+
+export const favoriteRelations = relations(favoritesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [favoritesTable.userId],
+    references: [usersTable.userId],
+  }),
+  question: one(questionsTable, {
+    fields: [favoritesTable.questionId],
+    references: [questionsTable.questionId],
+  }),
+  post: one(postsTable, {
+    fields: [favoritesTable.postId],
+    references: [postsTable.postId],
+  }),
+}));
 
 
 

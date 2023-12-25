@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-
 import { 
     postsTable, 
     usersTable, 
@@ -13,8 +12,6 @@ import {
     downvotesTable
 } from "@/db/schema";
 import { sql, eq, desc } from "drizzle-orm";
-
-const GetRequestSchema = z.number().min(1)
 
 const GetResponseSchema = z.array(z.object({
     postId: z.number().min(1),
@@ -28,22 +25,9 @@ const GetResponseSchema = z.array(z.object({
     tags: z.array(z.string())
 }))
 
-type GetRequest = z.infer<typeof GetRequestSchema>;
-
 type GetResponse = z.infer<typeof GetResponseSchema>;
 
 export async function GET(req: NextRequest) {
-    const params = req.nextUrl.searchParams;
-    const pageNumber = parseInt(params.get('pageNumber') || '');
-  
-    try {
-        GetRequestSchema.parse(pageNumber);
-    } 
-    catch(error) {
-        console.log("Error parsing request in api/posts/route.ts")
-        return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-    }
-
     const upvotesSubQuery = db.select({
         postId: upvotesTable.postId,
         upvotesCount: sql<number>`cast(count(*) as int)`.as('upvotes'),
@@ -122,6 +106,12 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 
-    const data = combined;
+    combined.sort((a, b) => {
+        const popularityA = a.upvotes + a.downvotes + a.favorites;
+        const popularityB = b.upvotes + b.downvotes + b.favorites;
+        return popularityB - popularityA;
+    })
+
+    const data = combined.slice(0, 3);
     return NextResponse.json(data, { status: 200 });
 }
