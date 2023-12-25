@@ -1,59 +1,59 @@
 'use client';
 
 import React, { useState } from 'react';
+import type { SyntheticEvent } from 'react';
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
+// import type { AlertColor } from '@mui/material';
+import { TextField, Button, Card, CardContent, CardActions, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
+
+// import { login } from '@/lib/api/authentication/api';
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
 function Page() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [snackbarOpen, setSnackbarOpen] = useState(false);
+	const [openSnackbar, setOpenSnackbar] = useState(false);
 	const [snackbarMessage, setSnackbarMessage] = useState('');
 	const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('info');
 	const router = useRouter();
 	const commonTextClass = 'text-base';
 
-	const showSnackbar = (message: string, severity: AlertColor) => {
-		setSnackbarMessage(message);
-		setSnackbarSeverity(severity);
-		setSnackbarOpen(true);
-	};
-
-	const handleSignUp = async () => {
-		if (password !== confirmPassword) {
-			showSnackbar('Passwords do not match', 'error');
-			return;
-		}
-
-		if (password.length < 8) {
-			showSnackbar('Password must be at least 8 characters long', 'error');
-			return;
-		}
-
+	const handleSignIn = async () => {
 		// try {
-		// 	const { user } = await signup(email, password);
-
+		// 	const { user } = await login(email, password);
+		// 	showSnackbar('Sign in successful', 'success');
 		// 	localStorage.setItem('id', `${user.id}`);
-		// 	showSnackbar('Sign up successful', 'success');
-
-		// 	router.push('/operations-management/basic-information');
+		// 	router.push('/home');
 		// } catch (error) {
-		// 	showSnackbar('User already exists', 'error');
+		// 	showSnackbar('Invalid email or password', 'error');
 		// }
 	};
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		await handleSignUp();
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		await handleSignIn();
 	};
 
+	const showSnackbar = (message: string, severity: AlertColor) => {
+		setSnackbarMessage(message);
+		setSnackbarSeverity(severity);
+		setOpenSnackbar(true);
+	};
+
+	const handleCloseSnackbar = (
+		event: Event | SyntheticEvent<Element, Event>,
+		reason?: string,
+	) => {
+		if (reason === 'clickaway') {
+			return;
+		}
+		setOpenSnackbar(false);
+	};
 	return (
 		<Box className="flex h-screen  w-screen justify-center bg-white">
 			<Card
@@ -61,7 +61,7 @@ function Page() {
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '55px' }}>
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '80px' }}>
 						<Image src="/images/logo.png" alt="Logo" width={150} height={150} />
 					</div>
 					<p
@@ -97,40 +97,30 @@ function Page() {
 								setPassword(e.target.value)
 							}
 						/>
-						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
-							label="再次確認密碼"
-							variant="outlined"
-							type="password"
-							value={confirmPassword}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-								setConfirmPassword(e.target.value)
-							}
-						/>
 						<Button
-							className={`mb-4 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
 							type="submit"
+							className={`mb-4 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
 							variant="contained"
-							sx={{ mt: 2, bgcolor: '#35A996' }}
+							style={{ backgroundColor: '#104b76', color: 'white' }}
+						>
+							登入
+						</Button>
+					</form>
+					<div className={`flex flex-row items-center justify-center ${commonTextClass}`}>
+						<span className={`${commonTextClass}`}>還沒註冊嗎？</span>
+						<Button
+							className={`${commonTextClass} m-2 min-w-0 p-0`}
+							sx={{ color: '#104b76' }}
+							onClick={() => router.push('/sign-up')}
 						>
 							註冊
 						</Button>
-						<Button
-							className={`${commonTextClass} w-full`}
-							sx={{ color: '#104b76' }}
-							onClick={() => router.push('/')}
-						>
-							回到登入介面
-						</Button>
-					</form>
+					</div>
 				</CardContent>
-				<Snackbar
-					open={snackbarOpen}
-					autoHideDuration={6000}
-					onClose={() => setSnackbarOpen(false)}
-				>
+
+				<Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
 					<Alert
-						onClose={() => setSnackbarOpen(false)}
+						onClose={handleCloseSnackbar}
 						severity={snackbarSeverity}
 						sx={{ width: '100%' }}
 					>
