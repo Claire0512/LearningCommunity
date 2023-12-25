@@ -38,7 +38,7 @@ export const postsTable = pgTable(
     title: varchar("title").notNull(),
     context: text("context").notNull(),
     posterId: integer("poster_id").notNull().references(() => usersTable.userId),
-    createdTime: timestamp("created_time").default(new Date()),
+    createdAt: timestamp("created_at").default(new Date()),
   }
 );
 
@@ -62,7 +62,8 @@ export const questionsTable = pgTable(
     context: text("context").notNull(),
     posterId: integer("poster_id").notNull().references(() => usersTable.userId),
     isSolved: boolean("is_solved").default(false),
-    helpfulCommentId: integer("helpful_comment_id").references(() => commentsTable.commentId)
+    helpfulCommentId: integer("helpful_comment_id").references(() => commentsTable.commentId),
+    createdAt: timestamp("created_at").default(new Date()),
   }
 );
 
@@ -85,7 +86,8 @@ export const commentsTable: any = pgTable(
     postId: integer("post_id").references(() => postsTable.postId),
     questionId: integer("question_id").references(() => questionsTable.questionId),
     parentCommentId: integer("parent_comment_id").references(() => commentsTable.commentId),
-    isHelpful: boolean("is_helpful").default(false)
+    isHelpful: boolean("is_helpful").default(false),
+    createdAt: timestamp("created_at").default(new Date()),
   }
 );
 

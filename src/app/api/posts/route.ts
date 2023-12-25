@@ -5,9 +5,7 @@ import { db } from "@/db";
 import { 
     postsTable, 
     usersTable, 
-    commentsTable,
-    tagsTable, 
-    postTagsTable, 
+    commentsTable, 
     favoritesTable, 
     upvotesTable,
     downvotesTable
@@ -35,7 +33,7 @@ type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest) {
     const params = req.nextUrl.searchParams;
     const pageNumber = parseInt(params.get('pageNumber') || '');
-  
+
     try {
         GetRequestSchema.parse(pageNumber);
     } 
@@ -82,6 +80,7 @@ export async function GET(req: NextRequest) {
         postTitle: postsTable.title,
         postContext: postsTable.context,
         posterId: postsTable.posterId,
+        createdAt: postsTable.createdAt,
         posterName: usersTable.name,
         profilePicture: usersTable.profilePicture,
         upvotes: upvotesSubQuery.upvotesCount,
@@ -95,7 +94,7 @@ export async function GET(req: NextRequest) {
     .leftJoin(commentsSubQuery, eq(commentsSubQuery.postId, postsTable.postId))
     .leftJoin(favoritesSubQuery, eq(favoritesSubQuery.postId, postsTable.postId))
     .leftJoin(usersTable, eq(usersTable.userId, postsTable.posterId))
-    .orderBy(desc(postsTable.createdTime))
+    .orderBy(desc(postsTable.createdAt))
     
     const postTags = db.query.postsTable.findMany({
         columns: {
@@ -104,7 +103,7 @@ export async function GET(req: NextRequest) {
         with: {
             tags: true
         },
-        orderBy: [desc(postsTable.createdTime)],
+        orderBy: [desc(postsTable.createdAt)],
     })
 
     const [details, allTags] = await Promise.all([postDetails, postTags]);
