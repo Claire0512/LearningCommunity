@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Provider from "@/app/context/client-provider"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 import { ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,13 +21,17 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+	const session = await getServerSession(authOptions)
+
 	return (
 		<html lang="en">
-			<ThemeProvider theme={theme}>
-				<CssBaseline />
-				<body className={`h-screen ${inter.className}`}>{children}</body>
-			</ThemeProvider>
+				<ThemeProvider theme={theme}>
+					<CssBaseline />
+					<Provider session={session}>
+						<body className={`h-screen ${inter.className}`}>{children}</body>
+					</Provider>
+				</ThemeProvider>
 		</html>
 	);
 }
