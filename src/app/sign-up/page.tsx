@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
 
-import signUp from '@/endpoints/users/signup'
+import logIn from '@/endpoints/users/login';
+import signUp from '@/endpoints/users/signup';
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
@@ -39,6 +40,19 @@ function Page() {
 			showSnackbar('Password must be at least 8 characters long', 'error');
 			return;
 		}
+
+		const success = await signUp(email, username, password);
+		if (!success) {
+			showSnackbar('User already exists', 'error');
+			return;
+		}
+
+		const loginSuccess = await logIn(email, password);
+		if (!loginSuccess) {
+			return;
+		}
+
+		router.push('/');
 	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,7 +67,7 @@ function Page() {
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '25px' }}>
 						<Image src="/images/logo.png" alt="Logo" width={100} height={100} />
 					</div>
 					<p
@@ -69,7 +83,6 @@ function Page() {
 						學習互助平台
 					</p>
 					<form onSubmit={handleSubmit}>
-						
 						<TextField
 							className={`mb-4 w-full ${commonTextClass}`}
 							label="電子郵件信箱"

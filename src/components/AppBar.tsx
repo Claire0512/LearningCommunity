@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -183,6 +184,8 @@ function formatNotificationTime(createdAt: string) {
 }
 
 export default function Bar({ activeButton }: { activeButton: string }) {
+	const { data: session } = useSession();
+	console.log(session);
 	const theme = useTheme();
 	const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 	const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);

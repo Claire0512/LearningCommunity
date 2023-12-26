@@ -27,6 +27,7 @@ const sampleUser = {
 	downvotes: 50,
 	favorites: 75,
 	checkmarks: 5,
+	email: '1@gmail.com',
 };
 
 const sampleUserPosts = [
@@ -230,6 +231,9 @@ function Page() {
 				<CardContent sx={{ flex: '1 0 auto', width: '40%', marginTop: '25px' }}>
 					<Typography variant="h6" component="div">
 						{sampleUser.userName}
+					</Typography>
+					<Typography variant="body1" component="div">
+						{sampleUser.email}
 					</Typography>
 					<Stack direction="row" spacing={1} alignItems="center">
 						<FavoriteIcon color="error" /> <span>{sampleUser.hearts}</span>
