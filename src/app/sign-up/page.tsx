@@ -8,10 +8,13 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
 
+import signUp from '@/endpoints/users/signup'
+
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
 function Page() {
 	const [email, setEmail] = useState('');
+	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -44,14 +47,14 @@ function Page() {
 	};
 
 	return (
-		<Box className="flex h-screen  w-screen justify-center bg-white">
+		<Box className="flex h-screen w-screen justify-center bg-white">
 			<Card
 				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0`}
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '55px' }}>
-						<Image src="/images/logo.png" alt="Logo" width={120} height={120} />
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+						<Image src="/images/logo.png" alt="Logo" width={100} height={100} />
 					</div>
 					<p
 						style={{
@@ -66,14 +69,26 @@ function Page() {
 						學習互助平台
 					</p>
 					<form onSubmit={handleSubmit}>
+						
 						<TextField
 							className={`mb-4 w-full ${commonTextClass}`}
-							label="帳號"
+							label="電子郵件信箱"
 							variant="outlined"
 							type="email"
 							value={email}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setEmail(e.target.value)
+							}
+						/>
+
+						<TextField
+							className={`mb-4 w-full ${commonTextClass}`}
+							label="使用者名稱"
+							variant="outlined"
+							type="username"
+							value={username}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+								setUsername(e.target.value)
 							}
 						/>
 						<TextField
