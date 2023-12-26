@@ -18,7 +18,7 @@ const layout = ({ children }: Props) => {
 			className="flex min-h-full flex-col"
 			sx={{ backgroundColor: theme.palette.background.default }}
 		>
-			<Bar activeButton="學習資源" />
+			<Bar activeButton="個人檔案" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">
 				<Box

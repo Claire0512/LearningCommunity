@@ -3,8 +3,8 @@
 import React, { useState, ChangeEvent } from 'react';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import { List, ListItem, ListItemText, ListItemAvatar } from '@mui/material';
@@ -35,6 +35,7 @@ const samplePosts = {
 	downvotes: 15,
 	commentsCount: 45,
 	favorites: 100,
+	createdAt: '2023 11 05 19:00',
 	tags: ['technology', 'gadgets', 'innovation'],
 	comments: [
 		{
@@ -82,13 +83,29 @@ const samplePosts = {
 		},
 	],
 };
+function getTimeDifference(createdAt: string) {
+	const postDate = new Date(createdAt).getTime();
+	const now = new Date().getTime();
+	const differenceInMilliseconds = now - postDate;
 
+	const minutes = Math.floor(differenceInMilliseconds / 60000);
+	const hours = Math.floor(minutes / 60);
+	const days = Math.floor(hours / 24);
+
+	if (minutes < 60) {
+		return `${minutes} 分鐘前`;
+	} else if (hours < 24) {
+		return `${hours} 小時前`;
+	} else {
+		return `${days} 天前`;
+	}
+}
 function Page() {
 	const theme = useTheme();
-	const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with your actual auth logic
-	// const [newComment, setNewComment] = useState('');
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [newComment, setNewComment] = useState('');
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
+	const formattedTime = getTimeDifference(samplePosts.createdAt);
 
 	const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
@@ -97,20 +114,18 @@ function Page() {
 	const handleReplyChange = (commentId: number, event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
 	};
-	// States for icons
+
 	const [upvoted, setUpvoted] = useState(false);
 	const [downvoted, setDownvoted] = useState(false);
-	// const [commented, setCommented] = useState(false);
+
 	const [favorited, setFavorited] = useState(false);
 
-	// Icon click handlers
 	const handleUpvote = () => {
 		if (!isLoggedIn) {
 			alert('登入後才可使用此功能');
 			return;
 		}
 		setUpvoted(!upvoted);
-		// Additional logic for upvote action
 	};
 
 	const handleDownvote = () => {
@@ -119,7 +134,6 @@ function Page() {
 			return;
 		}
 		setDownvoted(!downvoted);
-		// Additional logic for downvote action
 	};
 
 	const handleFavorite = () => {
@@ -128,7 +142,6 @@ function Page() {
 			return;
 		}
 		setFavorited(!favorited);
-		// Additional logic for favorite action
 	};
 
 	const handleSubmitComment = () => {
@@ -143,11 +156,17 @@ function Page() {
 			alert('登入後才可留言哦');
 			return;
 		}
-		// Add logic to submit the reply
 	};
 
 	return (
-		<div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+		<div
+			style={{
+				position: 'relative',
+				display: 'flex',
+				justifyContent: 'center',
+				width: '80%',
+			}}
+		>
 			<a
 				href="/resources"
 				style={{
@@ -175,7 +194,7 @@ function Page() {
 					position: 'relative',
 				}}
 			>
-				<CardContent sx={{ flex: '1 0 auto' }}>
+				<CardContent sx={{ flex: '1 0 auto', paddingBottom: '0px' }}>
 					<Stack
 						direction="row"
 						spacing={2}
@@ -186,29 +205,19 @@ function Page() {
 						<Typography variant="subtitle1" component="div">
 							{samplePosts.posterName}
 						</Typography>
-						<Box
-							sx={{
-								display: 'flex',
-								gap: 0.5,
-								overflow: 'hidden',
-								flexWrap: 'wrap',
-								margin: '5px',
-							}}
-						>
-							{samplePosts.tags.map((tag) => (
-								<Chip key={tag} label={tag} size="small" data-tag={tag} />
-							))}
-						</Box>
+						<Typography variant="body2" sx={{ marginLeft: 1 }}>
+							{formattedTime}
+						</Typography>
 					</Stack>
-					<Typography variant="h4" component="div">
+					<Typography
+						variant="h4"
+						component="div"
+						sx={{ marginTop: '10px', marginLeft: '5px' }}
+					>
 						{samplePosts.postTitle}
 					</Typography>
-					<Stack
-						direction="row"
-						spacing={1}
-						alignItems="center"
-						sx={{ p: 2, pl: 0, pt: 2, mt: 'auto' }}
-					>
+
+					<Stack direction="row" spacing={1} alignItems="center">
 						<IconButton
 							onClick={handleUpvote}
 							color={upvoted ? 'secondary' : 'default'}
@@ -231,17 +240,17 @@ function Page() {
 							onClick={handleFavorite}
 							color={favorited ? 'secondary' : 'default'}
 						>
-							<FavoriteIcon />
+							<BookmarkIcon />
 						</IconButton>
 						<Typography variant="body2">{samplePosts.favorites}</Typography>
 					</Stack>
 					<Divider
 						sx={{
-							borderWidth: 1, // this will make it thicker
+							borderWidth: 1,
 							borderStyle: 'solid',
-							borderRadius: '2px', // adjust the border-radius as needed
+							borderRadius: '2px',
 							bgcolor: theme.palette.background.default,
-							my: 2,
+							my: 1,
 						}}
 					/>
 
@@ -250,15 +259,31 @@ function Page() {
 						color="text.main"
 						component="div"
 						sx={{
-							lineHeight: '30px', // Adjust this value based on your design
+							lineHeight: '30px',
 							fontSize: '22px',
+							marginLeft: '10px',
 						}}
 					>
 						{samplePosts.postContext}
 					</Typography>
+					<Box
+						sx={{
+							display: 'flex',
+							gap: 0.5,
+							overflow: 'hidden',
+							flexWrap: 'wrap',
+							paddingLeft: '0px',
+							marginLeft: '10px',
+							marginTop: '10px',
+						}}
+					>
+						{samplePosts.tags.map((tag) => (
+							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
+						))}
+					</Box>
 				</CardContent>
 
-				<CardContent>
+				<CardContent sx={{ paddingTop: '5px' }}>
 					<List sx={{ borderRadius: '30px' }}>
 						{samplePosts.comments.map((comment, index) => (
 							<React.Fragment key={comment.commentId}>
@@ -277,12 +302,11 @@ function Page() {
 										secondaryTypographyProps={{
 											variant: 'body2',
 											color: 'text.secondary',
-											sx: { wordBreak: 'break-word' }, // Apply styles directly using sx prop
+											sx: { wordBreak: 'break-word' },
 										}}
 									/>
 								</ListItem>
 
-								{/* Display replies with inset dividers */}
 								{comment.replies &&
 									comment.replies.map((reply, replyIndex) => (
 										<React.Fragment key={reply.commentId}>
@@ -303,7 +327,7 @@ function Page() {
 													secondaryTypographyProps={{
 														variant: 'body2',
 														color: 'text.secondary',
-														sx: { wordBreak: 'break-word' }, // Apply styles directly using sx prop
+														sx: { wordBreak: 'break-word' },
 													}}
 												/>
 											</ListItem>
@@ -332,7 +356,7 @@ function Page() {
 													color="secondary"
 													sx={{
 														'& .MuiOutlinedInput-root': {
-															borderRadius: '20px', // Rounded corners for the TextField
+															borderRadius: '20px',
 														},
 													}}
 												/>
@@ -345,7 +369,7 @@ function Page() {
 													sx={{
 														mt: 2,
 														bgcolor: `${theme.palette.secondary.main} !important`,
-														height: '40px', // Adjust the height as needed
+														height: '40px',
 														borderRadius: '20px',
 													}}
 													color="secondary"
@@ -359,7 +383,7 @@ function Page() {
 							</React.Fragment>
 						))}
 						<Divider />
-						{/* Add Comment Section */}
+
 						{
 							<ListItem>
 								<ListItemText>
@@ -373,9 +397,9 @@ function Page() {
 											color="secondary"
 											sx={{
 												'& .MuiOutlinedInput-root': {
-													borderRadius: '20px', // Applies rounded corners
+													borderRadius: '20px',
 													'& fieldset': {
-														borderRadius: '20px', // Ensures the border also has rounded corners
+														borderRadius: '20px',
 													},
 												},
 											}}
@@ -387,7 +411,7 @@ function Page() {
 											sx={{
 												mt: 2,
 												bgcolor: `${theme.palette.secondary.main} !important`,
-												height: '40px', // Adjust the height as needed
+												height: '40px',
 												borderRadius: '20px',
 											}}
 											color="secondary"

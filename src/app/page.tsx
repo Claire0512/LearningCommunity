@@ -2,10 +2,8 @@
 
 import React from 'react';
 
-import Link from 'next/link';
-
 import Bar from '../components/AppBar';
-import { Card, CardActions, CardContent, Button, Typography, CardMedia } from '@mui/material';
+import { Card, CardContent, Typography, CardMedia } from '@mui/material';
 import Box from '@mui/material/Box';
 
 const cardData = [
@@ -35,17 +33,11 @@ const cardData = [
 ];
 
 export default function Home() {
-	// const { isRedirecting, redirectURL } = useRedirect();
-	// if (isRedirecting) redirect(redirectURL);
 	return (
-		// <Box className="flex min-h-full bg-white">
-
 		<Box component="main" className="flex min-h-full flex-col bg-[#F9F5EB]">
 			<Bar activeButton="首頁" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">
-				{/* <AppNews /> */}
-
 				<Box
 					sx={{
 						height: '75%',
@@ -55,26 +47,28 @@ export default function Home() {
 						flexDirection: 'column',
 						alignItems: 'center',
 						padding: 15,
-						// mt: 1,
 					}}
 				>
-					<Box className="mt-16 flex h-full w-full justify-between">
+					<Box className="mt-16 flex h-full w-full justify-between ">
 						{cardData.map((card, index) => (
 							<Card
 								key={index}
-								className="relative mx-3 mb-1 h-[267px] flex-1"
+								className="relative mx-3 mb-1 h-[267px] flex-1 bg-[#FCFAF5]"
 								sx={{
 									overflow: 'visible',
 									...(index === 0 && { marginRight: 'auto' }),
 									...(index === 1 && { marginX: 'auto' }),
 									...(index === 2 && { marginLeft: 'auto' }),
+									borderRadius: '10px',
 								}}
 							>
 								<Box
 									sx={{
-										bgcolor: '#104b76',
-										height: '20%',
+										bgcolor: '#BFD1ED',
+										height: '15%',
 										position: 'relative',
+										borderTopLeftRadius: '10px',
+										borderTopRightRadius: '10px',
 									}}
 								>
 									<CardMedia
@@ -83,7 +77,7 @@ export default function Home() {
 											width: '150px',
 											height: '150px',
 											position: 'absolute',
-											top: -88,
+											top: 120,
 											right: 10,
 										}}
 										image={card.image}
@@ -111,14 +105,6 @@ export default function Home() {
 										</Typography>
 									))}
 								</CardContent>
-
-								<CardActions className="absolute bottom-0 right-0 ">
-									<Link href={card.link}>
-										<Button size="small" sx={{ color: '#104b76' }}>
-											{card.buttonText}
-										</Button>
-									</Link>
-								</CardActions>
 							</Card>
 						))}
 					</Box>

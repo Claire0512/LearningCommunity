@@ -44,7 +44,6 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 	};
 
 	const onSaveClicked = () => {
-		// Flatten selected tags into an array
 		const selected: SelectedTag[] = Object.entries(selectedTags).flatMap(
 			([category, tagsById]) =>
 				Object.entries(tagsById)
@@ -65,7 +64,7 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 			fullWidth
 			PaperProps={{
 				sx: {
-					borderRadius: '30px', // Adjust this value as needed
+					borderRadius: '30px',
 				},
 			}}
 		>
@@ -73,7 +72,6 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				color="primary"
 				sx={{
 					fontWeight: 'bold',
-					// color: theme.palette.primary.main,
 					fontSize: '30px',
 					textAlign: 'center',
 				}}

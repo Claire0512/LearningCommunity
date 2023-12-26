@@ -36,17 +36,6 @@ function Page() {
 			showSnackbar('Password must be at least 8 characters long', 'error');
 			return;
 		}
-
-		// try {
-		// 	const { user } = await signup(email, password);
-
-		// 	localStorage.setItem('id', `${user.id}`);
-		// 	showSnackbar('Sign up successful', 'success');
-
-		// 	router.push('/operations-management/basic-information');
-		// } catch (error) {
-		// 	showSnackbar('User already exists', 'error');
-		// }
 	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,15 +51,15 @@ function Page() {
 			>
 				<CardContent>
 					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '55px' }}>
-						<Image src="/images/logo.png" alt="Logo" width={150} height={150} />
+						<Image src="/images/logo.png" alt="Logo" width={120} height={120} />
 					</div>
 					<p
 						style={{
 							fontWeight: 'bold',
 							color: '#104b76',
-							fontSize: '32px', // 增加字体大小
-							textAlign: 'center', // 文本居中
-							marginBottom: '20px', // 可选，增加与图片的间距
+							fontSize: '32px',
+							textAlign: 'center',
+							marginBottom: '20px',
 							marginTop: '20px',
 						}}
 					>

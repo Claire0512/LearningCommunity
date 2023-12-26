@@ -2,18 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 
-import Bar from '../../components/AppBar';
 import PostCard from '../../components/PostCard';
 import TagsSelector from '../../components/TagsSelector';
 import ArticleIcon from '@mui/icons-material/Article';
-// import useRedirect from '@/hooks/useRedirect';
+import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import { Box, Button, Dialog, TextField, Chip, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, Fab, Box, Button, Dialog, TextField, Chip, Typography } from '@mui/material';
 
 import type { PostCardType } from '@/lib/types';
 
-// Import your TagsSelector component
 const sampleTags = {
 	grades: [
 		{ id: 1, name: 'Grade 1' },
@@ -40,6 +37,7 @@ const sampleHotPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['technology', 'gadgets', 'innovation'],
 	},
 	{
@@ -53,6 +51,7 @@ const sampleHotPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['health', 'diet', 'nutrition'],
 	},
 	{
@@ -66,6 +65,7 @@ const sampleHotPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['travel', 'adventure', 'destinations'],
 	},
 ];
@@ -81,6 +81,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['food', 'recipes', 'cooking'],
 	},
 	{
@@ -94,6 +95,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['travel', 'budget', 'advice'],
 	},
 	{
@@ -107,6 +109,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['food', 'recipes', 'cooking'],
 	},
 	{
@@ -120,6 +123,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['travel', 'budget', 'advice'],
 	},
 	{
@@ -133,6 +137,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['food', 'recipes', 'cooking'],
 	},
 	{
@@ -146,6 +151,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['travel', 'budget', 'advice'],
 	},
 	{
@@ -159,6 +165,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['food', 'recipes', 'cooking'],
 	},
 	{
@@ -172,6 +179,7 @@ const sampleAllPosts = [
 		downvotes: 15,
 		commentsCount: 45,
 		favorites: 100,
+		createdAt: '2023 11 05 19:00',
 		tags: ['travel', 'budget', 'advice'],
 	},
 ];
@@ -187,11 +195,10 @@ interface SelectedTag extends Tag {
 function Page() {
 	const theme = useTheme();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	// Define the type of setSelectedTags based on the SelectedTag interface
 	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<PostCardType[]>(sampleAllPosts);
 	const [searchInput, setSearchInput] = useState('');
-
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleSave = (selected: SelectedTag[]) => {
@@ -199,7 +206,12 @@ function Page() {
 		handleCloseModal();
 		console.log('Selected tags:', selected);
 	};
-
+	const handleCreatePostClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+		if (!isLoggedIn) {
+			alert('登入後才可發文哦');
+			event.preventDefault();
+		}
+	};
 	useEffect(() => {
 		const filterByTags =
 			selectedTags.length > 0
@@ -216,7 +228,7 @@ function Page() {
 			(post: PostCardType) => filterByTags(post) && filterBySearch(post),
 		);
 		setFilteredPosts(newFilteredPosts);
-	}, [selectedTags, searchInput]); // Include searchInput in dependency array
+	}, [selectedTags, searchInput]);
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
@@ -311,6 +323,24 @@ function Page() {
 					<PostCard {...post} />
 				))}
 			</Box>
+			<a
+				href="/resources/post/new"
+				style={{ textDecoration: 'none' }}
+				onClick={handleCreatePostClick}
+			>
+				<Fab
+					color="secondary"
+					aria-label="我要發文"
+					style={{
+						position: 'fixed',
+						bottom: 20,
+						right: 20,
+						backgroundColor: `${theme.palette.secondary.main} !important`,
+					}}
+				>
+					<CreateIcon />
+				</Fab>
+			</a>
 		</>
 	);
 }

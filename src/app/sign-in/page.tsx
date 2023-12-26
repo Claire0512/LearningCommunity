@@ -6,11 +6,8 @@ import type { SyntheticEvent } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-// import type { AlertColor } from '@mui/material';
-import { TextField, Button, Card, CardContent, CardActions, Snackbar, Alert } from '@mui/material';
+import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
-
-// import { login } from '@/lib/api/authentication/api';
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
@@ -23,16 +20,7 @@ function Page() {
 	const router = useRouter();
 	const commonTextClass = 'text-base';
 
-	const handleSignIn = async () => {
-		// try {
-		// 	const { user } = await login(email, password);
-		// 	showSnackbar('Sign in successful', 'success');
-		// 	localStorage.setItem('id', `${user.id}`);
-		// 	router.push('/home');
-		// } catch (error) {
-		// 	showSnackbar('Invalid email or password', 'error');
-		// }
-	};
+	const handleSignIn = async () => {};
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -62,15 +50,15 @@ function Page() {
 			>
 				<CardContent>
 					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '80px' }}>
-						<Image src="/images/logo.png" alt="Logo" width={150} height={150} />
+						<Image src="/images/logo.png" alt="Logo" width={120} height={120} />
 					</div>
 					<p
 						style={{
 							fontWeight: 'bold',
 							color: '#104b76',
-							fontSize: '32px', // 增加字体大小
-							textAlign: 'center', // 文本居中
-							marginBottom: '20px', // 可选，增加与图片的间距
+							fontSize: '32px',
+							textAlign: 'center',
+							marginBottom: '20px',
 							marginTop: '20px',
 						}}
 					>

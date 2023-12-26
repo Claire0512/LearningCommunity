@@ -2,17 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
-import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Card, CardContent, Typography, Avatar, Chip, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-import type { PostCardType } from '@/lib/types';
+import type { QuestionCardType } from '@/lib/types';
 
 function getTimeDifference(createdAt: string) {
-	const postDate = new Date(createdAt).getTime();
+	const questionDate = new Date(createdAt).getTime();
 	const now = new Date().getTime();
-	const differenceInMilliseconds = now - postDate;
+	const differenceInMilliseconds = now - questionDate;
 
 	const minutes = Math.floor(differenceInMilliseconds / 60000);
 	const hours = Math.floor(minutes / 60);
@@ -27,11 +26,10 @@ function getTimeDifference(createdAt: string) {
 	}
 }
 
-function PostCard(post: PostCardType) {
-	const [visibleTags, setVisibleTags] = useState<string[]>(post.tags);
+function QuestionCard(question: QuestionCardType) {
+	const [visibleTags, setVisibleTags] = useState<string[]>(question.tags);
 	const tagContainerRef = useRef<HTMLDivElement>(null);
-	const theme = useTheme();
-	const formattedTime = getTimeDifference(post.createdAt);
+	const formattedTime = getTimeDifference(question.createdAt);
 
 	useEffect(() => {
 		const updateVisibleTags = () => {
@@ -41,7 +39,7 @@ function PostCard(post: PostCardType) {
 				let accumulatedWidth = 0;
 				const newVisibleTags: string[] = [];
 
-				post.tags.forEach((tag) => {
+				question.tags.forEach((tag) => {
 					const tagElement = container.querySelector(
 						`[data-tag="${tag}"]`,
 					) as HTMLElement;
@@ -64,7 +62,7 @@ function PostCard(post: PostCardType) {
 		return () => {
 			window.removeEventListener('resize', updateVisibleTags);
 		};
-	}, [post.tags]);
+	}, [question.tags]);
 
 	return (
 		<Card
@@ -84,7 +82,7 @@ function PostCard(post: PostCardType) {
 					top: 0,
 					bottom: 0,
 					width: '15px',
-					backgroundColor: theme.palette.secondary.main,
+					backgroundColor: question.isSolved ? '#C0EDCA' : '#EDC0C0',
 				},
 			}}
 		>
@@ -95,28 +93,23 @@ function PostCard(post: PostCardType) {
 					alignItems="center"
 					sx={{ flexWrap: 'nowrap', overflow: 'hidden' }}
 				>
-					<Avatar alt={post.posterName} src={post.profilePicture} />
-					<Typography
-						variant="subtitle1"
-						component="div"
-						noWrap
-						sx={{ paddingTop: '5px' }}
-					>
-						{post.posterName}
+					<Avatar alt={question.questionerName} src={question.profilePicture} />
+					<Typography variant="subtitle1" component="div" noWrap>
+						{question.questionerName}
 					</Typography>
 					<Typography variant="body2" sx={{ marginLeft: 1 }}>
 						{formattedTime}
 					</Typography>
 				</Stack>
-				<Typography variant="h6" component="div" noWrap>
-					{post.postTitle}
+				<Typography variant="h6" component="div" noWrap sx={{ paddingTop: '5px' }}>
+					{question.questionTitle}
 				</Typography>
 				<Typography
 					variant="body2"
 					color="text.secondary"
 					sx={{
 						display: '-webkit-box',
-						WebkitLineClamp: 1,
+						WebkitLineClamp: 2,
 						WebkitBoxOrient: 'vertical',
 						overflow: 'hidden',
 						lineHeight: '20px',
@@ -125,7 +118,7 @@ function PostCard(post: PostCardType) {
 						paddingTop: '5px',
 					}}
 				>
-					{post.postContext}
+					{question.questionContext}
 				</Typography>
 				<Box
 					ref={tagContainerRef}
@@ -142,17 +135,16 @@ function PostCard(post: PostCardType) {
 				alignItems="center"
 				sx={{ p: 2, pl: 4, pt: 0, mt: 'auto' }}
 			>
-				<ThumbUpAltIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
-				<Typography variant="body2">{post.upvotes}</Typography>
-				<ThumbDownAltIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
-				<Typography variant="body2">{post.downvotes}</Typography>
+				<FavoriteIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<Typography variant="body2">{question.upvotes}</Typography>
+
 				<CommentIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
-				<Typography variant="body2">{post.commentsCount}</Typography>
+				<Typography variant="body2">{question.commentsCount}</Typography>
 				<BookmarkIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
-				<Typography variant="body2">{post.favorites}</Typography>
+				<Typography variant="body2">{question.favorites}</Typography>
 			</Stack>
 		</Card>
 	);
 }
 
-export default PostCard;
+export default QuestionCard;
