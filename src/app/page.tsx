@@ -1,5 +1,4 @@
 'use client';
-import { useSession } from "next-auth/react"
 
 import React from 'react';
 
@@ -7,7 +6,6 @@ import Bar from '../components/AppBar';
 import { Card, CardContent, Typography, CardMedia } from '@mui/material';
 import Box from '@mui/material/Box';
 
-<<<<<<< HEAD
 const cardData = [
 	{
 		title: '討論專區',
@@ -33,28 +31,6 @@ const cardData = [
 		link: '/operations-management/basic-information',
 	},
 ];
-=======
-import logIn from '@/endpoints/users/login';
-
-type AlertColor = 'success' | 'info' | 'warning' | 'error';
-
-function Page() {
-	const { data: session } = useSession()
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [openSnackbar, setOpenSnackbar] = useState(false);
-	const [snackbarMessage, setSnackbarMessage] = useState('');
-	const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('info');
-	const router = useRouter();
-	const commonTextClass = 'text-base';
-
-	const handleSignIn = async () => {
-		const result = await logIn(email, password);
-		if (!result) {
-			showSnackbar('Invalid email or password', 'error');
-		}
-	};
->>>>>>> e34c34d (Add login/logout support)
 
 export default function Home() {
 	return (
