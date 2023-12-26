@@ -1,125 +1,115 @@
 'use client';
 
-import React, { useState } from 'react';
-import type { SyntheticEvent } from 'react';
+import React from 'react';
 
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-
-// import type { AlertColor } from '@mui/material';
-import { TextField, Button, Card, CardContent, CardActions, Snackbar, Alert } from '@mui/material';
+import Bar from '../components/AppBar';
+import { Card, CardContent, Typography, CardMedia } from '@mui/material';
 import Box from '@mui/material/Box';
 
-// import { login } from '@/lib/api/authentication/api';
+const cardData = [
+	{
+		title: '討論專區',
+		description:
+			'概覽：在營業前，速覽一下菜單吧\n菜單：可新增菜單或編輯訂單\n品項控管：管理販售中以及暫停販售的品項',
+		buttonText: '新建你的第一份菜單',
+		image: '/images/1.png',
+		link: '/menus-management/menus',
+	},
+	{
+		title: '學習資源',
+		description:
+			'新訂單：選擇是否接受訂單\n進行中：可以延時或者取消訂單\n等待取餐：餐點準備完成\n已完成：可察看歷史訂單',
+		buttonText: '開始管理你的訂單',
+		image: '/images/2.png',
+		link: '/orders-management/incoming-orders',
+	},
+	{
+		title: '個人檔案',
+		description: '在這裡可以編輯你的個人資訊，還有查看你發布和收藏的問題以及文章哦！',
+		buttonText: '看看本月表現如何吧',
+		image: '/images/3.png',
+		link: '/operations-management/basic-information',
+	},
+];
 
-type AlertColor = 'success' | 'info' | 'warning' | 'error';
-
-function Page() {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [openSnackbar, setOpenSnackbar] = useState(false);
-	const [snackbarMessage, setSnackbarMessage] = useState('');
-	const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('info');
-	const router = useRouter();
-	const commonTextClass = 'text-base';
-
-	const handleSignIn = async () => {
-		// try {
-		// 	const { user } = await login(email, password);
-		// 	showSnackbar('Sign in successful', 'success');
-		// 	localStorage.setItem('id', `${user.id}`);
-		// 	router.push('/home');
-		// } catch (error) {
-		// 	showSnackbar('Invalid email or password', 'error');
-		// }
-	};
-
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		await handleSignIn();
-	};
-
-	const showSnackbar = (message: string, severity: AlertColor) => {
-		setSnackbarMessage(message);
-		setSnackbarSeverity(severity);
-		setOpenSnackbar(true);
-	};
-
-	const handleCloseSnackbar = (
-		event: Event | SyntheticEvent<Element, Event>,
-		reason?: string,
-	) => {
-		if (reason === 'clickaway') {
-			return;
-		}
-		setOpenSnackbar(false);
-	};
+export default function Home() {
 	return (
-		<Box className="flex h-screen  w-screen justify-center bg-white">
-			<Card
-				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0`}
-				elevation={0}
-			>
-				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-						<Image src="/images/logo.png" alt="Logo" width={280} height={280} />
-					</div>
+		<Box component="main" className="flex min-h-full flex-col bg-[#F9F5EB]">
+			<Bar activeButton="首頁" />
 
-					<form onSubmit={handleSubmit}>
-						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
-							label="帳號"
-							variant="outlined"
-							type="email"
-							value={email}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-								setEmail(e.target.value)
-							}
-						/>
-						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
-							label="密碼"
-							variant="outlined"
-							type="password"
-							value={password}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-								setPassword(e.target.value)
-							}
-						/>
-						<Button
-							type="submit"
-							className={`mb-4 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
-							variant="contained"
-							style={{ backgroundColor: '#104b76', color: 'white' }}
-						>
-							登入
-						</Button>
-					</form>
-				</CardContent>
-				<CardActions className="flex w-full flex-col">
-					<div className={`flex flex-row items-center justify-center ${commonTextClass}`}>
-						<span className={`${commonTextClass}`}>還沒註冊嗎？</span>
-						<Button
-							className={`${commonTextClass} m-2 min-w-0 p-0`}
-							sx={{ color: '#104b76' }}
-							onClick={() => router.push('/sign-up')}
-						>
-							註冊
-						</Button>
-					</div>
-				</CardActions>
-				<Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-					<Alert
-						onClose={handleCloseSnackbar}
-						severity={snackbarSeverity}
-						sx={{ width: '100%' }}
-					>
-						{snackbarMessage}
-					</Alert>
-				</Snackbar>
-			</Card>
+			<Box className="mt-[100px] flex flex-1 flex-col items-center">
+				<Box
+					sx={{
+						height: '75%',
+						width: '100%',
+						overflow: 'visible',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						padding: 15,
+					}}
+				>
+					<Box className="mt-16 flex h-full w-full justify-between ">
+						{cardData.map((card, index) => (
+							<Card
+								key={index}
+								className="relative mx-3 mb-1 h-[267px] flex-1 bg-[#FCFAF5]"
+								sx={{
+									overflow: 'visible',
+									...(index === 0 && { marginRight: 'auto' }),
+									...(index === 1 && { marginX: 'auto' }),
+									...(index === 2 && { marginLeft: 'auto' }),
+									borderRadius: '10px',
+								}}
+							>
+								<Box
+									sx={{
+										bgcolor: '#BFD1ED',
+										height: '15%',
+										position: 'relative',
+										borderTopLeftRadius: '10px',
+										borderTopRightRadius: '10px',
+									}}
+								>
+									<CardMedia
+										component="img"
+										sx={{
+											width: '150px',
+											height: '150px',
+											position: 'absolute',
+											top: 120,
+											right: 10,
+										}}
+										image={card.image}
+										alt={card.title}
+									/>
+								</Box>
+								<CardContent>
+									<Typography
+										gutterBottom
+										variant="h5"
+										component="div"
+										className="font-black"
+									>
+										{card.title}
+									</Typography>
+									{card.description.split('\n').map((line, index) => (
+										<Typography
+											key={index}
+											variant="body2"
+											color="text.secondary"
+											component="div"
+											className="mt-1 font-bold"
+										>
+											{line}
+										</Typography>
+									))}
+								</CardContent>
+							</Card>
+						))}
+					</Box>
+				</Box>
+			</Box>
 		</Box>
 	);
 }
-
-export default Page;

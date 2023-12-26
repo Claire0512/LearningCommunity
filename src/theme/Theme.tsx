@@ -6,12 +6,14 @@ export const theme = createTheme({
 	palette: {
 		primary: {
 			main: '#104b76',
+			light: '#527da3',
+			dark: '#000000',
 		},
 		secondary: {
-			main: '#44bdea',
+			main: '#BFD1ED',
 		},
 		background: {
-			default: '#F0F0F0',
+			default: '#F9F5EB',
 		},
 		text: {
 			primary: '#000000',
@@ -21,5 +23,17 @@ export const theme = createTheme({
 	},
 	typography: {
 		fontFamily: ['Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
+	},
+	components: {
+		// Name of the component
+		MuiButton: {
+			styleOverrides: {
+				// Name of the slot
+				root: {
+					// Some CSS
+					backgroundColor: '#BFD1ED',
+				},
+			},
+		},
 	},
 });
