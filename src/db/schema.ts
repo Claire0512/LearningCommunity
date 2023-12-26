@@ -35,9 +35,10 @@ export const postsTable = pgTable(
   "posts",
   {
     postId: serial("post_id").primaryKey(),
-    title: varchar("title").notNull(),
-    context: text("context").notNull(),
+    postTitle: varchar("post_title").notNull(),
+    postContext: text("post_context").notNull(),
     posterId: integer("poster_id").notNull().references(() => usersTable.userId),
+    postImage: varchar("post_image"),
     createdAt: timestamp("created_at").default(new Date()),
   }
 );
@@ -58,9 +59,9 @@ export const questionsTable = pgTable(
   "questions",
   {
     questionId: serial("question_id").primaryKey(),
-    title: varchar("title").notNull(),
-    context: text("context").notNull(),
-    posterId: integer("poster_id").notNull().references(() => usersTable.userId),
+    questionTitle: varchar("question_title").notNull(),
+    questionContext: text("question_context").notNull(),
+    questionerId: integer("questioner_id").notNull().references(() => usersTable.userId),
     isSolved: boolean("is_solved").default(false),
     helpfulCommentId: integer("helpful_comment_id").references(() => commentsTable.commentId),
     createdAt: timestamp("created_at").default(new Date()),
@@ -69,7 +70,7 @@ export const questionsTable = pgTable(
 
 export const questionsRelations = relations(questionsTable, ({ one, many }) => ({
   user: one(usersTable, {
-    fields: [questionsTable.posterId],
+    fields: [questionsTable.questionerId],
     references: [usersTable.userId],
   }),
   comments: many(commentsTable),

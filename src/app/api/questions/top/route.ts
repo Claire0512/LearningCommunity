@@ -2,22 +2,20 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
 import { 
-    postsTable, 
+    questionsTable, 
     usersTable, 
     commentsTable,
-    tagsTable, 
-    postTagsTable, 
     favoritesTable, 
     upvotesTable,
-    downvotesTable
 } from "@/db/schema";
 import { sql, eq, desc } from "drizzle-orm";
 
 const GetResponseSchema = z.array(z.object({
-    postId: z.number().min(1),
-    postTitle: z.string(),
-    postContext: z.string().min(1),
-    posterId: z.number(),
+    questionId: z.number().min(1),
+    questionTitle: z.string(),
+    questionContext: z.string().min(1),
+    questionerId: z.number(),
+    isSolved: z.boolean(),
     upvotes: z.number(),
     downvotes: z.number(),
     commentsCount: z.number(),
@@ -29,69 +27,60 @@ type GetResponse = z.infer<typeof GetResponseSchema>;
 
 export async function GET(req: NextRequest) {
     const upvotesSubQuery = db.select({
-        postId: upvotesTable.postId,
+        questionId: upvotesTable.questionId,
         upvotesCount: sql<number>`cast(count(*) as int)`.as('upvotes'),
     })
     .from(upvotesTable)
-    .groupBy(upvotesTable.postId)
+    .groupBy(upvotesTable.questionId)
     .as('upvotesSubQuery');
     
-    const downvotesSubQuery = db.select({
-        postId: downvotesTable.postId,
-        downvotesCount: sql<number>`cast(count(*) as int)`.as('downvotesCount'),
-    })
-    .from(downvotesTable)
-    .groupBy(downvotesTable.postId)
-    .as('downvotesSubQuery');
-
     const commentsSubQuery = db.select({
-        postId: commentsTable.postId,
+        questionId: commentsTable.questionId,
         commentsCount: sql<number>`cast(count(*) as int)`.as('commentsCount')
     })
     .from(commentsTable)
-    .groupBy(commentsTable.postId)
+    .groupBy(commentsTable.questionId)
     .as('commentsSubQuery');
 
     const favoritesSubQuery = db.select({
-        postId: favoritesTable.postId,
+        questionId: favoritesTable.questionId,
         favoritesCount: sql<number>`cast(count(*) as int)`.as('favoritesCount')
     })
     .from(favoritesTable)
-    .groupBy(favoritesTable.postId)
+    .groupBy(favoritesTable.questionId)
     .as('favoritesSubQuery');
 
     
-    const postDetails = db.select({
-        postId: postsTable.postId,
-        postTitle: postsTable.title,
-        postContext: postsTable.context,
-        posterId: postsTable.posterId,
-        posterName: usersTable.name,
+    const questionDetails = db.select({
+        questionId: questionsTable.questionId,
+        questionTitle: questionsTable.questionTitle,
+        questionContext: questionsTable.questionContext,
+        questionerId: questionsTable.questionerId,
+        isSolved: questionsTable.isSolved,
+        questionerName: usersTable.name,
         profilePicture: usersTable.profilePicture,
         upvotes: upvotesSubQuery.upvotesCount,
-        downvotes: downvotesSubQuery.downvotesCount,
         commentsCount: commentsSubQuery.commentsCount,
         favorites: favoritesSubQuery.favoritesCount,
     })
-    .from(postsTable)
-    .leftJoin(upvotesSubQuery, eq(upvotesSubQuery.postId, postsTable.postId))
-    .leftJoin(downvotesSubQuery, eq(downvotesSubQuery.postId, postsTable.postId))
-    .leftJoin(commentsSubQuery, eq(commentsSubQuery.postId, postsTable.postId))
-    .leftJoin(favoritesSubQuery, eq(favoritesSubQuery.postId, postsTable.postId))
-    .leftJoin(usersTable, eq(usersTable.userId, postsTable.posterId))
-    .orderBy(desc(postsTable.createdTime))
+    .from(questionsTable)
+    .leftJoin(upvotesSubQuery, eq(upvotesSubQuery.questionId, questionsTable.questionId))
+    .leftJoin(commentsSubQuery, eq(commentsSubQuery.questionId, questionsTable.questionId))
+    .leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
+    .leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
+    .orderBy(desc(questionsTable.createdAt))
     
-    const postTags = db.query.postsTable.findMany({
+    const questionTags = db.query.questionsTable.findMany({
         columns: {
-            postId: true,
+            questionId: true,
         },
         with: {
             tags: true
         },
-        orderBy: [desc(postsTable.createdTime)],
+        orderBy: [desc(questionsTable.createdAt)],
     })
 
-    const [details, allTags] = await Promise.all([postDetails, postTags]);
+    const [details, allTags] = await Promise.all([questionDetails, questionTags]);
 
     const combined = details.map((detail, index) => ({
         ...detail,
@@ -102,13 +91,13 @@ export async function GET(req: NextRequest) {
         GetResponseSchema.parse(combined);
     }
     catch (error) {
-        console.log("Error parsing response in api/posts/route.ts")
+        console.log("Error parsing response in api/questions/top/route.ts")
         return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 
     combined.sort((a, b) => {
-        const popularityA = a.upvotes + a.downvotes + a.favorites;
-        const popularityB = b.upvotes + b.downvotes + b.favorites;
+        const popularityA = a.upvotes + a.favorites;
+        const popularityB = b.upvotes + b.favorites;
         return popularityB - popularityA;
     })
 

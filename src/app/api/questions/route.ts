@@ -3,36 +3,35 @@ import { z } from "zod";
 import { db } from "@/db";
 
 import { 
-    postsTable, 
+    questionsTable, 
     usersTable, 
     commentsTable, 
     favoritesTable, 
     upvotesTable,
-    downvotesTable,
     tagsTable,
-    postTagsTable
+    questionTagsTable
 } from "@/db/schema";
 import { sql, eq, desc } from "drizzle-orm";
 
 const GetRequestSchema = z.number().min(1)
 
 const GetResponseSchema = z.array(z.object({
-    postId: z.number().min(1),
-    postTitle: z.string().min(1),
-    postContext: z.string().min(1),
-    posterId: z.number(),
+    questionId: z.number().min(1),
+    questionTitle: z.string().min(1),
+    questionContext: z.string().min(1),
+    questionerId: z.number(),
     upvotes: z.number(),
-    downvotes: z.number(),
     commentsCount: z.number(),
     favorites: z.number(),
+    isSolved: z.boolean(),
     tags: z.array(z.string())
 }))
 
 const PostRequestSchema = z.object({
-    postTitle: z.string().min(1),
-    postContext: z.string().min(1),
-    posterId: z.number(),
-    postImage: z.string().optional(),
+    questionTitle: z.string().min(1),
+    questionContext: z.string().min(1),
+    questionerId: z.number(),
+    questionImage: z.string().optional(),
     tags: z.array(z.string())
 })
 
@@ -55,70 +54,61 @@ export async function GET(req: NextRequest) {
     }
 
     const upvotesSubQuery = db.select({
-        postId: upvotesTable.postId,
+        questionId: upvotesTable.questionId,
         upvotesCount: sql<number>`cast(count(*) as int)`.as('upvotes'),
     })
     .from(upvotesTable)
-    .groupBy(upvotesTable.postId)
+    .groupBy(upvotesTable.questionId)
     .as('upvotesSubQuery');
     
-    const downvotesSubQuery = db.select({
-        postId: downvotesTable.postId,
-        downvotesCount: sql<number>`cast(count(*) as int)`.as('downvotesCount'),
-    })
-    .from(downvotesTable)
-    .groupBy(downvotesTable.postId)
-    .as('downvotesSubQuery');
-
     const commentsSubQuery = db.select({
-        postId: commentsTable.postId,
+        questionId: commentsTable.questionId,
         commentsCount: sql<number>`cast(count(*) as int)`.as('commentsCount')
     })
     .from(commentsTable)
-    .groupBy(commentsTable.postId)
+    .groupBy(commentsTable.questionId)
     .as('commentsSubQuery');
 
     const favoritesSubQuery = db.select({
-        postId: favoritesTable.postId,
+        questionId: favoritesTable.questionId,
         favoritesCount: sql<number>`cast(count(*) as int)`.as('favoritesCount')
     })
     .from(favoritesTable)
-    .groupBy(favoritesTable.postId)
+    .groupBy(favoritesTable.questionId)
     .as('favoritesSubQuery');
 
     
-    const postDetails = db.select({
-        postId: postsTable.postId,
-        postTitle: postsTable.postTitle,
-        postContext: postsTable.postContext,
-        posterId: postsTable.posterId,
-        createdAt: postsTable.createdAt,
-        posterName: usersTable.name,
+    const questionDetails = db.select({
+        questionId: questionsTable.questionId,
+        questionTitle: questionsTable.questionTitle,
+        questionContext: questionsTable.questionContext,
+        questionerId: questionsTable.questionerId,
+        createdAt: questionsTable.createdAt,
+        isSolved: questionsTable.isSolved,
+        questionerName: usersTable.name,
         profilePicture: usersTable.profilePicture,
         upvotes: upvotesSubQuery.upvotesCount,
-        downvotes: downvotesSubQuery.downvotesCount,
         commentsCount: commentsSubQuery.commentsCount,
         favorites: favoritesSubQuery.favoritesCount,
     })
-    .from(postsTable)
-    .leftJoin(upvotesSubQuery, eq(upvotesSubQuery.postId, postsTable.postId))
-    .leftJoin(downvotesSubQuery, eq(downvotesSubQuery.postId, postsTable.postId))
-    .leftJoin(commentsSubQuery, eq(commentsSubQuery.postId, postsTable.postId))
-    .leftJoin(favoritesSubQuery, eq(favoritesSubQuery.postId, postsTable.postId))
-    .leftJoin(usersTable, eq(usersTable.userId, postsTable.posterId))
-    .orderBy(desc(postsTable.createdAt))
+    .from(questionsTable)
+    .leftJoin(upvotesSubQuery, eq(upvotesSubQuery.questionId, questionsTable.questionId))
+    .leftJoin(commentsSubQuery, eq(commentsSubQuery.questionId, questionsTable.questionId))
+    .leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
+    .leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
+    .orderBy(desc(questionsTable.createdAt))
     
-    const postTags = db.query.postsTable.findMany({
+    const questionTags = db.query.questionsTable.findMany({
         columns: {
-            postId: true,
+            questionId: true,
         },
         with: {
             tags: true
         },
-        orderBy: [desc(postsTable.createdAt)],
+        orderBy: [desc(questionsTable.createdAt)],
     })
 
-    const [details, allTags] = await Promise.all([postDetails, postTags]);
+    const [details, allTags] = await Promise.all([questionDetails, questionTags]);
 
     const combined = details.map((detail, index) => ({
         ...detail,
@@ -129,7 +119,7 @@ export async function GET(req: NextRequest) {
         GetResponseSchema.parse(combined);
     }
     catch (error) {
-        console.log("Error parsing response in api/posts/route.ts")
+        console.log("Error parsing response in api/questions/route.ts")
         return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 
@@ -143,17 +133,17 @@ export async function POST(req: NextRequest) {
         PostRequestSchema.parse(data);
     } 
     catch(error) {
-        console.log("Error parsing request in api/posts/route.ts")
+        console.log("Error parsing request in api/questions/route.ts")
         return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
-    const { tags, ...newPost } = data as PostRequest;
+    const { tags, ...newQuestion } = data as PostRequest;
 
-    let postId = -1;
+    let questionId = -1;
     try {
-        const inserted = await db.insert(postsTable)
-        .values(newPost)
-        .returning({postId: postsTable.postId});
-        postId = inserted[0].postId;
+        const inserted = await db.insert(questionsTable)
+        .values(newQuestion)
+        .returning({questionId: questionsTable.questionId});
+        questionId = inserted[0].questionId;
     } catch (error) {
         return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }   
@@ -189,15 +179,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }
 
-    const postTagIds = tagIds.map(tagId => ({
-        postId, tagId
+    const questionTagIds = tagIds.map(tagId => ({
+        questionId, tagId
     }))
 
     try {
-        await db.insert(postTagsTable).values(postTagIds);
+        await db.insert(questionTagsTable).values(questionTagIds);
         return NextResponse.json({ result: "success" }, { status: 200 });
     } catch (error) {
-        console.log("Failed inserting post and tags relationship!");
+        console.log("Failed inserting question and tags relationship!");
         return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }
 

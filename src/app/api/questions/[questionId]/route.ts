@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@/db";
 
 const GetRequestSchema = z.object({
-    postId: z.number().min(1),
+    questionId: z.number().min(1),
 });
 
 
@@ -62,9 +62,6 @@ const GetResponseSchema = z.object({
     upvotes: z.array(z.object({
         userId: z.number().min(1),
     })),
-    downvotes: z.array(z.object({
-        userId: z.number().min(1),
-    })),
 })
 
 
@@ -79,12 +76,11 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
         return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const postDetail = await db.query.postsTable.findFirst({
+    const questionDetail = await db.query.questionsTable.findFirst({
         with: {
             user: true,
             tags: true,
             upvotes: true,
-            downvotes: true,
             comments: {
                 with: {
                     user: true,
@@ -100,21 +96,21 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
                 }
             },
         }, 
-        where: (post, { eq }) => eq(post.postId, params.postId),
+        where: (question, { eq }) => eq(question.questionId, params.questionId),
     });
 
-    if (!postDetail) {
-        return NextResponse.json({ error: "post not found" }, { status: 404 });
+    if (!questionDetail) {
+        return NextResponse.json({ error: "question not found" }, { status: 404 });
     }
 
     try {
-        CommentSchema.parse(postDetail);
+        CommentSchema.parse(questionDetail);
     } catch (err) {
         console.log("Error parsing response in api/posts/[postId]/route.ts");
         return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 
-    const parsedDetail = postDetail as unknown as GetResponse
+    const parsedDetail = questionDetail as unknown as GetResponse
 
     const response = {
         postId: parsedDetail.postId,
@@ -125,7 +121,6 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
         isSolved: parsedDetail.isSolved,
         tags: parsedDetail.tags,
         upvotes: parsedDetail.upvotes.length,
-        downvotes: parsedDetail.downvotes.length,
         commentsCount: parsedDetail.comments.length,
         comments: parsedDetail.comments.map((comment) => ({
             commentId: comment.commentId,
