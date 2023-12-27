@@ -21,6 +21,14 @@ export type NewPostType = {
     tags: string[],
 }
 
+export type NewQuestionType = {
+	questionTitle: string,
+    questionContext: string,
+    questionerId: number,
+    questionImage? : string,
+    tags: string[],
+}
+
 export type QuestionCardType = {
 	questionId: number;
 	questionTitle: string;
