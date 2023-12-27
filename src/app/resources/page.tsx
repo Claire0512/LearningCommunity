@@ -6,6 +6,8 @@ import { useSession } from 'next-auth/react';
 
 import PostCard from '../../components/PostCard';
 import TagsSelector from '../../components/TagsSelector';
+import { getAllPosts, getTop3HotPosts } from '../../lib/api/resources/apiEndpoints';
+import { getAllTags } from '../../lib/api/tags/apiEndpoints';
 import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
@@ -13,197 +15,19 @@ import { useTheme, Fab, Box, Button, Dialog, TextField, Chip, Typography } from 
 
 import type { PostCardType } from '@/lib/types';
 
-const sampleTags = {
-	grades: [
-		{ id: 1, name: 'Grade 1' },
-		{ id: 2, name: 'Grade 2' },
-	],
-	subjects: [
-		{ id: 101, name: 'Mathematics' },
-		{ id: 102, name: 'Science' },
-	],
-	others: [
-		{ id: 201, name: 'Homework Help' },
-		{ id: 202, name: 'Exam Prep' },
-	],
-};
-const sampleHotPosts = [
-	{
-		postId: 501,
-		postTitle: 'Innovative Tech Gadgets',
-		postContext: 'Exploring the latest in technology and gadgets.',
-		posterId: 789,
-		posterName: 'TechEnthusiast',
-		profilePicture: 'url/to/profile/picture3.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['technology', 'gadgets', 'innovation'],
-	},
-	{
-		postId: 502,
-		postTitle: 'Healthy Eating Habits',
-		postContext: 'Tips for maintaining a healthy and balanced diet.',
-		posterId: 101,
-		posterName: 'HealthyFoodie',
-		profilePicture: 'url/to/profile/picture4.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['health', 'diet', 'nutrition'],
-	},
-	{
-		postId: 503,
-		postTitle: 'Adventure Travel Destinations',
-		postContext: 'Top destinations for adventure travel enthusiasts.',
-		posterId: 202,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture5.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['travel', 'adventure', 'destinations'],
-	},
-];
-const sampleAllPosts = [
-	{
-		postId: 456,
-		postTitle: 'Delicious Recipes',
-		postContext: 'Sharing my favorite homemade recipes.',
-		posterId: 123,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		postId: 457,
-		postTitle: 'Traveling Tips',
-		postContext: 'Essential tips for budget traveling.',
-		posterId: 456,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		postId: 458,
-		postTitle: 'Delicious Recipes',
-		postContext: 'Sharing my favorite homemade recipes.',
-		posterId: 123,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		postId: 459,
-		postTitle: 'Traveling Tips',
-		postContext: 'Essential tips for budget traveling.',
-		posterId: 456,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		postId: 460,
-		postTitle: 'Delicious Recipes',
-		postContext: 'Sharing my favorite homemade recipes.',
-		posterId: 123,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		postId: 461,
-		postTitle: 'Traveling Tips',
-		postContext: 'Essential tips for budget traveling.',
-		posterId: 456,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		postId: 462,
-		postTitle: 'Delicious Recipes',
-		postContext: 'Sharing my favorite homemade recipes.',
-		posterId: 123,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		postId: 463,
-		postTitle: 'Traveling Tips',
-		postContext: 'Essential tips for budget traveling.',
-		posterId: 456,
-		posterName: 'GlobeTrotter',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		downvotes: 15,
-		commentsCount: 45,
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		tags: ['travel', 'budget', 'advice'],
-	},
-];
-interface Tag {
-	id: number;
-	name: string;
-}
-
-interface SelectedTag extends Tag {
-	category: string;
-}
-
 function Page() {
 	const theme = useTheme();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
-	const [filteredPosts, setFilteredPosts] = useState<PostCardType[]>(sampleAllPosts);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+	const [filteredPosts, setFilteredPosts] = useState<PostCardType[]>([]);
+	const [hotPosts, setHotPosts] = useState<PostCardType[]>([]);
 	const [searchInput, setSearchInput] = useState('');
+	const [loading, setLoading] = useState(true);
+	const [tags, setTags] = useState<string[]>([]);
 	const { data: session } = useSession();
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
-	const handleSave = (selected: SelectedTag[]) => {
+	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
 		console.log('Selected tags:', selected);
@@ -215,18 +39,44 @@ function Page() {
 		}
 	};
 	useEffect(() => {
+		async function fetchTags() {
+			try {
+				const fetchedTags = await getAllTags();
+				console.log('Fetched tags:', fetchedTags);
+				setTags(fetchedTags);
+			} catch (error) {
+				console.error('Error fetching tags:', error);
+			}
+		}
+		fetchTags();
+	}, []);
+	useEffect(() => {
+		async function fetchData() {
+			setLoading(true);
+			try {
+				const allPosts = await getAllPosts();
+				const topHotPosts = await getTop3HotPosts();
+				setFilteredPosts(allPosts);
+				setHotPosts(topHotPosts);
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		fetchData();
+	}, []);
+
+	useEffect(() => {
 		const filterByTags =
 			selectedTags.length > 0
 				? (post: PostCardType) =>
-						selectedTags
-							.map((tag) => tag.name)
-							.every((tagName) => post.tags.includes(tagName))
+						selectedTags.every((tagName) => post.tags.includes(tagName))
 				: (post: PostCardType) => true;
-
 		const filterBySearch = (post: PostCardType) =>
 			post.postTitle.toLowerCase().startsWith(searchInput.toLowerCase());
 
-		const newFilteredPosts = sampleAllPosts.filter(
+		const newFilteredPosts = filteredPosts.filter(
 			(post: PostCardType) => filterByTags(post) && filterBySearch(post),
 		);
 		setFilteredPosts(newFilteredPosts);
@@ -242,14 +92,14 @@ function Page() {
 				<p
 					style={{
 						fontWeight: 'bold',
-						color: '#000000',
+						color: '#24282D',
 						fontSize: '32px',
 						textAlign: 'center',
 					}}
 				>
 					本日熱門文章
 				</p>
-				<LocalFireDepartmentIcon sx={{ color: 'red', fontSize: '40px', ml: 1 }} />
+				<LocalFireDepartmentIcon sx={{ color: '#E09090', fontSize: '40px', ml: 1 }} />
 			</Box>
 
 			<Box
@@ -262,7 +112,7 @@ function Page() {
 					marginLeft: '50px',
 				}}
 			>
-				{sampleHotPosts.map((post) => (
+				{hotPosts.map((post) => (
 					<PostCard {...post} />
 				))}
 			</Box>
@@ -277,32 +127,41 @@ function Page() {
 				<p
 					style={{
 						fontWeight: 'bold',
-						color: '#000000',
+						color: '#24282D',
 						fontSize: '32px',
 						textAlign: 'center',
 					}}
 				>
 					所有文章
 				</p>
-				<ArticleIcon sx={{ color: 'blue', fontSize: '40px', ml: 1 }} />
+				<ArticleIcon sx={{ color: '#9FAAE3', fontSize: '40px', ml: 1 }} />
 			</Box>
 
-			<Box display="flex" alignItems="center" gap={1}>
-				<Button onClick={handleOpenModal}>
-					<Typography variant="body1" style={{ fontSize: '26px' }}>
+			<Box display="flex" alignItems="center" gap={1} sx={{ mt: '8px' }}>
+				<Button
+					variant="contained"
+					onClick={handleOpenModal}
+					color="secondary"
+					sx={{
+						bgcolor: `${theme.palette.secondary.main} !important`,
+
+						borderRadius: '20px',
+					}}
+				>
+					<Typography variant="body1" style={{ fontSize: '20px' }}>
 						{selectedTags.length > 0 ? '所選分類' : '選擇分類'}
 					</Typography>
 				</Button>
 				{selectedTags.map((tag) => (
 					<Chip
-						key={tag.id}
-						label={<Typography style={{ fontSize: '26px' }}>{tag.name}</Typography>}
+						key={tag}
+						label={<Typography style={{ fontSize: '26px' }}>{tag}</Typography>}
 					/>
 				))}
 			</Box>
 
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
-				<TagsSelector tags={sampleTags} onSave={handleSave} onCancel={handleCloseModal} />
+				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />{' '}
 			</Dialog>
 			<TextField
 				fullWidth

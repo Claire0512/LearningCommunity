@@ -82,7 +82,6 @@ const GetResponseSchema = z.object({
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
-
 	const postId = parseInt(params.postId);
 	if (!postId) {
 		return NextResponse.json({ error: 'Post id invalid' }, { status: 400 });

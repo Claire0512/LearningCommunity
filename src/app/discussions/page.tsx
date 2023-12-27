@@ -6,247 +6,68 @@ import { useSession } from 'next-auth/react';
 
 import QuestionCard from '../../components/QuestionCard';
 import TagsSelector from '../../components/TagsSelector';
+import { getAllQuestions, getTop3HotQuestions } from '../../lib/api/discussions/apiEndpoints';
+import { getAllTags } from '../../lib/api/tags/apiEndpoints';
 import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import { Box, Button, Dialog, TextField, Chip, Typography } from '@mui/material';
-import { Fab } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Button, Dialog, TextField, Chip, Typography, Fab, useTheme } from '@mui/material';
 
 import type { QuestionCardType } from '@/lib/types';
 
-const sampleTags = {
-	grades: [
-		{ id: 1, name: 'Grade 1' },
-		{ id: 2, name: 'Grade 2' },
-	],
-	subjects: [
-		{ id: 101, name: 'Mathematics' },
-		{ id: 102, name: 'Science' },
-	],
-	others: [
-		{ id: 201, name: 'Homework Help' },
-		{ id: 202, name: 'Exam Prep' },
-	],
-};
-const sampleHotQuestions = [
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 456,
-		questionTitle: 'Delicious Recipes Inquiry',
-		questionContext: 'Seeking advice on homemade recipes.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 300,
-		commentsCount: 30,
-		isSolved: false,
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 457,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 458,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-];
-
-const sampleAllQuestions = [
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 456,
-		questionTitle: 'Delicious Recipes Inquiry',
-		questionContext: 'Seeking advice on homemade recipes.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 300,
-		commentsCount: 30,
-		isSolved: false,
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 457,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 458,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 459,
-		questionTitle: 'Delicious Recipes Inquiry',
-		questionContext: 'Seeking advice on homemade recipes.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 300,
-		commentsCount: 30,
-		isSolved: false,
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 450,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 451,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 452,
-		questionTitle: 'Delicious Recipes Inquiry',
-		questionContext: 'Seeking advice on homemade recipes.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture1.jpg',
-		upvotes: 300,
-		commentsCount: 30,
-		isSolved: false,
-		tags: ['food', 'recipes', 'cooking'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 453,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-	{
-		favorites: 100,
-		createdAt: '2023 11 05 19:00',
-		questionId: 454,
-		questionTitle: 'Traveling Tips Needed',
-		questionContext: 'Looking for budget traveling tips.',
-		questionerId: 123,
-		questionerName: 'user123',
-		profilePicture: 'url/to/profile/picture2.jpg',
-		upvotes: 250,
-		commentsCount: 40,
-		isSolved: true,
-		tags: ['travel', 'budget', 'advice'],
-	},
-];
-interface Tag {
-	id: number;
-	name: string;
-}
-
-interface SelectedTag extends Tag {
-	category: string;
-}
-
 function Page() {
 	const theme = useTheme();
+	const { data: session } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	// Define the type of setSelectedTags based on the SelectedTag interface
-	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
-	const [filteredQuestions, setFilteredQuestions] =
-		useState<QuestionCardType[]>(sampleAllQuestions);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]); // 更新狀態類型
+	const [filteredQuestions, setFilteredQuestions] = useState<QuestionCardType[]>([]);
+	const [hotQuestions, setHotQuestions] = useState<QuestionCardType[]>([]);
+	const [tags, setTags] = useState<string[]>([]);
 	const [searchInput, setSearchInput] = useState('');
-	// const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
-	const handleSave = (selected: SelectedTag[]) => {
+	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
 		console.log('Selected tags:', selected);
 	};
-	const { data: session } = useSession();
+
 	const handleCreateQuestionClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
 		if (!session) {
 			alert('登入後才可發問哦');
 			event.preventDefault();
 		}
 	};
+
+	useEffect(() => {
+		const fetchQuestionsAndTags = async () => {
+			try {
+				const questions = await getAllQuestions();
+				const hotQs = await getTop3HotQuestions();
+				const fetchedTags = await getAllTags();
+
+				setFilteredQuestions(questions);
+				setHotQuestions(hotQs);
+				setTags(fetchedTags);
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+		};
+		fetchQuestionsAndTags();
+	}, []);
+
 	useEffect(() => {
 		const filterByTags =
 			selectedTags.length > 0
 				? (question: QuestionCardType) =>
-						selectedTags
-							.map((tag) => tag.name)
-							.every((tagName) => question.tags.includes(tagName))
+						selectedTags.every((tagName) => question.tags.includes(tagName))
 				: (question: QuestionCardType) => true;
 
 		const filterBySearch = (question: QuestionCardType) =>
-			question.questionTitle.toLowerCase().startsWith(searchInput.toLowerCase());
+			question.questionTitle.toLowerCase().includes(searchInput.toLowerCase());
 
-		const newFilteredQuestions = sampleAllQuestions.filter(
+		const newFilteredQuestions = filteredQuestions.filter(
 			(question: QuestionCardType) => filterByTags(question) && filterBySearch(question),
 		);
 		setFilteredQuestions(newFilteredQuestions);
@@ -262,14 +83,14 @@ function Page() {
 				<p
 					style={{
 						fontWeight: 'bold',
-						color: '#000000',
+						color: '#24282D',
 						fontSize: '32px',
 						textAlign: 'center',
 					}}
 				>
 					本日熱門問題
 				</p>
-				<LocalFireDepartmentIcon sx={{ color: 'red', fontSize: '40px', ml: 1 }} />
+				<LocalFireDepartmentIcon sx={{ color: '#E09090', fontSize: '40px', ml: 1 }} />
 			</Box>
 
 			<Box
@@ -282,8 +103,8 @@ function Page() {
 					marginLeft: '50px',
 				}}
 			>
-				{sampleHotQuestions.map((question) => (
-					<QuestionCard {...question} />
+				{hotQuestions.map((question) => (
+					<QuestionCard key={question.questionId} {...question} />
 				))}
 			</Box>
 			<Box
@@ -297,32 +118,41 @@ function Page() {
 				<p
 					style={{
 						fontWeight: 'bold',
-						color: '#000000',
+						color: '#24282D',
 						fontSize: '32px',
 						textAlign: 'center',
 					}}
 				>
 					所有問題
 				</p>
-				<ArticleIcon sx={{ color: 'blue', fontSize: '40px', ml: 1 }} />
+				<ArticleIcon sx={{ color: '#9FAAE3', fontSize: '40px', ml: 1 }} />
 			</Box>
 
 			<Box display="flex" alignItems="center" gap={1}>
-				<Button onClick={handleOpenModal}>
-					<Typography variant="body1" style={{ fontSize: '26px' }}>
+				<Button
+					variant="contained"
+					onClick={handleOpenModal}
+					color="secondary"
+					sx={{
+						bgcolor: `${theme.palette.secondary.main} !important`,
+
+						borderRadius: '20px',
+					}}
+				>
+					<Typography variant="body1" style={{ fontSize: '20px' }}>
 						{selectedTags.length > 0 ? '所選分類' : '選擇分類'}
 					</Typography>
 				</Button>
 				{selectedTags.map((tag) => (
 					<Chip
-						key={tag.id}
-						label={<Typography style={{ fontSize: '26px' }}>{tag.name}</Typography>}
+						key={tag}
+						label={<Typography style={{ fontSize: '26px' }}>{tag}</Typography>}
 					/>
 				))}
 			</Box>
 
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
-				<TagsSelector tags={sampleTags} onSave={handleSave} onCancel={handleCloseModal} />
+				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
 			</Dialog>
 			<TextField
 				fullWidth
@@ -342,7 +172,7 @@ function Page() {
 				}}
 			>
 				{filteredQuestions.map((question) => (
-					<QuestionCard {...question} />
+					<QuestionCard key={question.questionId} {...question} />
 				))}
 			</Box>
 			<a

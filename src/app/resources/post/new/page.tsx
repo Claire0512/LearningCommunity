@@ -1,41 +1,39 @@
 'use client';
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
+
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 import TagsSelector from '../../../../components/TagsSelector';
+import { addNewPost } from '../../../../lib/api/resources/apiEndpoints';
+import { getAllTags } from '../../../../lib/api/tags/apiEndpoints';
+import type { NewPostType } from '../../../../lib/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Button } from '@mui/material';
-import { Card, CardContent, Typography, TextField, Dialog, useTheme } from '@mui/material';
-import { Avatar, Chip, Stack, Box } from '@mui/material';
+import {
+	Button,
+	Card,
+	CardContent,
+	Typography,
+	TextField,
+	Dialog,
+	Avatar,
+	Chip,
+	Stack,
+	Box,
+	useTheme,
+} from '@mui/material';
 
-interface Tag {
-	id: number;
-	name: string;
-}
-interface SelectedTag extends Tag {
-	category: string;
-}
-const sampleTags = {
-	grades: [
-		{ id: 1, name: 'Grade 1' },
-		{ id: 2, name: 'Grade 2' },
-	],
-	subjects: [
-		{ id: 101, name: 'Mathematics' },
-		{ id: 102, name: 'Science' },
-	],
-	others: [
-		{ id: 201, name: 'Homework Help' },
-		{ id: 202, name: 'Exam Prep' },
-	],
-};
 function Page() {
 	const theme = useTheme();
-	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
+	const router = useRouter();
+	const { data: session } = useSession();
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
+	const [tags, setTags] = useState<string[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const handleSave = (selected: SelectedTag[]) => {
+	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
 		console.log('Selected tags:', selected);
@@ -50,14 +48,45 @@ function Page() {
 	const handleContentChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setContent(event.target.value);
 	};
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (!title || !content) {
 			alert('標題和內文不能為空！');
 			return;
 		}
 
-		console.log('送出資料', { title, content, selectedTags });
+		const posterId = session?.user.userId;
+		console.log('posterId:', posterId);
+		const newPost: NewPostType = {
+			postTitle: title,
+			postContext: content,
+			tags: selectedTags,
+			posterId: posterId,
+		};
+
+		try {
+			console.log(newPost);
+			await addNewPost(newPost);
+			alert('文章發布成功！');
+			setTitle('');
+			setContent('');
+			setSelectedTags([]);
+			router.push('/resources');
+		} catch (error) {
+			console.error('Error submitting post:', error);
+			alert('發布文章失敗，請重試。');
+		}
 	};
+	useEffect(() => {
+		const fetchTags = async () => {
+			try {
+				const fetchedTags = await getAllTags();
+				setTags(fetchedTags);
+			} catch (error) {
+				console.error('Error fetching tags:', error);
+			}
+		};
+		fetchTags();
+	}, []);
 	return (
 		<div
 			style={{
@@ -152,10 +181,8 @@ function Page() {
 						</Button>
 						{selectedTags.map((tag) => (
 							<Chip
-								key={tag.id}
-								label={
-									<Typography style={{ fontSize: '16px' }}>{tag.name}</Typography>
-								}
+								key={tag}
+								label={<Typography style={{ fontSize: '16px' }}>{tag}</Typography>}
 							/>
 						))}
 					</Box>
@@ -169,8 +196,8 @@ function Page() {
 				>
 					<Button
 						variant="contained"
-						color="secondary"
 						onClick={handleSubmit}
+						color="secondary"
 						sx={{
 							mt: 2,
 							bgcolor: `${theme.palette.secondary.main} !important`,
@@ -183,7 +210,7 @@ function Page() {
 				</Box>
 			</Card>
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
-				<TagsSelector tags={sampleTags} onSave={handleSave} onCancel={handleCloseModal} />
+				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
 			</Dialog>
 		</div>
 	);

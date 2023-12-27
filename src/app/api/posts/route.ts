@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.postId, postsTable.postId))
 		.leftJoin(usersTable, eq(usersTable.userId, postsTable.posterId))
 		.orderBy(desc(postsTable.createdAt));
-	
+
 	const postTags = db.query.postsTable.findMany({
 		columns: {
 			postId: true,
@@ -111,11 +111,11 @@ export async function GET(req: NextRequest) {
 			tags: {
 				with: {
 					tag: {
-                        columns: {
-                            name: true,
-                        },
-                    },
-				}
+						columns: {
+							name: true,
+						},
+					},
+				},
 			},
 		},
 		orderBy: [desc(postsTable.createdAt)],
@@ -130,7 +130,7 @@ export async function GET(req: NextRequest) {
 		commentsCount: detail.commentsCount ? detail.commentsCount : 0,
 		tags: allTags[index].tags.map((singleTag) => {
 			return singleTag.tag.name;
-		})
+		}),
 	}));
 
 	try {
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
 		console.log('Failed getting id of tags!');
 		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 	}
-	
+
 	const postTagIds = tagIds.map((tagId) => ({
 		postId,
 		tagId,
