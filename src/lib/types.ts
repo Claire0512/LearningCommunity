@@ -12,6 +12,15 @@ export type PostCardType = {
 	tags: string[];
 	createdAt: string;
 };
+
+export type NewPostType = {
+	postTitle: string,
+    postContext: string,
+    posterId: number,
+    postImage? : string,
+    tags: string[],
+}
+
 export type QuestionCardType = {
 	questionId: number;
 	questionTitle: string;
@@ -26,7 +35,7 @@ export type QuestionCardType = {
 	tags: string[];
 	createdAt: string;
 };
-export type sampleNotification = {
+export type NotificationType = {
 	userId: number;
 	replierId: number;
 	replierName: string;
@@ -37,4 +46,18 @@ export type sampleNotification = {
 	NotificationId: number;
 	postId: number;
 	questionId: null;
+};
+
+export type CommentType = {
+    commentId: number;
+    commenterId: string;
+    commenterName: string;
+    commenterProfilePicture: string;
+    upvotes: number;
+    downvotes: number;
+    hasUpvoted: boolean;
+    hasDownvoted: boolean;
+    text: string;
+    createdAt: string;
+    replies?: Comment[]; 
 };
