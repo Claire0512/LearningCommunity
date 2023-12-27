@@ -1,9 +1,9 @@
 import api from '@/lib/api/base';
 import { PostCardType, NewPostType } from '@/lib/types';
 
-export const getAllPosts = async (pageNumber: number) => {
+export const getAllPosts = async () => {
 	try {
-		const response = await api.get(`/api/posts?page=${pageNumber}`);
+		const response = await api.get(`/api/posts`);
 		return response.data as PostCardType[];
 	} catch (error) {
 		console.error('Error getAllPosts :', error);
@@ -18,6 +18,7 @@ export const getTop3HotPosts = async () => {
 		if (data.length > 3) {
 			console.log('Data length is too long!');
 		}
+		return data;
 	} catch (error) {
 		console.error('Error getTop3HotPosts :', error);
 		throw error;

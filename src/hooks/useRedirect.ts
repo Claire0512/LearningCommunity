@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { getRestaurantInfoStatus } from '@/lib/api/restaurant/api';
+import { useSession } from 'next-auth/react';
 
 const useRedirect = () => {
 	const [isRedirecting, setIsRedirecting] = useState(false);
@@ -11,19 +11,19 @@ const useRedirect = () => {
 			setIsRedirecting(true);
 			setRedirectURL('/');
 		} else {
-			setRestaurantId(parsedId);
-			const fetchData = async () => {
-				const data = await getRestaurantInfoStatus(parsedId);
-				if (!data) {
-					setIsRedirecting(true);
-					setRedirectURL('/operations-management/basic-information');
-				}
-			};
-			fetchData();
+			// setRestaurantId(parsedId);
+			// const fetchData = async () => {
+			// 	const data = await getRestaurantInfoStatus(parsedId);
+			// 	if (!data) {
+			// 		setIsRedirecting(true);
+			// 		setRedirectURL('/operations-management/basic-information');
+			// 	}
+			// };
+			// fetchData();
 		}
 	}, []);
 
-	return { isRedirecting, redirectURL, restaurantId };
+	return { isRedirecting, redirectURL };
 };
 
 export default useRedirect;

@@ -4,7 +4,7 @@ import React, { useState, ChangeEvent } from 'react';
 
 import { useSession } from 'next-auth/react';
 
-import getTimeDifference from '../../../components/getTimeDifference';
+import getTimeDifference from '../../../../components/getTimeDifference';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';

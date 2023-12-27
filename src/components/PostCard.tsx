@@ -32,7 +32,7 @@ function PostCard(post: PostCardType) {
 	const tagContainerRef = useRef<HTMLDivElement>(null);
 	const theme = useTheme();
 	const formattedTime = getTimeDifference(post.createdAt);
-
+	// console.log("post.tags", post.tags);
 	useEffect(() => {
 		const updateVisibleTags = () => {
 			const container = tagContainerRef.current;

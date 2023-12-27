@@ -35,7 +35,7 @@ export const postsTable = pgTable('posts', {
 		.notNull()
 		.references(() => usersTable.userId),
 	postImage: varchar('post_image'),
-	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`)
+	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const postsRelations = relations(postsTable, ({ one, many }) => ({
@@ -59,7 +59,7 @@ export const questionsTable = pgTable('questions', {
 		.references(() => usersTable.userId),
 	isSolved: boolean('is_solved').default(false),
 	helpfulCommentId: integer('helpful_comment_id').references(() => commentsTable.commentId),
-	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`)
+	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const questionsRelations = relations(questionsTable, ({ one, many }) => ({
@@ -82,7 +82,7 @@ export const commentsTable: any = pgTable('comments', {
 	questionId: integer('question_id').references(() => questionsTable.questionId),
 	parentCommentId: integer('parent_comment_id').references(() => commentsTable.commentId),
 	isHelpful: boolean('is_helpful').default(false),
-	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`)
+	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const commentsRelations = relations(commentsTable, ({ one, many }) => ({

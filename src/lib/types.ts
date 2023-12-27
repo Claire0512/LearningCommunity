@@ -14,20 +14,20 @@ export type PostCardType = {
 };
 
 export type NewPostType = {
-	postTitle: string,
-    postContext: string,
-    posterId: number,
-    postImage? : string,
-    tags: string[],
-}
+	postTitle: string;
+	postContext: string;
+	posterId: number;
+	postImage?: string;
+	tags: string[];
+};
 
 export type NewQuestionType = {
-	questionTitle: string,
-    questionContext: string,
-    questionerId: number,
-    questionImage? : string,
-    tags: string[],
-}
+	questionTitle: string;
+	questionContext: string;
+	questionerId: number;
+	questionImage?: string;
+	tags: string[];
+};
 
 export type QuestionCardType = {
 	questionId: number;
@@ -57,15 +57,15 @@ export type NotificationType = {
 };
 
 export type CommentType = {
-    commentId: number;
-    commenterId: string;
-    commenterName: string;
-    commenterProfilePicture: string;
-    upvotes: number;
-    downvotes: number;
-    hasUpvoted: boolean;
-    hasDownvoted: boolean;
-    text: string;
-    createdAt: string;
-    replies?: Comment[]; 
+	commentId: number;
+	commenterId: string;
+	commenterName: string;
+	commenterProfilePicture: string;
+	upvotes: number;
+	downvotes: number;
+	hasUpvoted: boolean;
+	hasDownvoted: boolean;
+	text: string;
+	createdAt: string;
+	replies?: Comment[];
 };

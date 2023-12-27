@@ -1,9 +1,11 @@
 import api from '@/lib/api/base';
 import { QuestionCardType, NewQuestionType } from '@/lib/types';
 
-export const getAllQuestions = async (pageNumber: number) => {
+export const getAllQuestions = async () => {
 	try {
-		const response = await api.get(`/api/questions?page=${pageNumber}`);
+		console.log('@@');
+		const response = await api.get(`/api/questions`);
+		console.log('response.data:', response.data);
 		return response.data as QuestionCardType[];
 	} catch (error) {
 		console.error('Error getAllQuestions :', error);
@@ -14,10 +16,12 @@ export const getAllQuestions = async (pageNumber: number) => {
 export const getTop3HotQuestions = async () => {
 	try {
 		const response = await api.get('/api/questions/top');
+		console.log('response.data:', response.data);
 		const data = response.data as QuestionCardType[];
 		if (data.length > 3) {
 			console.log('Data length is too long!');
 		}
+		return data;
 	} catch (error) {
 		console.error('Error getTop3HotQuestions :', error);
 		throw error;
@@ -34,7 +38,11 @@ export const getQuestionDetail = async (questionId: number) => {
 	}
 };
 
-export const addCommentToQuestion = async (questionId: number, commenterId: number, text: string) => {
+export const addCommentToQuestion = async (
+	questionId: number,
+	commenterId: number,
+	text: string,
+) => {
 	try {
 		const response = await api.post(`/api/comments`, { questionId, commenterId, text });
 		return response.data;
@@ -61,7 +69,11 @@ export const addReplyToComment = async (
 	}
 };
 
-export const interactWithQuestion = async (userId: number, questionId: number, actionType: string) => {
+export const interactWithQuestion = async (
+	userId: number,
+	questionId: number,
+	actionType: string,
+) => {
 	try {
 		await api.post('/api/interactions', {
 			userId,
