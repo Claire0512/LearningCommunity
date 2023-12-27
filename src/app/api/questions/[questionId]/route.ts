@@ -70,11 +70,13 @@ const GetResponseSchema = z.object({
 		name: z.string().min(1),
 		profilePicture: z.string().nullable(),
 	}),
-	tags: z.array(z.object({
-		tag: z.object({
-			name: z.string()
-		})
-	})),
+	tags: z.array(
+		z.object({
+			tag: z.object({
+				name: z.string(),
+			}),
+		}),
+	),
 	upvotes: z.array(
 		z.object({
 			userId: z.number().min(1),
@@ -91,7 +93,6 @@ const GetResponseSchema = z.object({
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
-
 	const questionId = parseInt(params.questionId);
 	const searchParams = req.nextUrl.searchParams;
 	const userId = parseInt(searchParams.get('userId') || '');
@@ -106,8 +107,8 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				columns: {
 					userId: true,
 					name: true,
-					profilePicture: true
-				}
+					profilePicture: true,
+				},
 			},
 			tags: {
 				columns: {},
@@ -115,19 +116,19 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 					tag: {
 						columns: {
 							name: true,
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			upvotes: {
 				columns: {
 					userId: true,
-				}
+				},
 			},
 			favorites: {
 				columns: {
 					userId: true,
-				}
+				},
 			},
 			comments: {
 				with: {
@@ -135,8 +136,8 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 						columns: {
 							userId: true,
 							name: true,
-							profilePicture: true
-						}
+							profilePicture: true,
+						},
 					},
 					replies: {
 						with: {
@@ -174,14 +175,14 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		questionerId: parsedDetail.questionerId,
 		questionerName: parsedDetail.user.name,
 		profilePicture: parsedDetail.user.profilePicture,
-		tags: parsedDetail.tags.map(singleTag => {
-			return singleTag.tag.name
+		tags: parsedDetail.tags.map((singleTag) => {
+			return singleTag.tag.name;
 		}),
 		createdAt: parsedDetail.createdAt,
 		upvotes: parsedDetail.upvotes.length,
-		hasUpvote: parsedDetail.upvotes.some(upvote => upvote.userId === userId),
+		hasUpvote: parsedDetail.upvotes.some((upvote) => upvote.userId === userId),
 		favorites: parsedDetail.favorites.length,
-		hasFavorite: parsedDetail.favorites.some(favorite => favorite.userId === userId),
+		hasFavorite: parsedDetail.favorites.some((favorite) => favorite.userId === userId),
 		commentsCount: parsedDetail.comments.length,
 		comments: parsedDetail.comments.map((comment) => ({
 			commentId: comment.commentId,
@@ -189,9 +190,9 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			commenterName: comment.user.name,
 			commenterProfilePicture: comment.user.profilePicture,
 			upvotes: comment.upvotes.length,
-			hasUpvote: comment.upvotes.some(upvote => upvote.userId === userId),
+			hasUpvote: comment.upvotes.some((upvote) => upvote.userId === userId),
 			downvotes: comment.downvotes.length,
-			hasDownvote: comment.downvotes.some(downvote => downvote.userId === userId),
+			hasDownvote: comment.downvotes.some((downvote) => downvote.userId === userId),
 			text: comment.text,
 			isHelpful: comment.isHelpful,
 			replies: comment.replies.map((reply) => ({
@@ -202,10 +203,10 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				text: reply.text,
 				isHelpful: reply.isHelpful,
 				upvotes: reply.upvotes.length,
-				hasUpvote: reply.upvotes.some(upvote => upvote.userId === userId),
-                downvotes: reply.downvotes.length,
-                hasDownvote: reply.downvotes.some(downvote => downvote.userId === userId),
-                createdAt: reply.createdAt,
+				hasUpvote: reply.upvotes.some((upvote) => upvote.userId === userId),
+				downvotes: reply.downvotes.length,
+				hasDownvote: reply.downvotes.some((downvote) => downvote.userId === userId),
+				createdAt: reply.createdAt,
 			})),
 		})),
 	};

@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
 		.orderBy(desc(questionsTable.createdAt));
-	
+
 	const questionTags = db.query.questionsTable.findMany({
 		columns: {
 			questionId: true,
@@ -96,11 +96,11 @@ export async function GET(req: NextRequest) {
 			tags: {
 				with: {
 					tag: {
-                        columns: {
-                            name: true,
-                        },
-                    },
-				}
+						columns: {
+							name: true,
+						},
+					},
+				},
 			},
 		},
 		orderBy: [desc(questionsTable.createdAt)],
@@ -114,7 +114,7 @@ export async function GET(req: NextRequest) {
 		commentsCount: detail.commentsCount ? detail.commentsCount : 0,
 		tags: allTags[index].tags.map((singleTag) => {
 			return singleTag.tag.name;
-		})
+		}),
 	}));
 
 	try {
@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
 		const popularityA = a.upvotes + a.favorites;
 		const popularityB = b.upvotes + b.favorites;
 		return popularityB - popularityA;
-	})
+	});
 
 	const data = sorted.slice(0, 3);
 	return NextResponse.json(data, { status: 200 });

@@ -43,7 +43,7 @@ export const postsRelations = relations(postsTable, ({ one, many }) => ({
 		fields: [postsTable.posterId],
 		references: [usersTable.userId],
 	}),
-	comments: many(commentsTable, { relationName: "post" }),
+	comments: many(commentsTable, { relationName: 'post' }),
 	tags: many(postTagsTable),
 	upvotes: many(upvotesTable),
 	downvotes: many(downvotesTable),
@@ -67,7 +67,7 @@ export const questionsRelations = relations(questionsTable, ({ one, many }) => (
 		fields: [questionsTable.questionerId],
 		references: [usersTable.userId],
 	}),
-	comments: many(commentsTable, { relationName: "question" }),
+	comments: many(commentsTable, { relationName: 'question' }),
 	tags: many(questionTagsTable),
 	upvotes: many(upvotesTable),
 	favorites: many(favoritesTable),
@@ -89,7 +89,7 @@ export const commentsTable: any = pgTable('comments', {
 export const commentsRelations = relations(commentsTable, ({ one, many }) => ({
 	upvotes: many(upvotesTable),
 	downvotes: many(downvotesTable),
-	replies: many(commentsTable, {relationName: "parentComment"}),
+	replies: many(commentsTable, { relationName: 'parentComment' }),
 	user: one(usersTable, {
 		fields: [commentsTable.commenterId],
 		references: [usersTable.userId],
@@ -97,17 +97,17 @@ export const commentsRelations = relations(commentsTable, ({ one, many }) => ({
 	post: one(postsTable, {
 		fields: [commentsTable.postId],
 		references: [postsTable.postId],
-		relationName: "post"
+		relationName: 'post',
 	}),
 	question: one(questionsTable, {
 		fields: [commentsTable.questionId],
 		references: [questionsTable.questionId],
-		relationName: "question"
+		relationName: 'question',
 	}),
 	parentComment: one(commentsTable, {
 		fields: [commentsTable.parentCommentId],
 		references: [commentsTable.commentId],
-		relationName: "parentComment"
+		relationName: 'parentComment',
 	}),
 }));
 
