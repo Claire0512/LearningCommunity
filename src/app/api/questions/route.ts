@@ -14,23 +14,24 @@ import {
 	questionTagsTable,
 } from '@/db/schema';
 
-const GetRequestSchema = z.number().min(1);
-
 const GetResponseSchema = z.array(
 	z.object({
 		questionId: z.number().min(1),
 		questionTitle: z.string().min(1),
 		questionContext: z.string().min(1),
 		questionerId: z.number(),
-		upvotes: z.number(),
-		commentsCount: z.number(),
-		favorites: z.number(),
-		isSolved: z.boolean(),
+		createdAt: z.date(),
+		questionerName: z.string(),
+		profilePicture: z.string().optional().nullable(),
+		upvotes: z.number().default(0),
+		downvotes: z.number().default(0),
+		commentsCount: z.number().default(0),
+		favorites: z.number().default(0),
 		tags: z.array(z.string()),
 	}),
 );
 
-const PostRequestSchema = z.object({
+const questionRequestSchema = z.object({
 	questionTitle: z.string().min(1),
 	questionContext: z.string().min(1),
 	questionerId: z.number(),
@@ -38,23 +39,11 @@ const PostRequestSchema = z.object({
 	tags: z.array(z.string()),
 });
 
-type GetRequest = z.infer<typeof GetRequestSchema>;
-
 type GetResponse = z.infer<typeof GetResponseSchema>;
 
-type PostRequest = z.infer<typeof PostRequestSchema>;
+type questionRequest = z.infer<typeof questionRequestSchema>;
 
 export async function GET(req: NextRequest) {
-	const params = req.nextUrl.searchParams;
-	const pageNumber = parseInt(params.get('pageNumber') || '');
-
-	try {
-		GetRequestSchema.parse(pageNumber);
-	} catch (error) {
-		console.log('Error parsing request in api/posts/route.ts');
-		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
-	}
-
 	const upvotesSubQuery = db
 		.select({
 			questionId: upvotesTable.questionId,
@@ -88,8 +77,8 @@ export async function GET(req: NextRequest) {
 			questionTitle: questionsTable.questionTitle,
 			questionContext: questionsTable.questionContext,
 			questionerId: questionsTable.questionerId,
-			createdAt: questionsTable.createdAt,
 			isSolved: questionsTable.isSolved,
+			createdAt: questionsTable.createdAt,
 			questionerName: usersTable.name,
 			profilePicture: usersTable.profilePicture,
 			upvotes: upvotesSubQuery.upvotesCount,
@@ -102,28 +91,40 @@ export async function GET(req: NextRequest) {
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
 		.orderBy(desc(questionsTable.createdAt));
-
+	
 	const questionTags = db.query.questionsTable.findMany({
 		columns: {
 			questionId: true,
 		},
 		with: {
-			tags: true,
+			tags: {
+				with: {
+					tag: {
+                        columns: {
+                            name: true,
+                        },
+                    },
+				}
+			},
 		},
 		orderBy: [desc(questionsTable.createdAt)],
 	});
 
 	const [details, allTags] = await Promise.all([questionDetails, questionTags]);
-
 	const combined = details.map((detail, index) => ({
 		...detail,
-		tags: allTags[index].tags,
+		upvotes: detail.upvotes ? detail.upvotes : 0,
+		favorites: detail.favorites ? detail.favorites : 0,
+		commentsCount: detail.commentsCount ? detail.commentsCount : 0,
+		tags: allTags[index].tags.map((singleTag) => {
+			return singleTag.tag.name;
+		})
 	}));
 
 	try {
 		GetResponseSchema.parse(combined);
 	} catch (error) {
-		console.log('Error parsing response in api/questions/route.ts');
+		console.log('Error parsing response in api/questions/route.ts', error);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
@@ -133,13 +134,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
 	const data = await req.json();
+	console.log(data);
 	try {
-		PostRequestSchema.parse(data);
+		questionRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/questions/route.ts');
+		console.log('Error parsing request in api/questions/route.ts', error);
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
-	const { tags, ...newQuestion } = data as PostRequest;
+	const { tags, ...newQuestion } = data as questionRequest;
 
 	let questionId = -1;
 	try {
@@ -176,24 +178,24 @@ export async function POST(req: NextRequest) {
 	}
 
 	try {
-		getTagIds(tags).then((ids) => {
-			tagIds = ids;
-		});
+		tagIds = await getTagIds(tags);
 	} catch (error) {
 		console.log('Failed getting id of tags!');
 		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 	}
-
+	
 	const questionTagIds = tagIds.map((tagId) => ({
 		questionId,
 		tagId,
 	}));
 
-	try {
-		await db.insert(questionTagsTable).values(questionTagIds);
-		return NextResponse.json({ result: 'success' }, { status: 200 });
-	} catch (error) {
-		console.log('Failed inserting question and tags relationship!');
-		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+	if (questionTagIds) {
+		try {
+			await db.insert(questionTagsTable).values(questionTagIds);
+			return NextResponse.json({ result: 'success' }, { status: 200 });
+		} catch (error) {
+			console.log('Failed inserting question and tags relationship!', error);
+			return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+		}
 	}
 }

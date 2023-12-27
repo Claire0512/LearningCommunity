@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 
 const GetRequestSchema = z.object({
-	questionId: z.number().min(1),
+	questionId: z.string().min(1),
 });
 
 const ReplySchema = z.object({
@@ -26,15 +26,16 @@ const ReplySchema = z.object({
 		}),
 	),
 	user: z.object({
+		userId: z.number().min(1),
 		name: z.string().min(1),
-		profilePicture: z.string().min(1),
+		profilePicture: z.string().nullable(),
 	}),
 });
 
 const CommentSchema = z.object({
 	commentId: z.number().min(1),
 	commenterId: z.number().min(1),
-	postId: z.number().min(1),
+	questionId: z.number().min(1),
 	text: z.string().min(1),
 	createdAt: z.date(),
 	isHelpful: z.boolean(),
@@ -49,49 +50,94 @@ const CommentSchema = z.object({
 		}),
 	),
 	user: z.object({
+		userId: z.number().min(1),
 		name: z.string().min(1),
-		profilePicture: z.string().min(1),
+		profilePicture: z.string().nullable(),
 	}),
 	replies: z.array(ReplySchema),
 });
 
 const GetResponseSchema = z.object({
-	postId: z.number().min(1),
-	postTitle: z.string(),
-	postContext: z.string().min(1),
-	posterId: z.number(),
-	tags: z.array(z.string()),
+	questionId: z.number().min(1),
+	questionTitle: z.string(),
+	questionContext: z.string().min(1),
+	questionerId: z.number(),
+	questionImage: z.string().nullable().optional(),
+	createdAt: z.date(),
 	isSolved: z.boolean(),
-	comments: z.array(CommentSchema),
 	user: z.object({
+		userId: z.number().min(1),
 		name: z.string().min(1),
-		profilePicture: z.string().min(1),
+		profilePicture: z.string().nullable(),
 	}),
+	tags: z.array(z.object({
+		tag: z.object({
+			name: z.string()
+		})
+	})),
 	upvotes: z.array(
 		z.object({
 			userId: z.number().min(1),
 		}),
 	),
+	favorites: z.array(
+		z.object({
+			userId: z.number().min(1),
+		}),
+	),
+	comments: z.array(CommentSchema),
 });
 
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
-	try {
-		GetRequestSchema.parse(params);
-	} catch (error) {
-		console.log('Error parsing request in api/posts/[postId]/route.ts');
-		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+
+	const questionId = parseInt(params.questionId);
+	const searchParams = req.nextUrl.searchParams;
+	const userId = parseInt(searchParams.get('userId') || '');
+
+	if (!questionId) {
+		return NextResponse.json({ error: 'question id invalid' }, { status: 400 });
 	}
 
 	const questionDetail = await db.query.questionsTable.findFirst({
 		with: {
-			user: true,
-			tags: true,
-			upvotes: true,
+			user: {
+				columns: {
+					userId: true,
+					name: true,
+					profilePicture: true
+				}
+			},
+			tags: {
+				columns: {},
+				with: {
+					tag: {
+						columns: {
+							name: true,
+						}
+					}
+				}
+			},
+			upvotes: {
+				columns: {
+					userId: true,
+				}
+			},
+			favorites: {
+				columns: {
+					userId: true,
+				}
+			},
 			comments: {
 				with: {
-					user: true,
+					user: {
+						columns: {
+							userId: true,
+							name: true,
+							profilePicture: true
+						}
+					},
 					replies: {
 						with: {
 							user: true,
@@ -104,7 +150,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				},
 			},
 		},
-		where: (question, { eq }) => eq(question.questionId, params.questionId),
+		where: (question, { eq }) => eq(question.questionId, questionId),
 	});
 
 	if (!questionDetail) {
@@ -112,29 +158,40 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 	}
 
 	try {
-		CommentSchema.parse(questionDetail);
+		GetResponseSchema.parse(questionDetail);
 	} catch (err) {
-		console.log('Error parsing response in api/posts/[postId]/route.ts');
+		console.log('Error parsing response in api/questions/[questionId]/route.ts');
+		console.log(err);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
 	const parsedDetail = questionDetail as unknown as GetResponse;
 
-	const response = {
-		postId: parsedDetail.postId,
-		postTitle: parsedDetail.postTitle,
-		postContext: parsedDetail.postContext,
-		posterId: parsedDetail.posterId,
-		posterName: parsedDetail.user.name,
-		isSolved: parsedDetail.isSolved,
-		tags: parsedDetail.tags,
+	const data = {
+		questionId: parsedDetail.questionId,
+		questionTitle: parsedDetail.questionTitle,
+		questionContext: parsedDetail.questionContext,
+		questionerId: parsedDetail.questionerId,
+		questionerName: parsedDetail.user.name,
+		profilePicture: parsedDetail.user.profilePicture,
+		tags: parsedDetail.tags.map(singleTag => {
+			return singleTag.tag.name
+		}),
+		createdAt: parsedDetail.createdAt,
 		upvotes: parsedDetail.upvotes.length,
+		hasUpvote: parsedDetail.upvotes.some(upvote => upvote.userId === userId),
+		favorites: parsedDetail.favorites.length,
+		hasFavorite: parsedDetail.favorites.some(favorite => favorite.userId === userId),
 		commentsCount: parsedDetail.comments.length,
 		comments: parsedDetail.comments.map((comment) => ({
 			commentId: comment.commentId,
 			commenterId: comment.commenterId,
 			commenterName: comment.user.name,
 			commenterProfilePicture: comment.user.profilePicture,
+			upvotes: comment.upvotes.length,
+			hasUpvote: comment.upvotes.some(upvote => upvote.userId === userId),
+			downvotes: comment.downvotes.length,
+			hasDownvote: comment.downvotes.some(downvote => downvote.userId === userId),
 			text: comment.text,
 			isHelpful: comment.isHelpful,
 			replies: comment.replies.map((reply) => ({
@@ -144,9 +201,14 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				commenterProfilePicture: reply.user.profilePicture,
 				text: reply.text,
 				isHelpful: reply.isHelpful,
+				upvotes: reply.upvotes.length,
+				hasUpvote: reply.upvotes.some(upvote => upvote.userId === userId),
+                downvotes: reply.downvotes.length,
+                hasDownvote: reply.downvotes.some(downvote => downvote.userId === userId),
+                createdAt: reply.createdAt,
 			})),
 		})),
 	};
 
-	return NextResponse.json(response, { status: 200 });
+	return NextResponse.json(data, { status: 200 });
 }

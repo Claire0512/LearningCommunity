@@ -203,7 +203,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			upvotes: comment.upvotes.length,
 			hasUpvote: comment.upvotes.some(upvote => upvote.userId === userId),
 			downvotes: comment.downvotes.length,
-			hasDownvote: comment.upvotes.some(downvote => downvote.userId === userId),
+			hasDownvote: comment.downvotes.some(downvote => downvote.userId === userId),
 			text: comment.text,
 			isHelpful: comment.isHelpful,
 			replies: comment.replies.map((reply) => ({
@@ -216,7 +216,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				upvotes: reply.upvotes.length,
 				hasUpvote: reply.upvotes.some(upvote => upvote.userId === userId),
                 downvotes: reply.downvotes.length,
-                hasDownvote: reply.upvotes.some(downvote => downvote.userId === userId),
+                hasDownvote: reply.downvotes.some(downvote => downvote.userId === userId),
                 createdAt: reply.createdAt,
 			})),
 		})),
