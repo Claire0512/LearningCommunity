@@ -7,7 +7,6 @@ const useRedirect = () => {
 	const [redirectURL, setRedirectURL] = useState('');
 	const { data: session } = useSession();
 	useEffect(() => {
-		
 		if (!session) {
 			setIsRedirecting(true);
 			setRedirectURL('/');
