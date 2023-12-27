@@ -14,7 +14,7 @@ const GetResponseSchema = z.array(
 		posterId: z.number(),
 		user: z.object({
 			name: z.string(),
-			profilePicture: z.string().optional(),
+			profilePicture: z.string().nullable().optional(),
 		}),
 		upvotes: z.array(
 			z.object({
@@ -38,7 +38,9 @@ const GetResponseSchema = z.array(
 		),
 		tags: z.array(
 			z.object({
-				name: z.string(),
+				tag: z.object({
+					name: z.string(),
+				}),
 			}),
 		),
 	}),
@@ -60,11 +62,36 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		with: {
 			posts: {
 				with: {
-					tags: true,
-					user: true,
-					upvotes: true,
-					downvotes: true,
-					favorites: true,
+					tags: {
+						with: {
+							tag: {
+								columns: {
+                                    name: true,
+                                },
+							}
+						}
+					},
+					user: {
+						columns: {
+							name: true,
+                            profilePicture: true,
+						}
+					},
+					upvotes: {
+						columns: {
+							userId: true,
+						}
+					},
+					downvotes: {
+						columns: {
+							userId: true,
+						}
+					},
+					favorites: {
+						columns: {
+							userId: true,
+						}
+					},
 					comments: {
 						fields: {
 							commenterId: true,
@@ -81,11 +108,12 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	const rawPosts = user.posts;
-
+	console.log(rawPosts);
 	try {
 		GetResponseSchema.parse(rawPosts);
 	} catch (error) {
 		console.log('Error parsing response in api/users/[userId]/posts/route.ts');
+		console.log(error);
 		return NextResponse.json({ error: 'Invalid response' }, { status: 500 });
 	}
 
@@ -102,7 +130,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		downvotes: post.downvotes.length,
 		favorites: post.favorites.length,
 		commentsCount: post.comments.length,
-		tags: post.tags.map((tag: { name: string }) => tag.name),
+		tags: post.tags.map((singleTag) => singleTag.tag.name),
 	}));
 
 	return NextResponse.json(posts, { status: 200 });

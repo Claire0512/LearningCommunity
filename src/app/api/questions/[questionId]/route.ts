@@ -257,4 +257,6 @@ export async function PUT(req: NextRequest) {
 			return NextResponse.json({ error: 'server error updating helpful' }, { status: 500 });
 		}
 	}
+
+	return NextResponse.json({ success: true }, { status: 200 })
 }

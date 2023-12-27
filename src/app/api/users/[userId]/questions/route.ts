@@ -15,9 +15,14 @@ const GetResponseSchema = z.array(
 		isSolved: z.boolean(),
 		user: z.object({
 			name: z.string(),
-			profilePicture: z.string().optional(),
+			profilePicture: z.string().nullable().optional(),
 		}),
 		upvotes: z.array(
+			z.object({
+				userId: z.number().min(1),
+			}),
+		),
+		favorites: z.array(
 			z.object({
 				userId: z.number().min(1),
 			}),
@@ -27,14 +32,11 @@ const GetResponseSchema = z.array(
 				commenterId: z.number().min(1),
 			}),
 		),
-		favorites: z.array(
-			z.object({
-				userId: z.number().min(1),
-			}),
-		),
 		tags: z.array(
 			z.object({
-				name: z.string(),
+				tag: z.object({
+					name: z.string(),
+				}),
 			}),
 		),
 	}),
@@ -56,10 +58,31 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		with: {
 			questions: {
 				with: {
-					tags: true,
-					user: true,
-					upvotes: true,
-					favorites: true,
+					tags: {
+						with: {
+							tag: {
+								columns: {
+                                    name: true,
+                                },
+							}
+						}
+					},
+					user: {
+						columns: {
+							name: true,
+                            profilePicture: true,
+						}
+					},
+					upvotes: {
+						columns: {
+							userId: true,
+						}
+					},
+					favorites: {
+						columns: {
+							userId: true,
+						}
+					},
 					comments: {
 						fields: {
 							commenterId: true,
@@ -76,11 +99,11 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	const rawQuestions = user.questions;
-
 	try {
 		GetResponseSchema.parse(rawQuestions);
 	} catch (error) {
 		console.log('Error parsing response in api/users/[userId]/questions/route.ts');
+		console.log(error);
 		return NextResponse.json({ error: 'Invalid response' }, { status: 500 });
 	}
 
@@ -91,12 +114,13 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		questionTitle: question.questionTitle,
 		questionContext: question.questionContext,
 		questionerId: question.questionerId,
+		isSolved: question.isSolved,
 		profilePicture: question.user.profilePicture,
 		questionerName: question.user.name,
 		upvotes: question.upvotes.length,
 		favorites: question.favorites.length,
 		commentsCount: question.comments.length,
-		tags: question.tags.map((tag: { name: string }) => tag.name),
+		tags: question.tags.map((singleTag) => singleTag.tag.name),
 	}));
 
 	return NextResponse.json(questions, { status: 200 });
