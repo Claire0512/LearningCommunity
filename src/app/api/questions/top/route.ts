@@ -15,17 +15,27 @@ import {
 const GetResponseSchema = z.array(
 	z.object({
 		questionId: z.number().min(1),
-		questionTitle: z.string(),
+		questionTitle: z.string().min(1),
 		questionContext: z.string().min(1),
 		questionerId: z.number(),
-		isSolved: z.boolean(),
-		upvotes: z.number(),
-		downvotes: z.number(),
-		commentsCount: z.number(),
-		favorites: z.number(),
+		createdAt: z.date(),
+		questionerName: z.string(),
+		profilePicture: z.string().optional().nullable(),
+		upvotes: z.number().default(0),
+		downvotes: z.number().default(0),
+		commentsCount: z.number().default(0),
+		favorites: z.number().default(0),
 		tags: z.array(z.string()),
 	}),
 );
+
+const questionRequestSchema = z.object({
+	questionTitle: z.string().min(1),
+	questionContext: z.string().min(1),
+	questionerId: z.number(),
+	questionImage: z.string().optional(),
+	tags: z.array(z.string()),
+});
 
 type GetResponse = z.infer<typeof GetResponseSchema>;
 
@@ -64,6 +74,7 @@ export async function GET(req: NextRequest) {
 			questionContext: questionsTable.questionContext,
 			questionerId: questionsTable.questionerId,
 			isSolved: questionsTable.isSolved,
+			createdAt: questionsTable.createdAt,
 			questionerName: usersTable.name,
 			profilePicture: usersTable.profilePicture,
 			upvotes: upvotesSubQuery.upvotesCount,
@@ -76,37 +87,49 @@ export async function GET(req: NextRequest) {
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
 		.orderBy(desc(questionsTable.createdAt));
-
+	
 	const questionTags = db.query.questionsTable.findMany({
 		columns: {
 			questionId: true,
 		},
 		with: {
-			tags: true,
+			tags: {
+				with: {
+					tag: {
+                        columns: {
+                            name: true,
+                        },
+                    },
+				}
+			},
 		},
 		orderBy: [desc(questionsTable.createdAt)],
 	});
 
 	const [details, allTags] = await Promise.all([questionDetails, questionTags]);
-
 	const combined = details.map((detail, index) => ({
 		...detail,
-		tags: allTags[index].tags,
+		upvotes: detail.upvotes ? detail.upvotes : 0,
+		favorites: detail.favorites ? detail.favorites : 0,
+		commentsCount: detail.commentsCount ? detail.commentsCount : 0,
+		tags: allTags[index].tags.map((singleTag) => {
+			return singleTag.tag.name;
+		})
 	}));
 
 	try {
 		GetResponseSchema.parse(combined);
 	} catch (error) {
-		console.log('Error parsing response in api/questions/top/route.ts');
+		console.log('Error parsing response in api/questions/route.ts', error);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
-	combined.sort((a, b) => {
+	const sorted = combined.sort((a, b) => {
 		const popularityA = a.upvotes + a.favorites;
 		const popularityB = b.upvotes + b.favorites;
 		return popularityB - popularityA;
-	});
+	})
 
-	const data = combined.slice(0, 3);
+	const data = sorted.slice(0, 3);
 	return NextResponse.json(data, { status: 200 });
 }

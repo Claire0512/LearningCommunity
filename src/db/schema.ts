@@ -70,6 +70,7 @@ export const questionsRelations = relations(questionsTable, ({ one, many }) => (
 	comments: many(commentsTable, { relationName: "question" }),
 	tags: many(questionTagsTable),
 	upvotes: many(upvotesTable),
+	favorites: many(favoritesTable),
 }));
 
 export const commentsTable: any = pgTable('comments', {
