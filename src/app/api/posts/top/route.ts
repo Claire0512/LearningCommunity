@@ -72,6 +72,7 @@ export async function GET(req: NextRequest) {
 			postTitle: postsTable.postTitle,
 			postContext: postsTable.postContext,
 			posterId: postsTable.posterId,
+			createdAt: postsTable.createdAt,
 			posterName: usersTable.name,
 			profilePicture: usersTable.profilePicture,
 			upvotes: upvotesSubQuery.upvotesCount,
@@ -86,37 +87,52 @@ export async function GET(req: NextRequest) {
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.postId, postsTable.postId))
 		.leftJoin(usersTable, eq(usersTable.userId, postsTable.posterId))
 		.orderBy(desc(postsTable.createdAt));
-
+	
 	const postTags = db.query.postsTable.findMany({
 		columns: {
 			postId: true,
 		},
 		with: {
-			tags: true,
+			tags: {
+				with: {
+					tag: {
+                        columns: {
+                            name: true,
+                        },
+                    },
+				}
+			},
 		},
 		orderBy: [desc(postsTable.createdAt)],
 	});
 
 	const [details, allTags] = await Promise.all([postDetails, postTags]);
-
 	const combined = details.map((detail, index) => ({
 		...detail,
-		tags: allTags[index].tags,
+		upvotes: detail.upvotes ? detail.upvotes : 0,
+		downvotes: detail.downvotes ? detail.downvotes : 0,
+		favorites: detail.favorites ? detail.favorites : 0,
+		commentsCount: detail.commentsCount ? detail.commentsCount : 0,
+		tags: allTags[index].tags.map((singleTag) => {
+			return singleTag.tag.name;
+		})
 	}));
 
 	try {
 		GetResponseSchema.parse(combined);
 	} catch (error) {
-		console.log('Error parsing response in api/posts/route.ts');
+		console.log('Error parsing response in api/posts/route.ts', error);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
-	combined.sort((a, b) => {
+	const sorted = combined.sort((a, b) => {
 		const popularityA = a.upvotes + a.downvotes + a.favorites;
 		const popularityB = b.upvotes + b.downvotes + b.favorites;
 		return popularityB - popularityA;
-	});
+	})
 
-	const data = combined.slice(0, 3);
+	const data = sorted.slice(0, 3);
+
+
 	return NextResponse.json(data, { status: 200 });
 }
