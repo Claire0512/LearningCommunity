@@ -2,6 +2,8 @@
 
 import React, { useState, ChangeEvent } from 'react';
 
+import { useSession } from 'next-auth/react';
+
 import TagsSelector from '../../../../components/TagsSelector';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button } from '@mui/material';
@@ -34,6 +36,7 @@ function Page() {
 	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
+	const { data: session } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const handleSave = (selected: SelectedTag[]) => {
 		setSelectedTags(selected);
@@ -42,7 +45,7 @@ function Page() {
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
-	const posterName = 'Claire';
+	// const session?.user.username = 'Claire';
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
@@ -102,9 +105,9 @@ function Page() {
 						alignItems="center"
 						sx={{ flexWrap: 'wrap', overflow: 'hidden', paddingBottom: '10px' }}
 					>
-						<Avatar alt={posterName} src="" />
+						<Avatar alt={session?.user.name} src="" />
 						<Typography variant="subtitle1" component="div">
-							{posterName}
+							{session?.user.name}
 						</Typography>
 					</Stack>
 					<TextField

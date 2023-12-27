@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 
+import { useSession } from 'next-auth/react';
+
 import PostCard from '../../components/PostCard';
 import TagsSelector from '../../components/TagsSelector';
 import ArticleIcon from '@mui/icons-material/Article';
@@ -198,7 +200,7 @@ function Page() {
 	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<PostCardType[]>(sampleAllPosts);
 	const [searchInput, setSearchInput] = useState('');
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const { data: session } = useSession();
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleSave = (selected: SelectedTag[]) => {
@@ -207,7 +209,7 @@ function Page() {
 		console.log('Selected tags:', selected);
 	};
 	const handleCreatePostClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可發文哦');
 			event.preventDefault();
 		}
