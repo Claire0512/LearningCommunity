@@ -4,6 +4,10 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 
+import { questionsTable, commentsTable } from '@/db/schema';
+
+import { eq } from 'drizzle-orm';
+
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
 });
@@ -90,8 +94,15 @@ const GetResponseSchema = z.object({
 	comments: z.array(CommentSchema),
 });
 
+const PutRequestSchema = z.object({
+	questionId: z.number().min(1),
+	isSolved: z.boolean().optional(),
+	helpfulCommentId: z.number().optional()
+})
+
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
+type PutRequest = z.infer<typeof PutRequestSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
 	const questionId = parseInt(params.questionId);
 	const searchParams = req.nextUrl.searchParams;
@@ -212,4 +223,38 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 	};
 
 	return NextResponse.json(data, { status: 200 });
+}
+
+export async function PUT(req: NextRequest) {
+	const data = await req.json();
+	try {
+		PutRequestSchema.parse(data)
+	} catch (error) {
+		console.log('Error parsing out request in api/questions/[questionId]/route.ts');
+		return NextResponse.json({ error: 'put request invalid' }, { status: 400 });
+	}
+
+	const request = data as unknown as PutRequest;
+
+	if (request.isSolved) {
+		try {
+			await db.update(questionsTable)
+			.set({ isSolved: request.isSolved })
+			.where(eq(questionsTable.questionId, request.questionId));
+		} catch (error) {
+			console.log("Error updating question");
+			return NextResponse.json({ error: 'server error updating question' }, { status: 500 });
+		}
+	}
+
+	if (request.helpfulCommentId) {
+		try {
+			await db.update(commentsTable)
+			.set({ isHelpful: true })
+			.where(eq(commentsTable.commentId, request.helpfulCommentId));
+		} catch (error) {
+			console.log("Error updating helpful");
+			return NextResponse.json({ error: 'server error updating helpful' }, { status: 500 });
+		}
+	}
 }
