@@ -25,6 +25,7 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
 	posts: many(postsTable),
 	questions: many(questionsTable),
 	favorites: many(favoritesTable),
+	comments: many(commentsTable, { relationName: 'user' }),
 }));
 
 export const postsTable = pgTable('posts', {
@@ -93,6 +94,7 @@ export const commentsRelations = relations(commentsTable, ({ one, many }) => ({
 	user: one(usersTable, {
 		fields: [commentsTable.commenterId],
 		references: [usersTable.userId],
+		relationName: 'user'
 	}),
 	post: one(postsTable, {
 		fields: [commentsTable.postId],

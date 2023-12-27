@@ -202,12 +202,12 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			commenterId: comment.commenterId,
 			commenterName: comment.user.name,
 			commenterProfilePicture: comment.user.profilePicture,
+			text: comment.text,
 			upvotes: comment.upvotes.length,
+			isHelpful: comment.isHelpful,
 			hasUpvote: comment.upvotes.some((upvote) => upvote.userId === userId),
 			downvotes: comment.downvotes.length,
 			hasDownvote: comment.downvotes.some((downvote) => downvote.userId === userId),
-			text: comment.text,
-			isHelpful: comment.isHelpful,
 			createdAt: comment.createdAt,
 			replies: comment.replies.map((reply) => ({
 				commentId: reply.commentId,
@@ -225,5 +225,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		})),
 	};
 
+	console.log(data)
 	return NextResponse.json(data, { status: 200 });
 }
+
