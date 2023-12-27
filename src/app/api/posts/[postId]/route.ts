@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 
 const GetRequestSchema = z.object({
-	postId: z.number().min(1),
+	postId: z.string().min(1),
 });
 
 const ReplySchema = z.object({
@@ -82,11 +82,10 @@ const GetResponseSchema = z.object({
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
-	try {
-		GetRequestSchema.parse(params);
-	} catch (error) {
-		console.log('Error parsing request in api/posts/[postId]/route.ts');
-		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+
+	const postId = parseInt(params.postId);
+	if (!postId) {
+		return NextResponse.json({ error: 'Post id invalid' }, { status: 400 });
 	}
 
 	const postDetail = await db.query.postsTable.findFirst({
@@ -110,11 +109,11 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				},
 			},
 		},
-		where: (post, { eq }) => eq(post.postId, params.postId),
+		where: (post, { eq }) => eq(post.postId, postId),
 	});
 
 	if (!postDetail) {
-		return NextResponse.json({ error: 'post not found' }, { status: 404 });
+		return NextResponse.json({ error: 'Post not found' }, { status: 404 });
 	}
 
 	try {

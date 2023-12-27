@@ -15,8 +15,8 @@ type PostRequestType = z.infer<typeof PostRequestSchema>;
 
 export async function GET(req: NextRequest) {
 	const result = await db.query.tagsTable.findMany();
-	const tags = result.map((tag) => tag.name);
-	return NextResponse.json(tags, { status: 200 });
+	const data = result.map((tag) => tag.name);
+	return NextResponse.json(data, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
