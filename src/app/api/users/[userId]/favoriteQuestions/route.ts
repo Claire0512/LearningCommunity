@@ -102,13 +102,16 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		return NextResponse.json({ error: 'User not found' }, { status: 404 });
 	}
 
+	console.log(user);
 	const rawQuestions = user.favorites
-		.map((favorite) => favorite.post)
-		.filter((post) => post !== null);
+		.map((favorite) => favorite.question)
+		.filter((question) => question !== null);
 
+	console.log(rawQuestions);
 	try {
 		GetResponseSchema.parse(rawQuestions);
 	} catch (error) {
+		console.log(error);
 		console.log('Error parsing response in api/users/[userId]/questions/route.ts');
 		return NextResponse.json({ error: 'Invalid response' }, { status: 500 });
 	}
