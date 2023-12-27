@@ -1,5 +1,5 @@
 import api from '@/lib/api/base';
-import { PostCardType, NewPostType } from '@/lib/types';
+import { PostCardType, NewPostType , PostCardDetailType} from '@/lib/types';
 
 export const getAllPosts = async () => {
 	try {
@@ -28,7 +28,7 @@ export const getTop3HotPosts = async () => {
 export const getPostDetail = async (postId: number) => {
 	try {
 		const response = await api.get(`/api/posts/${postId}`);
-		return response.data as PostCardType;
+		return response.data as PostCardDetailType;
 	} catch (error) {
 		console.error('Error getPostDetail :', error);
 		throw error;

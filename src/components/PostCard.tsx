@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
@@ -13,7 +15,7 @@ function getTimeDifference(createdAt: string) {
 	const postDate = new Date(createdAt).getTime();
 	const now = new Date().getTime();
 	const differenceInMilliseconds = now - postDate;
-
+	const router = useRouter();
 	const minutes = Math.floor(differenceInMilliseconds / 60000);
 	const hours = Math.floor(minutes / 60);
 	const days = Math.floor(hours / 24);
@@ -31,6 +33,7 @@ function PostCard(post: PostCardType) {
 	const [visibleTags, setVisibleTags] = useState<string[]>(post.tags);
 	const tagContainerRef = useRef<HTMLDivElement>(null);
 	const theme = useTheme();
+	const router = useRouter();
 	const formattedTime = getTimeDifference(post.createdAt);
 	// console.log("post.tags", post.tags);
 	useEffect(() => {
@@ -66,8 +69,13 @@ function PostCard(post: PostCardType) {
 		};
 	}, [post.tags]);
 
+	const handleCardClick = () => {
+		router.push(`/resources/post/${post.postId}`);
+	};
+
 	return (
 		<Card
+			onClick={handleCardClick}
 			sx={{
 				minWidth: 360,
 				maxWidth: 360,

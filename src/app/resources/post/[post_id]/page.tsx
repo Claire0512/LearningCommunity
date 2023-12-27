@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 
 import { useSession } from 'next-auth/react';
+import { useParams } from 'next/navigation';
 
 import getTimeDifference from '../../../../components/getTimeDifference';
+import { getPostDetail } from '../../../../lib/api/resources/apiEndpoints';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -25,73 +27,17 @@ import {
 	IconButton,
 } from '@mui/material';
 
-const samplePosts = {
-	postId: 123,
-	postTitle: 'Innovative Tech Gadgets',
-	postContext:
-		'Exploring the latest in technology and gadgets. Exploring the latest in technology and gadgets. Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.Exploring the latest in technology and gadgets.vvv',
-	postImage: 'url/to/poster/profile.jpg',
-	posterId: '999',
-	posterName: 'TechSavvy',
-	profilePicture: 'url/to/poster/profile.jpg',
-	upvotes: 250,
-	downvotes: 15,
-	commentsCount: 45,
-	favorites: 100,
-	createdAt: '2023 11 05 19:00',
-	tags: ['technology', 'gadgets', 'innovation'],
-	comments: [
-		{
-			commentId: 1001,
-			commenterId: '123',
-			commenterName: 'Alice',
-			commenterProfilePicture: 'url/to/profile/alice.jpg',
-			upvotes: 123,
-			downvotes: 123,
-			hasUpvoted: false,
-			hasDownvoted: true,
-			text: '早安一二三四五\n六七八',
-			replies: [
-				{
-					commentId: 1002,
-					commenterId: 'userB',
-					commenterName: 'Bob',
-					commenterProfilePicture: 'url/to/profile/bob.jpg',
-					text: 'iiiiiiiii',
-				},
-				{
-					commentId: 1003,
-					commenterId: 'userC',
-					commenterName: 'Charlie',
-					commenterProfilePicture: 'url/to/profile/charlie.jpg',
-					text: 'pppp',
-				},
-			],
-		},
-		{
-			commentId: 1004,
-			commenterId: '333',
-			commenterName: 'Diana',
-			commenterProfilePicture: 'url/to/profile/diana.jpg',
-			text: 'ppppp',
-			replies: [
-				{
-					commentId: 1005,
-					commenterId: '111',
-					commenterName: 'Ethan',
-					commenterProfilePicture: 'url/to/profile/ethan.jpg',
-					text: 'iiiiii',
-				},
-			],
-		},
-	],
-};
+import type { PostCardDetailType } from '@/lib/types';
 
 function Page() {
 	const theme = useTheme();
+	const { postId } = useParams<{ postId: string }>(); // 獲取 URL 中的 postId 參數
+	const [post, setPost] = useState<PostCardDetailType | null>(null); // 儲存帖子詳情
+
 	const [newComment, setNewComment] = useState('');
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
-	const formattedTime = getTimeDifference(samplePosts.createdAt);
+	const [formattedTime, setFormattedTime] = useState('');
+
 	const { data: session } = useSession();
 	const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
@@ -100,7 +46,25 @@ function Page() {
 	const handleReplyChange = (commentId: number, event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
 	};
+	useEffect(() => {
+		// 加載帖子詳情
+		const fetchPostDetail = async () => {
+			if (postId) {
+				try {
+					const postData = await getPostDetail(Number(postId));
+					setPost(postData);
+					setFormattedTime(getTimeDifference(postData.createdAt));
+				} catch (error) {
+					console.error('Error fetching post detail:', error);
+				}
+			}
+		};
 
+		fetchPostDetail();
+	}, [postId]);
+	if (!post) {
+		return <div>Loading...</div>;
+	}
 	const [upvoted, setUpvoted] = useState(false);
 	const [downvoted, setDownvoted] = useState(false);
 
@@ -187,9 +151,9 @@ function Page() {
 						alignItems="center"
 						sx={{ flexWrap: 'wrap', overflow: 'hidden' }}
 					>
-						<Avatar alt={samplePosts.posterName} src={samplePosts.profilePicture} />
+						<Avatar alt={post.posterName} src={post.profilePicture} />
 						<Typography variant="subtitle1" component="div">
-							{samplePosts.posterName}
+							{post.posterName}
 						</Typography>
 						<Typography variant="body2" sx={{ marginLeft: 1 }}>
 							{formattedTime}
@@ -200,7 +164,7 @@ function Page() {
 						component="div"
 						sx={{ marginTop: '10px', marginLeft: '5px' }}
 					>
-						{samplePosts.postTitle}
+						{post.postTitle}
 					</Typography>
 
 					<Stack direction="row" spacing={1} alignItems="center">
@@ -210,25 +174,25 @@ function Page() {
 						>
 							<ThumbUpAltIcon />
 						</IconButton>
-						<Typography variant="body2">{samplePosts.upvotes}</Typography>
+						<Typography variant="body2">{post.upvotes}</Typography>
 						<IconButton
 							onClick={handleDownvote}
 							color={downvoted ? 'secondary' : 'default'}
 						>
 							<ThumbDownAltIcon />
 						</IconButton>
-						<Typography variant="body2">{samplePosts.downvotes}</Typography>
+						<Typography variant="body2">{post.downvotes}</Typography>
 						<IconButton>
 							<CommentIcon />
 						</IconButton>
-						<Typography variant="body2">{samplePosts.commentsCount}</Typography>
+						<Typography variant="body2">{post.commentsCount}</Typography>
 						<IconButton
 							onClick={handleFavorite}
 							color={favorited ? 'secondary' : 'default'}
 						>
 							<BookmarkIcon />
 						</IconButton>
-						<Typography variant="body2">{samplePosts.favorites}</Typography>
+						<Typography variant="body2">{post.favorites}</Typography>
 					</Stack>
 					<Divider
 						sx={{
@@ -250,7 +214,7 @@ function Page() {
 							marginLeft: '10px',
 						}}
 					>
-						{samplePosts.postContext}
+						{post.postContext}
 					</Typography>
 					<Box
 						sx={{
@@ -263,7 +227,7 @@ function Page() {
 							marginTop: '10px',
 						}}
 					>
-						{samplePosts.tags.map((tag) => (
+						{post.tags.map((tag) => (
 							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
 						))}
 					</Box>
@@ -271,7 +235,7 @@ function Page() {
 
 				<CardContent sx={{ paddingTop: '5px' }}>
 					<List sx={{ borderRadius: '30px' }}>
-						{samplePosts.comments.map((comment, index) => (
+						{post.comments.map((comment, index) => (
 							<React.Fragment key={comment.commentId}>
 								{index >= 0 && <Divider />}
 								<ListItem alignItems="flex-start">

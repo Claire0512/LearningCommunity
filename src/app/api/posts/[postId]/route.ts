@@ -208,6 +208,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			hasDownvote: comment.downvotes.some((downvote) => downvote.userId === userId),
 			text: comment.text,
 			isHelpful: comment.isHelpful,
+			createdAt: comment.createdAt,
 			replies: comment.replies.map((reply) => ({
 				commentId: reply.commentId,
 				commenterId: reply.commenterId,
