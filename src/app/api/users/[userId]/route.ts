@@ -12,7 +12,7 @@ const GetResponseSchema = z.object({
 	userId: z.number(),
 	name: z.string(),
 	email: z.string(),
-	profilePicture: z.string(),
+	profilePicture: z.string().optional().nullable(),
 	points: z.number(),
 	posts: z.array(z.object({
 		upvotes: z.array(z.object({
@@ -130,9 +130,12 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		return NextResponse.json({ error: 'User not found' }, { status: 404 });
 	}
 
+	console.log(user);
+
 	try {
 		GetResponseSchema.parse(user);
 	} catch (error) {
+		console.log(error);
 		return NextResponse.json({ error: 'Server fetch error' }, { status: 500 });
 	}
 
