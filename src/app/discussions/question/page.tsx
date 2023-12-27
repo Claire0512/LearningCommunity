@@ -2,6 +2,9 @@
 
 import React, { useState, ChangeEvent } from 'react';
 
+import { useSession } from 'next-auth/react';
+
+import getTimeDifference from '../../../components/getTimeDifference';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -80,27 +83,11 @@ const sampleQuestions = {
 		},
 	],
 };
-function getTimeDifference(createdAt: string) {
-	const questionDate = new Date(createdAt).getTime();
-	const now = new Date().getTime();
-	const differenceInMilliseconds = now - questionDate;
 
-	const minutes = Math.floor(differenceInMilliseconds / 60000);
-	const hours = Math.floor(minutes / 60);
-	const days = Math.floor(hours / 24);
-
-	if (minutes < 60) {
-		return `${minutes} 分鐘前`;
-	} else if (hours < 24) {
-		return `${hours} 小時前`;
-	} else {
-		return `${days} 天前`;
-	}
-}
 function Page() {
 	const theme = useTheme();
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+	const { data: session } = useSession();
 	const [newComment, setNewComment] = useState('');
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const formattedTime = getTimeDifference(sampleQuestions.createdAt);
@@ -117,7 +104,7 @@ function Page() {
 	const [favorited, setFavorited] = useState(false);
 
 	const handleUpvote = () => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可使用此功能');
 			return;
 		}
@@ -125,7 +112,7 @@ function Page() {
 	};
 
 	const handleDownvote = () => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可使用此功能');
 			return;
 		}
@@ -133,7 +120,7 @@ function Page() {
 	};
 
 	const handleFavorite = () => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可使用此功能');
 			return;
 		}
@@ -141,14 +128,14 @@ function Page() {
 	};
 
 	const handleSubmitComment = () => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可留言哦');
 			return;
 		}
 	};
 
 	const handleSubmitReply = (commentId: number) => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可留言哦');
 			return;
 		}

@@ -5,11 +5,10 @@ import { getRestaurantInfoStatus } from '@/lib/api/restaurant/api';
 const useRedirect = () => {
 	const [isRedirecting, setIsRedirecting] = useState(false);
 	const [redirectURL, setRedirectURL] = useState('');
-	const [restaurantId, setRestaurantId] = useState(-1);
+	const { data: session } = useSession();
 	useEffect(() => {
-		const id = localStorage.getItem('id');
-		const parsedId = id ? parseInt(id, 10) : null;
-		if (!parsedId) {
+		
+		if (!session) {
 			setIsRedirecting(true);
 			setRedirectURL('/');
 		} else {

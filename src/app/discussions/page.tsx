@@ -2,21 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 
-import Bar from '../../components/AppBar';
+import { useSession } from 'next-auth/react';
+
 import QuestionCard from '../../components/QuestionCard';
 import TagsSelector from '../../components/TagsSelector';
 import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
-// import useRedirect from '@/hooks/useRedirect';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { Box, Button, Dialog, TextField, Chip, Typography } from '@mui/material';
 import { Fab } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-// 引入筆的圖標
 import type { QuestionCardType } from '@/lib/types';
 
-// Import your TagsSelector component
 const sampleTags = {
 	grades: [
 		{ id: 1, name: 'Grade 1' },
@@ -221,7 +219,7 @@ function Page() {
 	const [filteredQuestions, setFilteredQuestions] =
 		useState<QuestionCardType[]>(sampleAllQuestions);
 	const [searchInput, setSearchInput] = useState('');
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	// const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleSave = (selected: SelectedTag[]) => {
@@ -229,8 +227,9 @@ function Page() {
 		handleCloseModal();
 		console.log('Selected tags:', selected);
 	};
+	const { data: session } = useSession();
 	const handleCreateQuestionClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-		if (!isLoggedIn) {
+		if (!session) {
 			alert('登入後才可發問哦');
 			event.preventDefault();
 		}
@@ -347,7 +346,7 @@ function Page() {
 				))}
 			</Box>
 			<a
-				href="/resources/question/new"
+				href="/discussions/question/new"
 				style={{ textDecoration: 'none' }}
 				onClick={handleCreateQuestionClick}
 			>

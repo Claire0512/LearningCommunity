@@ -219,7 +219,8 @@ function Page() {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						ml: '40px',
+						ml: '35px',
+						mr: '10px',
 					}}
 				>
 					<Avatar
@@ -228,11 +229,11 @@ function Page() {
 						sx={{ width: 70, height: 70 }}
 					/>
 				</Box>
-				<CardContent sx={{ flex: '1 0 auto', width: '40%', marginTop: '25px' }}>
+				<CardContent sx={{ flex: '1 0 auto', width: '40%', marginTop: '10px' }}>
 					<Typography variant="h6" component="div">
 						{sampleUser.userName}
 					</Typography>
-					<Typography variant="body1" component="div">
+					<Typography variant="body1" component="div" sx={{ marginBottom: '5px' }}>
 						{sampleUser.email}
 					</Typography>
 					<Stack direction="row" spacing={1} alignItems="center">
@@ -261,7 +262,7 @@ function Page() {
 				</Box>
 			</Card>
 
-			<Dialog open={openDialog} onClose={handleCloseDialog}>
+			<Dialog open={openDialog} onClose={handleCloseDialog} sx={{ borderRadius: '10px' }}>
 				<DialogTitle sx={{ textAlign: 'center' }}>編輯個人資料</DialogTitle>
 				<DialogContent>
 					<Stack spacing={3} className="mt-[10px]">
@@ -326,6 +327,7 @@ function Page() {
 						sx={{
 							mt: 2,
 							ml: 1,
+							mb: 1,
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
@@ -340,6 +342,7 @@ function Page() {
 						sx={{
 							mt: 2,
 							ml: 1,
+							mb: 1,
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',

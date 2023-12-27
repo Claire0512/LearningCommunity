@@ -51,7 +51,7 @@ function Page() {
 		if (!loginSuccess) {
 			return;
 		}
-
+		showSnackbar('Sign up success!', 'success');
 		router.push('/');
 	};
 
@@ -67,7 +67,7 @@ function Page() {
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '25px' }}>
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
 						<Image src="/images/logo.png" alt="Logo" width={100} height={100} />
 					</div>
 					<p

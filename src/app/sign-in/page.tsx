@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
 
+import logIn from '@/endpoints/users/login';
+
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
 function Page() {
@@ -20,11 +22,16 @@ function Page() {
 	const router = useRouter();
 	const commonTextClass = 'text-base';
 
-	const handleSignIn = async () => {};
-
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		await handleSignIn();
+
+		const loginSuccess = await logIn(email, password);
+		if (!loginSuccess) {
+			showSnackbar('帳號或密碼錯誤', 'error');
+			return;
+		}
+		showSnackbar('Sign in success!', 'success');
+		router.push('/');
 	};
 
 	const showSnackbar = (message: string, severity: AlertColor) => {
