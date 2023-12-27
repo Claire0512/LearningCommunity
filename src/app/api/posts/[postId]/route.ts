@@ -26,8 +26,9 @@ const ReplySchema = z.object({
 		}),
 	),
 	user: z.object({
+		userId: z.number().min(1),
 		name: z.string().min(1),
-		profilePicture: z.string().min(1),
+		profilePicture: z.string().nullable(),
 	}),
 });
 
@@ -49,8 +50,9 @@ const CommentSchema = z.object({
 		}),
 	),
 	user: z.object({
+		userId: z.number().min(1),
 		name: z.string().min(1),
-		profilePicture: z.string().min(1),
+		profilePicture: z.string().nullable(),
 	}),
 	replies: z.array(ReplySchema),
 });
@@ -60,13 +62,18 @@ const GetResponseSchema = z.object({
 	postTitle: z.string(),
 	postContext: z.string().min(1),
 	posterId: z.number(),
-	tags: z.array(z.string()),
-	isSolved: z.boolean(),
-	comments: z.array(CommentSchema),
+	postImage: z.string().nullable(),
+	createdAt: z.date(),
 	user: z.object({
+		userId: z.number().min(1),
 		name: z.string().min(1),
-		profilePicture: z.string().min(1),
+		profilePicture: z.string().nullable(),
 	}),
+	tags: z.array(z.object({
+		tag: z.object({
+			name: z.string()
+		})
+	})),
 	upvotes: z.array(
 		z.object({
 			userId: z.number().min(1),
@@ -77,6 +84,12 @@ const GetResponseSchema = z.object({
 			userId: z.number().min(1),
 		}),
 	),
+	favorites: z.array(
+		z.object({
+			userId: z.number().min(1),
+		}),
+	),
+	comments: z.array(CommentSchema),
 });
 
 type GetRequest = z.infer<typeof GetRequestSchema>;
@@ -84,19 +97,56 @@ type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
 
 	const postId = parseInt(params.postId);
+	const searchParams = req.nextUrl.searchParams;
+	const userId = parseInt(searchParams.get('userId') || '');
+
 	if (!postId) {
 		return NextResponse.json({ error: 'Post id invalid' }, { status: 400 });
 	}
 
 	const postDetail = await db.query.postsTable.findFirst({
 		with: {
-			user: true,
-			tags: true,
-			upvotes: true,
-			downvotes: true,
+			user: {
+				columns: {
+					userId: true,
+					name: true,
+					profilePicture: true
+				}
+			},
+			tags: {
+				columns: {},
+				with: {
+					tag: {
+						columns: {
+							name: true,
+						}
+					}
+				}
+			},
+			upvotes: {
+				columns: {
+					userId: true,
+				}
+			},
+			downvotes: {
+				columns: {
+					userId: true,
+				}
+			},
+			favorites: {
+				columns: {
+					userId: true,
+				}
+			},
 			comments: {
 				with: {
-					user: true,
+					user: {
+						columns: {
+							userId: true,
+							name: true,
+							profilePicture: true
+						}
+					},
 					replies: {
 						with: {
 							user: true,
@@ -116,31 +166,45 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		return NextResponse.json({ error: 'Post not found' }, { status: 404 });
 	}
 
+	console.log(postDetail);
+
 	try {
-		CommentSchema.parse(postDetail);
+		GetResponseSchema.parse(postDetail);
 	} catch (err) {
 		console.log('Error parsing response in api/posts/[postId]/route.ts');
+		console.log(err);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
 	const parsedDetail = postDetail as unknown as GetResponse;
 
-	const response = {
+	const data = {
 		postId: parsedDetail.postId,
 		postTitle: parsedDetail.postTitle,
 		postContext: parsedDetail.postContext,
 		posterId: parsedDetail.posterId,
 		posterName: parsedDetail.user.name,
-		isSolved: parsedDetail.isSolved,
-		tags: parsedDetail.tags,
+		profilePicture: parsedDetail.user.profilePicture,
+		tags: parsedDetail.tags.map(singleTag => {
+			return singleTag.tag.name
+		}),
+		createdAt: parsedDetail.createdAt,
 		upvotes: parsedDetail.upvotes.length,
+		hasUpvote: parsedDetail.upvotes.some(upvote => upvote.userId === userId),
 		downvotes: parsedDetail.downvotes.length,
+		hasDownvote: parsedDetail.downvotes.some(downvote => downvote.userId === userId),
+		favorites: parsedDetail.favorites.length,
+		hasFavorite: parsedDetail.favorites.some(favorite => favorite.userId === userId),
 		commentsCount: parsedDetail.comments.length,
 		comments: parsedDetail.comments.map((comment) => ({
 			commentId: comment.commentId,
 			commenterId: comment.commenterId,
 			commenterName: comment.user.name,
 			commenterProfilePicture: comment.user.profilePicture,
+			upvotes: comment.upvotes.length,
+			hasUpvote: comment.upvotes.some(upvote => upvote.userId === userId),
+			downvotes: comment.downvotes.length,
+			hasDownvote: comment.upvotes.some(downvote => downvote.userId === userId),
 			text: comment.text,
 			isHelpful: comment.isHelpful,
 			replies: comment.replies.map((reply) => ({
@@ -150,9 +214,14 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 				commenterProfilePicture: reply.user.profilePicture,
 				text: reply.text,
 				isHelpful: reply.isHelpful,
+				upvotes: reply.upvotes.length,
+				hasUpvote: reply.upvotes.some(upvote => upvote.userId === userId),
+                downvotes: reply.downvotes.length,
+                hasDownvote: reply.upvotes.some(downvote => downvote.userId === userId),
+                createdAt: reply.createdAt,
 			})),
 		})),
 	};
 
-	return NextResponse.json(response, { status: 200 });
+	return NextResponse.json(data, { status: 200 });
 }
