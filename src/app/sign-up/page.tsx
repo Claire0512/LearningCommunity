@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
 
-import logIn from '@/endpoints/users/login';
-import signUp from '@/endpoints/users/signup';
+import logIn from '@/lib/api/users/login';
+import signUp from '@/lib/api/users/signup';
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
