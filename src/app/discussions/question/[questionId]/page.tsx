@@ -265,9 +265,7 @@ function Page() {
 						</IconButton>
 						<Typography variant="body2">{question.upvotes}</Typography>
 
-						<IconButton
-							color={question.hasComment ? 'secondary' : 'default'}
-						>
+						<IconButton color={question.hasComment ? 'secondary' : 'default'}>
 							<CommentIcon />
 						</IconButton>
 						<Typography variant="body2">{question.commentsCount}</Typography>

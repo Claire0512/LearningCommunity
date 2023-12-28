@@ -77,7 +77,6 @@ function Page() {
 		setSearchInput(event.target.value);
 	};
 
-
 	return (
 		<>
 			<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -156,12 +155,11 @@ function Page() {
 				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
 			</Dialog>
 			<TextField
-				
 				placeholder="Search..."
 				value={searchInput}
 				onChange={handleSearchChange}
 				sx={{ mt: 4, mb: 4, borderRadius: '15px' }}
-				color='secondary'
+				color="secondary"
 			/>
 			<Box
 				sx={{

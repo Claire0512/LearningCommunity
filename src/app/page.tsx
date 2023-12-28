@@ -34,7 +34,7 @@ const cardData = [
 
 export default function Home() {
 	return (
-		<Box component="main" className="flex min-h-full flex-col bg-[#FCFAF5]">
+		<Box component="main" className="flex min-h-full flex-col ">
 			<Bar activeButton="首頁" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">

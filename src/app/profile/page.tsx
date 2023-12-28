@@ -17,11 +17,13 @@ import {
 } from '../../lib/api/users/apiEndpoints';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CreateIcon from '@mui/icons-material/Create';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import StarIcon from '@mui/icons-material/Star';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { Button } from '@mui/material';
-import { Card, CardContent, Typography, TextField, Dialog, useTheme } from '@mui/material';
+import { Fab, Card, Typography, TextField, Dialog, useTheme } from '@mui/material';
 import { Avatar, Stack, Box } from '@mui/material';
 import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
@@ -40,6 +42,7 @@ function Page() {
 	const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 	const [userPosts, setUserPosts] = useState<PostCardType[]>([]);
 	const [userFavoritePosts, setUserFavoritePosts] = useState<PostCardType[]>([]);
+	const userId = session?.user?.userId;
 
 	const [userQuestions, setUserQuestions] = useState<QuestionCardType[]>([]);
 
@@ -53,16 +56,17 @@ function Page() {
 		setOpenDialog(false);
 	};
 	useEffect(() => {
+		console.log('hi');
 		const fetchData = async () => {
 			try {
-				const userId = session?.user?.userId;
-				const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] = await Promise.all([
-					getUserPosts(userId),
-					getUserFavoritePosts(userId),
-					getUserQuestions(userId),
-					getUserFavoriteQuestions(userId),
-					getUserInfo(userId)
-				]);
+				const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] =
+					await Promise.all([
+						getUserPosts(userId),
+						getUserFavoritePosts(userId),
+						getUserQuestions(userId),
+						getUserFavoriteQuestions(userId),
+						getUserInfo(userId),
+					]);
 				setUserInfo(userInfoData);
 				setUserPosts(posts);
 				setUserFavoritePosts(favoritePosts);
@@ -74,9 +78,10 @@ function Page() {
 				console.error('Error fetching data:', error);
 			}
 		};
-
 		fetchData();
-	}, [session?.user.userId]);
+		console.log('data fetched!');
+	}, [userId]);
+
 	const handleSave = async () => {
 		if (!userInfo) return;
 		if (!newName.trim() || !currentPassword.trim()) {
@@ -121,23 +126,23 @@ function Page() {
 				<Card
 					sx={{
 						width: '45%',
-						height: 'auto',
+						height: '150px',
 						m: 2,
 						display: 'flex',
 						borderRadius: '10px',
 						backgroundColor: '#FEFDFA',
 						position: 'relative',
 						margin: 'auto',
+						flexDirection: 'row',
 					}}
 				>
 					<Box
 						sx={{
-							width: '40%',
+							width: '50%',
 							display: 'flex',
+							flexDirection: 'row', // 更新為 row
 							alignItems: 'center',
 							justifyContent: 'center',
-							ml: '35px',
-							mr: '10px',
 						}}
 					>
 						<Avatar
@@ -145,38 +150,102 @@ function Page() {
 							src={userInfo.profilePicture || ''}
 							sx={{ width: 70, height: 70 }}
 						/>
-					</Box>
-					<CardContent sx={{ flex: '1 0 auto', width: '40%', marginTop: '10px' }}>
-						<Typography variant="h6" component="div">
-							{userInfo.name}
-						</Typography>
-						<Stack direction="row" spacing={1} alignItems="center">
-							<FavoriteIcon color="error" /> <span>{userInfo.hearts}</span>
-							<ThumbUpIcon color="primary" /> <span>{userInfo.upvotes}</span>
-							<ThumbDownIcon color="error" /> <span>{userInfo.downvotes}</span>
-							<BookmarkIcon color="primary" /> <span>{userInfo.favorites}</span>
-							<CheckCircleIcon color="success" /> <span>{userInfo.checkmarks}</span>
-						</Stack>
-					</CardContent>
-					<Box sx={{ p: 5, display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-						<Button
-							variant="contained"
-							color="secondary"
-							onClick={handleOpenDialog}
+						<Box
 							sx={{
-								mt: 2,
-								ml: 1,
-								bgcolor: `${theme.palette.secondary.main} !important`,
-								height: '40px',
-								borderRadius: '20px',
+								display: 'flex',
+								flexDirection: 'column', // 新增
+								ml: 3, // 新增間距
 							}}
 						>
-							編輯
-						</Button>
+							<Typography variant="h5" component="div">
+								{userInfo.name}
+							</Typography>
+							<Typography variant="body1" component="div">
+								{userInfo.email}
+							</Typography>
+						</Box>
+					</Box>
+					<Box
+						sx={{
+							width: '50%',
+							display: 'flex',
+							flexDirection: 'column',
+							justifyContent: 'center',
+						}}
+					>
+						<Stack direction="row" spacing={2} alignItems="center">
+							<FavoriteIcon sx={{ color: '#EDC0C0' }} />
+							<Box
+								sx={{
+									minWidth: '3ch',
+									display: 'flex',
+									justifyContent: 'flex-end',
+								}}
+							>
+								<span>{userInfo.hearts.toString().padStart(3, ' ')}</span>
+							</Box>
+							<ThumbUpIcon sx={{ color: '#BFD1ED' }} />
+							<Box
+								sx={{
+									minWidth: '3ch',
+									display: 'flex',
+									justifyContent: 'flex-end',
+								}}
+							>
+								<span>{userInfo.upvotes.toString().padStart(3, ' ')}</span>
+							</Box>
+							<ThumbDownIcon sx={{ color: '#EDD9C0' }} />
+							<Box
+								sx={{
+									minWidth: '3ch',
+									display: 'flex',
+									justifyContent: 'flex-end',
+								}}
+							>
+								<span>{userInfo.downvotes.toString().padStart(3, ' ')}</span>
+							</Box>
+						</Stack>
+						<Stack direction="row" spacing={2} alignItems="center" mt={1}>
+							<BookmarkIcon sx={{ color: '#D2C0ED' }} />
+							<Box
+								sx={{
+									minWidth: '3ch',
+									display: 'flex',
+									justifyContent: 'flex-end',
+								}}
+							>
+								<span>{userInfo.favorites.toString().padStart(3, ' ')}</span>
+							</Box>
+							<CheckCircleIcon sx={{ color: '#C0EDD4' }} />
+							<Box
+								sx={{
+									minWidth: '3ch',
+									display: 'flex',
+									justifyContent: 'flex-end',
+								}}
+							>
+								<span>{userInfo.checkmarks.toString().padStart(3, ' ')}</span>
+							</Box>
+							<StarIcon sx={{ color: '#EDE7C0' }} />
+							<Box
+								sx={{
+									minWidth: '3ch',
+									display: 'flex',
+									justifyContent: 'flex-end',
+								}}
+							>
+								<span>{userInfo.points.toString().padStart(3, ' ')}</span>
+							</Box>
+						</Stack>
 					</Box>
 				</Card>
 			)}
-			<Dialog open={openDialog} onClose={handleCloseDialog} sx={{ borderRadius: '10px', backgroundColor:'#FEFDFA' }}>
+
+			<Dialog
+				open={openDialog}
+				onClose={handleCloseDialog}
+				sx={{ borderRadius: '10px', backgroundColor: '#FEFDFA' }}
+			>
 				<DialogTitle sx={{ textAlign: 'center' }}>編輯個人資料</DialogTitle>
 				<DialogContent>
 					<Stack spacing={3} className="mt-[10px]">
@@ -292,6 +361,36 @@ function Page() {
 				items={userFavoritePosts}
 				renderPostItem={(post) => <PostCard key={post.postId} {...post} />}
 			/>
+
+			<Fab
+				color="secondary"
+				aria-label="我要發文"
+				style={{
+					position: 'fixed',
+					bottom: 20,
+					right: 20,
+					backgroundColor: `${theme.palette.secondary.main} !important`,
+				}}
+				onClick={handleOpenDialog}
+			>
+				<CreateIcon />
+			</Fab>
+			{/* <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+						<Button
+							variant="contained"
+							color="secondary"
+							onClick={handleOpenDialog}
+							sx={{
+								mt: 2,
+								ml: 1,
+								bgcolor: `${theme.palette.secondary.main} !important`,
+								height: '40px',
+								borderRadius: '20px',
+							}}
+						>
+							編輯
+						</Button>
+					</Box> */}
 		</div>
 	);
 }
