@@ -2,9 +2,10 @@ export type PostCardType = {
 	postId: number;
 	postTitle: string;
 	postContext: string;
+	postImage?: string | null;
 	posterId: number;
 	posterName: string;
-	profilePicture: string;
+	profilePicture: string | null;
 	upvotes: number;
 	downvotes: number;
 	commentsCount: number;
@@ -31,6 +32,7 @@ export type PostCardDetailType = {
 	postId: number;
 	postTitle: string;
 	postContext: string;
+	postImage?: string | null;
 	posterId: number;
 	posterName: string;
 	profilePicture: string | null | undefined;
@@ -66,6 +68,7 @@ export type QuestionCardType = {
 	questionId: number;
 	questionTitle: string;
 	questionContext: string;
+	questionImage?: string | null;
 	questionerId: number;
 	questionerName: string;
 	profilePicture: string;
@@ -80,6 +83,7 @@ export type QuestionCardDetailType = {
 	questionId: number;
 	questionTitle: string;
 	questionContext: string;
+	questionImage?: string | null;
 	questionerId: number;
 	questionerName: string;
 	profilePicture: string | null | undefined;

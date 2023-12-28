@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useSession } from 'next-auth/react';
+import { UploadButton } from "@/utils/uploadthing";
 
 import { ExpandableSection } from '../../components/ExpandableSection';
 import PostCard from '../../components/PostCard';
@@ -277,6 +278,16 @@ function Page() {
 							color="secondary"
 							onChange={(e) => setNewProfilePicture(e.target.value)}
 						/>
+						<UploadButton
+							endpoint="imageUploader"
+							onClientUploadComplete={(res) => {
+								setNewProfilePicture(res[0].url);
+							}}
+							onUploadError={(error: Error) => {
+								alert(`ERROR! ${error.message}`);
+							}}
+						/>
+
 						<TextField
 							margin="dense"
 							label="當前密碼"
