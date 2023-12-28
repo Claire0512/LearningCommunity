@@ -95,16 +95,17 @@ export type QuestionCardDetailType = {
 	hasComment: boolean;
 };
 export type NotificationType = {
+	notificationId: number;
+	notificationType: string;
 	userId: number;
-	replierId: number;
-	replierName: string;
-	postTitle: string;
-	questionTitle: null;
+	postTitle: string | null;
+	questionTitle: string | null;
 	isRead: boolean;
 	createdAt: string;
-	NotificationId: number;
-	postId: number;
-	questionId: null;
+	postId: number | null;
+	questionId: number | null;
+	lastNotifyUserId: number;
+	lastNotifyUsername: string;
 };
 
 export type NewCommentType = {

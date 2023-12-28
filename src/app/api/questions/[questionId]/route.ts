@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
-import { questionsTable, commentsTable } from '@/db/schema';
+import { questionsTable, commentsTable, notificationsTable } from '@/db/schema';
 
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
@@ -226,6 +226,14 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		})),
 	};
 
+	try {
+		await db.update(notificationsTable)
+			.set({isRead: true})
+			.where(eq(notificationsTable.questionId, parsedDetail.questionId))
+	} catch (error) {
+		console.error("Update notification status failed in questions/[questionId]/route.ts", error);
+		return NextResponse.json({ error: "server error" }, { status: 500 })
+	}
 	return NextResponse.json(data, { status: 200 });
 }
 
