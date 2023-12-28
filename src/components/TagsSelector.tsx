@@ -35,7 +35,7 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 			PaperProps={{
 				sx: {
 					borderRadius: '30px',
-					backgroundColor: '#BFD1ED',
+					backgroundColor: '#FEFDFA',
 				},
 			}}
 		>
@@ -59,12 +59,12 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 							onClick={() => toggleTag(tagName)}
 							variant={isTagSelected(tagName) ? 'filled' : 'outlined'}
 							sx={{
-								bgcolor: isTagSelected(tagName) ? 'primary.main' : 'default',
-								color: isTagSelected(tagName) ? 'common.white' : 'primary.main',
+								bgcolor: isTagSelected(tagName) ? 'secondary.main' : '#EBEBEB',
+								color: isTagSelected(tagName) ? 'common.black' : 'common.black',
 								'&:hover': {
-									bgcolor: 'primary.light',
+									bgcolor: 'secondary.light',
 								},
-								borderColor: 'primary.main',
+								borderColor: isTagSelected(tagName) ? 'secondary.main' : '#EBEBEB',
 								borderWidth: '1px',
 							}}
 						/>

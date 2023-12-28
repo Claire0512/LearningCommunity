@@ -22,7 +22,7 @@ const layout = ({ children }: Props) => {
 						display: 'flex',
 						flexDirection: 'column',
 						alignItems: 'center',
-						padding: 10,
+						padding: 5,
 					}}
 				>
 					{children}

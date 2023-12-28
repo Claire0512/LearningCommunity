@@ -21,6 +21,7 @@ function Page() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]); // 更新狀態類型
 	const [filteredQuestions, setFilteredQuestions] = useState<QuestionCardType[]>([]);
+	const [questions, setQuestions] = useState<QuestionCardType[]>([]);
 	const [hotQuestions, setHotQuestions] = useState<QuestionCardType[]>([]);
 	const [tags, setTags] = useState<string[]>([]);
 	const [searchInput, setSearchInput] = useState('');
@@ -46,7 +47,7 @@ function Page() {
 				const questions = await getAllQuestions();
 				const hotQs = await getTop3HotQuestions();
 				const fetchedTags = await getAllTags();
-
+				setQuestions(questions);
 				setFilteredQuestions(questions);
 				setHotQuestions(hotQs);
 				setTags(fetchedTags);
@@ -65,13 +66,14 @@ function Page() {
 				: (question: QuestionCardType) => true;
 
 		const filterBySearch = (question: QuestionCardType) =>
+			searchInput === '' ||
 			question.questionTitle.toLowerCase().includes(searchInput.toLowerCase());
 
-		const newFilteredQuestions = filteredQuestions.filter(
+		const newFilteredQuestions = questions.filter(
 			(question: QuestionCardType) => filterByTags(question) && filterBySearch(question),
 		);
 		setFilteredQuestions(newFilteredQuestions);
-	}, [selectedTags, searchInput]);
+	}, [selectedTags, searchInput, questions]);
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
@@ -84,7 +86,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '28px',
+						fontSize: '24px',
 						textAlign: 'center',
 					}}
 				>
@@ -100,7 +102,6 @@ function Page() {
 					gridTemplateColumns: 'repeat(3, 1fr)',
 					gap: 1,
 					width: '100%',
-					marginLeft: '50px',
 				}}
 			>
 				{hotQuestions.map((question) => (
@@ -119,7 +120,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '28px',
+						fontSize: '24px',
 						textAlign: 'center',
 					}}
 				>
@@ -128,15 +129,35 @@ function Page() {
 				<ArticleIcon sx={{ color: '#9FAAE3', fontSize: '40px', ml: 1 }} />
 			</Box>
 
-			<Box display="flex" alignItems="center" gap={1}>
+			<Box
+				sx={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: 1,
+					mt: 4,
+					mb: 4,
+				}}
+			>
+				<TextField
+					fullWidth
+					placeholder="Search..."
+					value={searchInput}
+					onChange={handleSearchChange}
+					sx={{ flexGrow: 1 }}
+					InputProps={{
+						style: { borderRadius: '15px', height: '40px' },
+					}}
+				/>
 				<Button
 					variant="contained"
 					onClick={handleOpenModal}
 					color="secondary"
 					sx={{
 						bgcolor: `${theme.palette.secondary.main} !important`,
-
 						borderRadius: '20px',
+						height: '40px',
+						width: '115px',
+						minWidth: '115px',
 					}}
 				>
 					<Typography variant="body1" style={{ fontSize: '20px' }}>
@@ -146,21 +167,13 @@ function Page() {
 				{selectedTags.map((tag) => (
 					<Chip
 						key={tag}
-						label={<Typography style={{ fontSize: '26px' }}>{tag}</Typography>}
+						label={<Typography style={{ fontSize: '18px' }}>{tag}</Typography>}
 					/>
 				))}
 			</Box>
-
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
 				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
 			</Dialog>
-			<TextField
-				placeholder="Search..."
-				value={searchInput}
-				onChange={handleSearchChange}
-				sx={{ mt: 4, mb: 4, borderRadius: '15px' }}
-				color="secondary"
-			/>
 			<Box
 				sx={{
 					height: '90%',
@@ -168,7 +181,6 @@ function Page() {
 					gridTemplateColumns: 'repeat(3, 1fr)',
 					gap: 1,
 					width: '100%',
-					marginLeft: '50px',
 				}}
 			>
 				{filteredQuestions.map((question) => (

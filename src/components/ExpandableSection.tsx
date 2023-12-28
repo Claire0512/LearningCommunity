@@ -74,12 +74,10 @@ export function ExpandableSection({
 
 			<Box
 				sx={{
-					width: '90%',
-					marginRight: '45px',
+					width: '100%',
 					gridTemplateColumns: 'repeat(3, 1fr)',
 					gap: 1,
 					display: 'grid',
-
 					mt: 2,
 				}}
 			>
