@@ -120,7 +120,7 @@ function Page() {
 					display: 'flex',
 					flexDirection: 'column',
 					borderRadius: '20px',
-					backgroundColor: '#F7F9FD',
+					backgroundColor: '#FEFDFA',
 					position: 'relative',
 					margin: 'auto',
 				}}

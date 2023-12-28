@@ -85,13 +85,13 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '32px',
+						fontSize: '28px',
 						textAlign: 'center',
 					}}
 				>
 					本日熱門問題
 				</p>
-				<LocalFireDepartmentIcon sx={{ color: '#E09090', fontSize: '40px', ml: 1 }} />
+				<LocalFireDepartmentIcon sx={{ color: '#E3A0A0', fontSize: '40px', ml: 1 }} />
 			</Box>
 
 			<Box
@@ -120,7 +120,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '32px',
+						fontSize: '28px',
 						textAlign: 'center',
 					}}
 				>
@@ -156,11 +156,12 @@ function Page() {
 				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
 			</Dialog>
 			<TextField
-				fullWidth
+				
 				placeholder="Search..."
 				value={searchInput}
 				onChange={handleSearchChange}
-				sx={{ mt: 4, mb: 4 }}
+				sx={{ mt: 4, mb: 4, borderRadius: '15px' }}
+				color='secondary'
 			/>
 			<Box
 				sx={{

@@ -50,9 +50,9 @@ function Page() {
 		setOpenSnackbar(false);
 	};
 	return (
-		<Box className="flex h-screen  w-screen justify-center bg-white">
+		<Box className="flex h-screen  w-screen justify-center ">
 			<Card
-				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0`}
+				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 `}
 				elevation={0}
 			>
 				<CardContent>

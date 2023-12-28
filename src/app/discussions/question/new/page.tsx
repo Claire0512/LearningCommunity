@@ -96,7 +96,7 @@ function Page() {
 				style={{
 					position: 'absolute',
 					top: '-30px',
-					left: '-30px',
+					left: '-130px',
 					margin: '10px',
 					zIndex: 1000,
 					textDecoration: 'none',
@@ -108,15 +108,16 @@ function Page() {
 			</a>
 			<Card
 				sx={{
-					width: '80%',
+					width: '100%',
 					height: 'auto',
 					m: 2,
 					display: 'flex',
 					flexDirection: 'column',
 					borderRadius: '20px',
-					backgroundColor: '#F7F9FD',
+					backgroundColor: '#FEFDFA',
 					position: 'relative',
 					margin: 'auto',
+					mt: '30px',
 				}}
 			>
 				<CardContent sx={{ flex: '1 0 auto' }}>

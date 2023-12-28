@@ -29,7 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
 				<Provider session={session}>
-					<body className={`h-screen ${inter.className}`}>{children}</body>
+					<body className={`h-screen ${inter.className} bg-[#FCFAF5]`}>{children}</body>
 				</Provider>
 			</ThemeProvider>
 		</html>

@@ -39,6 +39,7 @@ export function ExpandableSection({
 					justifyContent: 'space-between',
 					alignItems: 'center',
 					mt: 4,
+					backgroundColor:'#FEFDFA'
 				}}
 			>
 				<Box sx={{ width: '50%' }}></Box>

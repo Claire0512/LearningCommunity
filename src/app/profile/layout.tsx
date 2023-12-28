@@ -11,7 +11,7 @@ type Props = {
 
 const layout = ({ children }: Props) => {
 	return (
-		<Box component="main" className="flex min-h-full flex-col">
+		<Box component="main" className="flex min-h-full flex-col ">
 			<Bar activeButton="個人檔案" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">
