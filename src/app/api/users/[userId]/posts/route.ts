@@ -54,7 +54,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetRequestSchema.parse(userId);
 	} catch (error) {
-		console.log('Error parsing request in api/sign-up/route.ts');
+		console.error('Error parsing request in api/users/posts/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const user = await db.query.usersTable.findFirst({
@@ -108,12 +108,10 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	const rawPosts = user.posts;
-	console.log(rawPosts);
 	try {
 		GetResponseSchema.parse(rawPosts);
 	} catch (error) {
-		console.log('Error parsing response in api/users/[userId]/posts/route.ts');
-		console.log(error);
+		console.error('Error parsing response in api/users/[userId]/posts/route.ts', error);
 		return NextResponse.json({ error: 'Invalid response' }, { status: 500 });
 	}
 

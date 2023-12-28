@@ -136,7 +136,7 @@ export async function GET(req: NextRequest) {
 	try {
 		GetResponseSchema.parse(combined);
 	} catch (error) {
-		console.log('Error parsing response in api/posts/route.ts', error);
+		console.error('Error parsing response in api/posts/route.ts', error);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
@@ -145,11 +145,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
 	const data = await req.json();
-	console.log(data);
 	try {
 		PostRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/posts/route.ts', error);
+		console.error('Error parsing request in api/posts/route.ts', error);
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const { tags, ...newPost } = data as PostRequest;
@@ -190,7 +189,7 @@ export async function POST(req: NextRequest) {
 	try {
 		tagIds = await getTagIds(tags);
 	} catch (error) {
-		console.log('Failed getting id of tags!');
+		console.error('Failed getting id of tags!');
 		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 	}
 
@@ -205,7 +204,7 @@ export async function POST(req: NextRequest) {
 		}
 		return NextResponse.json({ result: 'success' }, { status: 200 });
 	} catch (error) {
-		console.log('Failed inserting post and tags relationship!', error);
+		console.error('Failed inserting post and tags relationship!', error);
 		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 	}
 }

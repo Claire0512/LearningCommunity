@@ -55,29 +55,30 @@ function Page() {
 	const handleCloseDialog = () => {
 		setOpenDialog(false);
 	};
+	
+	const fetchData = async () => {
+		try {
+			const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] =
+				await Promise.all([
+					getUserPosts(userId),
+					getUserFavoritePosts(userId),
+					getUserQuestions(userId),
+					getUserFavoriteQuestions(userId),
+					getUserInfo(userId),
+				]);
+			setUserInfo(userInfoData);
+			setUserPosts(posts);
+			setUserFavoritePosts(favoritePosts);
+			setUserQuestions(questions);
+			setUserFavoriteQuestions(favoriteQuestions);
+			setNewName(userInfoData?.name);
+			setNewProfilePicture(userInfoData?.profilePicture || '');
+		} catch (error) {
+			console.error('Error fetching data:', error);
+		}
+	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] =
-					await Promise.all([
-						getUserPosts(userId),
-						getUserFavoritePosts(userId),
-						getUserQuestions(userId),
-						getUserFavoriteQuestions(userId),
-						getUserInfo(userId),
-					]);
-				setUserInfo(userInfoData);
-				setUserPosts(posts);
-				setUserFavoritePosts(favoritePosts);
-				setUserQuestions(questions);
-				setUserFavoriteQuestions(favoriteQuestions);
-				setNewName(userInfoData?.name);
-				setNewProfilePicture(userInfoData?.profilePicture || '');
-			} catch (error) {
-				console.error('Error fetching data:', error);
-			}
-		};
 		fetchData();
 	}, [userId]);
 
@@ -103,6 +104,7 @@ function Page() {
 		try {
 			await updateUserInfo(newUserInfo);
 			handleCloseDialog();
+			await fetchData();
 		} catch (error) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response?.status === 400) {
@@ -113,7 +115,7 @@ function Page() {
 			}
 		}
 	};
-	console.log(userInfo);
+
 	return (
 		<div
 			style={{

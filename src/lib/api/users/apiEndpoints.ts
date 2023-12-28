@@ -14,7 +14,6 @@ export const getUserInfo = async (userId: number) => {
 export const getUserPosts = async (userId: number) => {
 	try {
 		const response = await api.get(`/api/users/${userId}/posts`);
-		console.log(response.data);
 		return response.data as PostCardType[];
 	} catch (error) {
 		console.error('Error getPost :', error);

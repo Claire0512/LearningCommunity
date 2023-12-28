@@ -81,7 +81,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetRequestSchema.parse(userId);
 	} catch (error) {
-		console.log('Error parsing request in api/users/[userId]/route.ts');
+		console.error('Error parsing request in api/users/[userId]/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
@@ -153,7 +153,6 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetResponseSchema.parse(user);
 	} catch (error) {
-		console.log(error);
 		return NextResponse.json({ error: 'Server fetch error' }, { status: 500 });
 	}
 
@@ -197,7 +196,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetRequestSchema.parse(userId);
 	} catch (error) {
-		console.log('Error parsing request in api/users/[userId]/route.ts');
+		console.error('Error parsing request in api/users/[userId]/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
@@ -206,7 +205,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		PutRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/users/[userId]/route.ts', error);
+		console.error('Error parsing request in api/users/[userId]/route.ts', error);
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 

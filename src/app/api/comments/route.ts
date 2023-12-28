@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 	try {
 		PostRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/comments/route.ts');
+		console.error('Error parsing request in api/comments/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const newComment = data as PostRequestType;

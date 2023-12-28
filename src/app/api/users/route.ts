@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 	try {
 		PostRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/users/route.ts');
+		console.error('Error parsing request in api/users/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const { name, email, password } = data as PostRequestType;
