@@ -56,11 +56,13 @@ function Page() {
 		const fetchData = async () => {
 			try {
 				const userId = session?.user?.userId;
-				const posts = await getUserPosts(userId);
-				const favoritePosts = await getUserFavoritePosts(userId);
-				const questions = await getUserQuestions(userId);
-				const favoriteQuestions = await getUserFavoriteQuestions(userId);
-				const userInfoData = await getUserInfo(userId);
+				const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] = await Promise.all([
+					getUserPosts(userId),
+					getUserFavoritePosts(userId),
+					getUserQuestions(userId),
+					getUserFavoriteQuestions(userId),
+					getUserInfo(userId)
+				]);
 				setUserInfo(userInfoData);
 				setUserPosts(posts);
 				setUserFavoritePosts(favoritePosts);
