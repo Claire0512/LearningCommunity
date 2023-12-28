@@ -170,8 +170,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 	try {
 		GetResponseSchema.parse(questionDetail);
 	} catch (err) {
-		console.log('Error parsing response in api/questions/[questionId]/route.ts');
-		console.log(err);
+		console.error('Error parsing response in api/questions/[questionId]/route.ts', err);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
@@ -235,7 +234,7 @@ export async function PUT(req: NextRequest) {
 	try {
 		PutRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing out request in api/questions/[questionId]/route.ts');
+		console.error('Error parsing out request in api/questions/[questionId]/route.ts');
 		return NextResponse.json({ error: 'put request invalid' }, { status: 400 });
 	}
 
@@ -248,7 +247,7 @@ export async function PUT(req: NextRequest) {
 				.set({ isSolved: request.isSolved })
 				.where(eq(questionsTable.questionId, request.questionId));
 		} catch (error) {
-			console.log('Error updating question');
+			console.error('Error updating question');
 			return NextResponse.json({ error: 'server error updating question' }, { status: 500 });
 		}
 	}
@@ -260,7 +259,7 @@ export async function PUT(req: NextRequest) {
 				.set({ isHelpful: true })
 				.where(eq(commentsTable.commentId, request.helpfulCommentId));
 		} catch (error) {
-			console.log('Error updating helpful');
+			console.error('Error updating helpful');
 			return NextResponse.json({ error: 'server error updating helpful' }, { status: 500 });
 		}
 	}

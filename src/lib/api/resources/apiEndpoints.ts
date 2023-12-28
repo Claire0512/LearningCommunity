@@ -16,7 +16,7 @@ export const getTop3HotPosts = async () => {
 		const response = await api.get('/api/posts/top');
 		const data = response.data as PostCardType[];
 		if (data.length > 3) {
-			console.log('Data length is too long!');
+			console.error('Data length is too long!');
 		}
 		return data;
 	} catch (error) {

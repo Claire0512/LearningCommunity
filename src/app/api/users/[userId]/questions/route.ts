@@ -50,7 +50,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetRequestSchema.parse(userId);
 	} catch (error) {
-		console.log('Error parsing request in api/sign-up/route.ts');
+		console.error('Error parsing request in api/users/[userId]/questions/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
@@ -103,8 +103,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetResponseSchema.parse(rawQuestions);
 	} catch (error) {
-		console.log('Error parsing response in api/users/[userId]/questions/route.ts');
-		console.log(error);
+		console.error('Error parsing response in api/users/[userId]/questions/route.ts', error);
 		return NextResponse.json({ error: 'Invalid response' }, { status: 500 });
 	}
 

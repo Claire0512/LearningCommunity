@@ -9,7 +9,7 @@ export default async function signUp(email: string, username: string, password: 
 		});
 		return true;
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		return false;
 	}
 }

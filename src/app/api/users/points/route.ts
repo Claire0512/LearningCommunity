@@ -19,7 +19,7 @@ export async function PUT(req: NextRequest) {
 	try {
 		PutRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/users/points/route.ts');
+		console.error('Error parsing request in api/users/points/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 

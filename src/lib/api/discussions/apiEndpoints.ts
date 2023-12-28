@@ -3,9 +3,7 @@ import type { QuestionCardType, NewQuestionType, QuestionCardDetailType } from '
 
 export const getAllQuestions = async () => {
 	try {
-		console.log('@@');
 		const response = await api.get(`/api/questions`);
-		console.log('response.data:', response.data);
 		return response.data as QuestionCardType[];
 	} catch (error) {
 		console.error('Error getAllQuestions :', error);
@@ -16,10 +14,9 @@ export const getAllQuestions = async () => {
 export const getTop3HotQuestions = async () => {
 	try {
 		const response = await api.get('/api/questions/top');
-		console.log('response.data:', response.data);
 		const data = response.data as QuestionCardType[];
 		if (data.length > 3) {
-			console.log('Data length is too long!');
+			console.error('Data length is too long!');
 		}
 		return data;
 	} catch (error) {

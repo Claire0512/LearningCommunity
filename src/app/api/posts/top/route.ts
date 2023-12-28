@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
 	try {
 		GetResponseSchema.parse(combined);
 	} catch (error) {
-		console.log('Error parsing response in api/posts/route.ts', error);
+		console.error('Error parsing response in api/posts/route.ts', error);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 

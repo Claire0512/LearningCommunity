@@ -167,13 +167,10 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		return NextResponse.json({ error: 'Post not found' }, { status: 404 });
 	}
 
-	console.log(postDetail);
-
 	try {
 		GetResponseSchema.parse(postDetail);
 	} catch (err) {
-		console.log('Error parsing response in api/posts/[postId]/route.ts');
-		console.log(err);
+		console.error('Error parsing response in api/posts/[postId]/route.ts', err);
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
@@ -232,6 +229,5 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		})),
 	};
 
-	console.log(data);
 	return NextResponse.json(data, { status: 200 });
 }
