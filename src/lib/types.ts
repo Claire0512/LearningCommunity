@@ -124,8 +124,9 @@ export type NewUserInfoType = {
 
 export type UserInfoType = {
 	userId: number;
-	profilePicture: string;
 	name: string;
+	email: string;
+	profilePicture: string | null;
 	resumeFile: string;
 	points: number;
 	hearts: number;
