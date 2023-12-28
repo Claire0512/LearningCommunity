@@ -64,7 +64,7 @@ const GetResponseSchema = z.object({
 	postTitle: z.string(),
 	postContext: z.string().min(1),
 	posterId: z.number(),
-	postImage: z.string().nullable(),
+	postImages: z.array(z.string()).nullable(),
 	createdAt: z.date(),
 	user: z.object({
 		userId: z.number().min(1),
@@ -182,7 +182,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		postId: parsedDetail.postId,
 		postTitle: parsedDetail.postTitle,
 		postContext: parsedDetail.postContext,
-		postImage: parsedDetail.postImage,
+		postImages: parsedDetail.postImages || [],
 		posterId: parsedDetail.posterId,
 		posterName: parsedDetail.user.name,
 		profilePicture: parsedDetail.user.profilePicture,

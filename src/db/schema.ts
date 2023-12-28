@@ -41,7 +41,7 @@ export const postsTable = pgTable('posts', {
 	posterId: integer('poster_id')
 		.notNull()
 		.references(() => usersTable.userId),
-	postImage: varchar('post_image'),
+	postImages: varchar('post_images').array(),
 	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -65,7 +65,7 @@ export const questionsTable = pgTable('questions', {
 	questionId: serial('question_id').primaryKey(),
 	questionTitle: varchar('question_title').notNull(),
 	questionContext: text('question_context').notNull(),
-	questionImage: varchar('question_image'),
+	questionImages: varchar('question_images').array(),
 	questionerId: integer('questioner_id')
 		.notNull()
 		.references(() => usersTable.userId),
