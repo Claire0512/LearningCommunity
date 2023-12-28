@@ -17,7 +17,7 @@ export const usersTable = pgTable('users', {
 	name: varchar('name'),
 	profilePicture: varchar('profile_picture'),
 	resumeFile: varchar('resume_file'),
-	points: integer('points').default(0),
+	points: integer('points').default(10),
 	lastSigned: timestamp('last_signed').default(sql`CURRENT_TIMESTAMP`),
 });
 

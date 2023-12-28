@@ -42,8 +42,14 @@ export async function POST(req: NextRequest) {
 				),
 			columns: {
 				notificationId: true,
+<<<<<<< HEAD
 			},
 		});
+=======
+				userId: true,
+			}
+		})
+>>>>>>> 8ffc763a19065b63fee44ce55c26053d69dfee55
 		if (!notification) {
 			const post = await db.query.postsTable.findFirst({
 				where: (post, { eq }) => eq(post.postId, newComment.postId as number),
@@ -52,6 +58,7 @@ export async function POST(req: NextRequest) {
 			if (!post) {
 				return NextResponse.json({ error: 'Post not exist' }, { status: 404 });
 			}
+<<<<<<< HEAD
 			await db.insert(notificationsTable).values({
 				userId: post.posterId,
 				postId: newComment.postId as number,
@@ -67,6 +74,30 @@ export async function POST(req: NextRequest) {
 					lastNotifyUserId: newComment.commenterId,
 				})
 				.where(eq(notificationsTable.notificationId, notification.notificationId));
+=======
+			if (post.posterId !== newComment.commenterId) {
+				await db
+					.insert(notificationsTable)
+					.values({
+						userId: post.posterId,
+						postId: newComment.postId as number,
+						notificationType: "comment",
+						lastNotifyUserId: newComment.commenterId
+					})
+			}
+		}
+		else {
+			if (notification.userId !== newComment.commenterId) {
+				await db
+					.update(notificationsTable)
+					.set({
+						isRead: false,
+						createdAt: new Date(),
+						lastNotifyUserId: newComment.commenterId
+					})
+					.where(eq(notificationsTable.notificationId, notification.notificationId))
+			}
+>>>>>>> 8ffc763a19065b63fee44ce55c26053d69dfee55
 		}
 	} else if (newComment.questionId) {
 		const notification = await db.query.notificationsTable.findFirst({
@@ -77,8 +108,14 @@ export async function POST(req: NextRequest) {
 				),
 			columns: {
 				notificationId: true,
+<<<<<<< HEAD
 			},
 		});
+=======
+				userId: true
+			}
+		})
+>>>>>>> 8ffc763a19065b63fee44ce55c26053d69dfee55
 		if (!notification) {
 			const question = await db.query.questionsTable.findFirst({
 				where: (question, { eq }) =>
@@ -88,6 +125,7 @@ export async function POST(req: NextRequest) {
 			if (!question) {
 				return NextResponse.json({ error: 'question not exist' }, { status: 404 });
 			}
+<<<<<<< HEAD
 			await db.insert(notificationsTable).values({
 				userId: question.questionerId,
 				questionId: newComment.questionId as number,
@@ -103,6 +141,30 @@ export async function POST(req: NextRequest) {
 					lastNotifyUserId: newComment.commenterId,
 				})
 				.where(eq(notificationsTable.notificationId, notification.notificationId));
+=======
+			if (question.questionerId !== newComment.commenterId) {
+				await db
+					.insert(notificationsTable)
+					.values({
+						userId: question.questionerId,
+						questionId: newComment.questionId as number,
+						notificationType: "comment",
+						lastNotifyUserId: newComment.commenterId
+					})
+			}
+		}
+		else {
+			if (notification.userId !== newComment.commenterId) {
+				await db
+					.update(notificationsTable)
+					.set({
+						isRead: false,
+						createdAt: new Date(),
+						lastNotifyUserId: newComment.commenterId
+					})
+					.where(eq(notificationsTable.notificationId, notification.notificationId))
+			}
+>>>>>>> 8ffc763a19065b63fee44ce55c26053d69dfee55
 		}
 	}
 
