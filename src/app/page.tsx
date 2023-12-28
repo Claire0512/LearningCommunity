@@ -1,35 +1,35 @@
 'use client';
 
 import React from 'react';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+
+import { useSession } from 'next-auth/react';
+
 import Bar from '../components/AppBar';
-import { Card, CardContent, Typography, CardMedia,  Fab , useTheme} from '@mui/material';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import { Card, CardContent, Typography, CardMedia, Fab, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
 
-import { useSession } from 'next-auth/react';                                              
 const cardData = [
 	{
-		title: '討論專區',
+		title: '討論專區 - 互助共成長',
 		description:
-			'在這裡你可以透過回答別人的問題獲得點數，還有使用點數發問！',
-		buttonText: '新建你的第一份菜單',
+			'加入討論，豐富知識之旅！在這裡，回答問題不僅能幫助他人，還能賺取點數。有疑問？使用點數提問，讓專家來助你一臂之力！',
+
 		image: '/images/1.png',
-		link: '/menus-management/menus',
 	},
 	{
-		title: '學習資源',
+		title: '學習資源 - 知識的寶庫',
 		description:
-			'在這裡你可以看到各式各樣知識分享行文章，透過分類找到喜歡的文章，或是分享文章來獲得點數吧！',
-		buttonText: '開始管理你的訂單',
+			'探索知識的海洋！這裡有各種知識分享型文章，按類別尋找你感興趣的內容，或是分享自己的專業文章來獲得點數！',
+
 		image: '/images/2.png',
-		link: '/orders-management/incoming-orders',
 	},
 	{
-		title: '個人檔案',
-		description: '在這裡可以編輯你的個人資訊，還有查看你發布和收藏的問題以及文章，還有歷史總獲得讚數、愛心等相關資訊哦！',
-		buttonText: '看看本月表現如何吧',
+		title: '個人檔案 - 你的成長軌跡',
+		description:
+			'在這裡，你可以編輯個人資訊，追蹤自己發布和收藏的問題與文章。查看你的成就，包括獲得的讚數、愛心等，見證自己的成長！',
+
 		image: '/images/3.png',
-		link: '/operations-management/basic-information',
 	},
 ];
 
@@ -56,7 +56,7 @@ export default function Home() {
 						{cardData.map((card, index) => (
 							<Card
 								key={index}
-								className="relative mx-5 mb-1 h-[267px] flex-1 bg-[#FEFDFA]"
+								className="relative mx-5 mb-1 h-[200px] flex-1 bg-[#FEFDFA]"
 								sx={{
 									overflow: 'visible',
 									...(index === 0 && { marginRight: 'auto' }),
@@ -73,40 +73,52 @@ export default function Home() {
 										borderTopLeftRadius: '10px',
 										borderTopRightRadius: '10px',
 									}}
-								>
-									<CardMedia
-										component="img"
-										sx={{
-											width: '120px',
-											height: '120px',
-											position: 'absolute',
-											top: 150,
-											right: 10,
-										}}
-										image={card.image}
-										alt={card.title}
-									/>
-								</Box>
-								<CardContent>
+								></Box>
+
+								<CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
 									<Typography
 										gutterBottom
-										variant="h5"
+										variant="h6"
 										component="div"
 										className="font-black"
+										sx={{ alignSelf: 'flex-start' }}
 									>
 										{card.title}
 									</Typography>
-									{card.description.split('\n').map((line, index) => (
-										<Typography
-											key={index}
-											variant="body2"
-											color="text.secondary"
-											component="div"
-											className="mt-1 font-bold"
-										>
-											{line}
-										</Typography>
-									))}
+
+									<Box
+										sx={{
+											display: 'flex',
+											flexDirection: 'row',
+											justifyContent: 'space-between',
+											alignItems: 'center',
+											width: '100%',
+										}}
+									>
+										<Box sx={{ flex: '1 1 auto' }}>
+											{card.description.split('\n').map((line, index) => (
+												<Typography
+													key={index}
+													variant="body2"
+													color="text.secondary"
+													component="div"
+													className=" font-bold"
+												>
+													{line}
+												</Typography>
+											))}
+										</Box>
+										<CardMedia
+											component="img"
+											sx={{
+												width: '110px',
+												height: '90px',
+												alignSelf: 'center',
+											}}
+											image={card.image}
+											alt={card.title}
+										/>
+									</Box>
 								</CardContent>
 							</Card>
 						))}
@@ -114,17 +126,17 @@ export default function Home() {
 				</Box>
 			</Box>
 			<Fab
-					color="secondary"
-					aria-label="我要簽到"
-					style={{
-						position: 'fixed',
-						bottom: 20,
-						right: 20,
-						backgroundColor: `${theme.palette.secondary.main} !important`,
-					}}
-				>
-					<EventAvailableIcon />
-				</Fab>
+				color="secondary"
+				aria-label="我要簽到"
+				style={{
+					position: 'fixed',
+					bottom: 20,
+					right: 20,
+					backgroundColor: `${theme.palette.secondary.main} !important`,
+				}}
+			>
+				<EventAvailableIcon />
+			</Fab>
 		</Box>
 	);
 }

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+
 import bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
@@ -214,13 +215,14 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	const newUser = data as PutRequestType;
-	
+
 	try {
 		const updatedUsers = await db.transaction(async (tx) => {
-			const [user] = await tx.select({ password: usersTable.password })
+			const [user] = await tx
+				.select({ password: usersTable.password })
 				.from(usersTable)
 				.where(eq(usersTable.userId, newUser.userId));
-			
+
 			if (!user) return;
 			const isMatch = await bcrypt.compare(newUser.currentPassword, user.password);
 			if (!isMatch) {
@@ -228,27 +230,28 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 				return;
 			}
 			const updatedUser: {
-				userId: number,
-				name?: string,
-				profilePicture?: string,
-				password?: string
+				userId: number;
+				name?: string;
+				profilePicture?: string;
+				password?: string;
 			} = {
 				userId: newUser.userId,
-			}
-	
+			};
+
 			if (newUser.newPassword) {
 				const hashedPassword = await bcrypt.hash(newUser.newPassword, 10);
-				updatedUser.password = hashedPassword
+				updatedUser.password = hashedPassword;
 			}
-	
+
 			if (newUser.newName) {
 				updatedUser.name = newUser.newName;
 			}
-	
+
 			if (newUser.newProfilePicture) {
-				updatedUser.profilePicture = newUser.newProfilePicture
+				updatedUser.profilePicture = newUser.newProfilePicture;
 			}
-			const results = await tx.update(usersTable)
+			const results = await tx
+				.update(usersTable)
 				.set(updatedUser)
 				.where(eq(usersTable.userId, newUser.userId))
 				.returning({
@@ -264,5 +267,5 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	} catch (error) {
 		return NextResponse.json({ error: 'Incorrect Password!' }, { status: 400 });
 	}
-	return NextResponse.json({success: true}, { status: 200 });
+	return NextResponse.json({ success: true }, { status: 200 });
 }

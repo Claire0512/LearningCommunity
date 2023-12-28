@@ -26,9 +26,10 @@ import { Button } from '@mui/material';
 import { Fab, Card, Typography, TextField, Dialog, useTheme } from '@mui/material';
 import { Avatar, Stack, Box } from '@mui/material';
 import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import type { AxiosError } from 'axios';
 
 import type { PostCardType, QuestionCardType, NewUserInfoType, UserInfoType } from '@/lib/types';
-import type { AxiosError } from 'axios';
+
 function Page() {
 	const theme = useTheme();
 	const { data: session } = useSession();
@@ -109,8 +110,7 @@ function Page() {
 			const axiosError = error as AxiosError;
 			if (axiosError.response?.status === 400) {
 				alert('Password is incorrect!');
-			}
-			else {
+			} else {
 				alert('Failed to update user information');
 			}
 		}

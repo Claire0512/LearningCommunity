@@ -65,11 +65,11 @@ export const updateUserInfo = async (newUserInfo: NewUserInfoType) => {
 export const updateUserPoints = async (userId: number, pointsDiff: number) => {
 	try {
 		const requestBody = {
-            userId,
-            pointsDiff
-        };
-        const response = await api.put(`/api/users/points`, requestBody);
-        return response.data;
+			userId,
+			pointsDiff,
+		};
+		const response = await api.put(`/api/users/points`, requestBody);
+		return response.data;
 	} catch (error) {
 		console.error('Error updating user points:', error);
 		throw error;
