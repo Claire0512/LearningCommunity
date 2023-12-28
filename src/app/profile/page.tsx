@@ -28,7 +28,7 @@ import { Avatar, Stack, Box } from '@mui/material';
 import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 import type { PostCardType, QuestionCardType, NewUserInfoType, UserInfoType } from '@/lib/types';
-
+import type { AxiosError } from 'axios';
 function Page() {
 	const theme = useTheme();
 	const { data: session } = useSession();
@@ -55,8 +55,8 @@ function Page() {
 	const handleCloseDialog = () => {
 		setOpenDialog(false);
 	};
+
 	useEffect(() => {
-		console.log('hi');
 		const fetchData = async () => {
 			try {
 				const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] =
@@ -79,7 +79,6 @@ function Page() {
 			}
 		};
 		fetchData();
-		console.log('data fetched!');
 	}, [userId]);
 
 	const handleSave = async () => {
@@ -105,7 +104,13 @@ function Page() {
 			await updateUserInfo(newUserInfo);
 			handleCloseDialog();
 		} catch (error) {
-			alert('Failed to update user information');
+			const axiosError = error as AxiosError;
+			if (axiosError.response?.status === 400) {
+				alert('Password is incorrect!');
+			}
+			else {
+				alert('Failed to update user information');
+			}
 		}
 	};
 	console.log(userInfo);

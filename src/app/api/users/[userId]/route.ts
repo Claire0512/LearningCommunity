@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-
+import bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -66,10 +66,10 @@ const GetResponseSchema = z.object({
 
 const PutRequestSchema = z.object({
 	userId: z.number().min(1),
-	name: z.string().min(1),
-	email: z.string().email().min(1),
-	profilePicture: z.string().optional(),
-	resumeFile: z.string().optional(),
+	currentPassword: z.string().min(1),
+	newName: z.string().optional(),
+	newProfilePicture: z.string().optional(),
+	newPassword: z.string().optional(),
 });
 
 type GetResponseType = z.infer<typeof GetResponseSchema>;
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetRequestSchema.parse(userId);
 	} catch (error) {
-		console.log('Error parsing request in api/sign-up/route.ts');
+		console.log('Error parsing request in api/users/[userId]/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
@@ -150,8 +150,6 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		return NextResponse.json({ error: 'User not found' }, { status: 404 });
 	}
 
-	console.log(user);
-
 	try {
 		GetResponseSchema.parse(user);
 	} catch (error) {
@@ -199,7 +197,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		GetRequestSchema.parse(userId);
 	} catch (error) {
-		console.log('Error parsing request in api/sign-up/route.ts');
+		console.log('Error parsing request in api/users/[userId]/route.ts');
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
@@ -208,22 +206,60 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	try {
 		PutRequestSchema.parse(data);
 	} catch (error) {
-		console.log('Error parsing request in api/sign-up/route.ts');
+		console.log('Error parsing request in api/users/[userId]/route.ts', error);
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
 	const newUser = data as PutRequestType;
-
-	const updatedUsers = await db
-		.update(usersTable)
-		.set(newUser)
-		.where(eq(usersTable.userId, userId))
-		.returning();
-
-	if (!updatedUsers) {
-		return NextResponse.json({ error: 'User not found' }, { status: 404 });
+	
+	try {
+		const updatedUsers = await db.transaction(async (tx) => {
+			const [user] = await tx.select({ password: usersTable.password })
+				.from(usersTable)
+				.where(eq(usersTable.userId, newUser.userId));
+			
+			if (!user) return;
+			const isMatch = await bcrypt.compare(newUser.currentPassword, user.password);
+			if (!isMatch) {
+				tx.rollback();
+				return;
+			}
+			const updatedUser: {
+				userId: number,
+				name?: string,
+				profilePicture?: string,
+				password?: string
+			} = {
+				userId: newUser.userId,
+			}
+	
+			if (newUser.newPassword) {
+				const hashedPassword = await bcrypt.hash(newUser.newPassword, 10);
+				updatedUser.password = hashedPassword
+			}
+	
+			if (newUser.newName) {
+				updatedUser.name = newUser.newName;
+			}
+	
+			if (newUser.newProfilePicture) {
+				updatedUser.profilePicture = newUser.newProfilePicture
+			}
+			const results = await tx.update(usersTable)
+				.set(updatedUser)
+				.where(eq(usersTable.userId, newUser.userId))
+				.returning({
+					userId: usersTable.userId,
+					name: usersTable.name,
+					profilePicture: usersTable.profilePicture,
+				});
+			return results;
+		});
+		if (!updatedUsers) {
+			return NextResponse.json({ error: 'User Not Found' }, { status: 404 });
+		}
+	} catch (error) {
+		return NextResponse.json({ error: 'Incorrect Password!' }, { status: 400 });
 	}
-
-	const updatedUser = updatedUsers[0];
-	return NextResponse.json(updatedUser, { status: 200 });
+	return NextResponse.json({success: true}, { status: 200 });
 }

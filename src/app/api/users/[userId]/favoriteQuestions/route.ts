@@ -13,6 +13,7 @@ const GetResponseSchema = z.array(
 		questionContext: z.string(),
 		questionerId: z.number(),
 		isSolved: z.boolean(),
+		createdAt: z.date(),
 		user: z.object({
 			name: z.string(),
 			profilePicture: z.string().nullable().optional(),
@@ -124,6 +125,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		questionContext: question.questionContext,
 		questionerId: question.questionerId,
 		isSolved: question.isSolved,
+		createdAt: question.createdAt,
 		profilePicture: question.user.profilePicture,
 		questionerName: question.user.name,
 		upvotes: question.upvotes.length,
