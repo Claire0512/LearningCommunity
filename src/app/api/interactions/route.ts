@@ -4,7 +4,7 @@ import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
-import { upvotesTable, downvotesTable, favoritesTable } from '@/db/schema';
+import { upvotesTable, downvotesTable, favoritesTable, notificationsTable } from '@/db/schema';
 
 const PostRequestSchema = z.object({
 	postId: z.number().optional(),
@@ -177,6 +177,86 @@ export async function POST(req: NextRequest) {
 	} else {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
+
+	if (newInteraction.postId && newInteraction.actionType.startsWith('add')) {
+		const notification = await db.query.notificationsTable.findFirst({
+			where: (notification, { eq, and }) => and(
+				eq(notification.postId, newInteraction.postId as number),
+				eq(notification.notificationType, "interaction")
+			),
+			columns: {
+				notificationId: true
+			}
+		})
+		if (!notification) {
+			const post = await db.query.postsTable.findFirst({
+				where: (post, { eq }) => eq(post.postId, newInteraction.postId as number),
+                columns: { posterId: true }
+            })
+			if (!post) {
+				return NextResponse.json({ error: 'Post not exist' }, { status: 404 });
+			}
+			await db
+				.insert(notificationsTable)
+				.values({
+					userId: post.posterId,
+					postId: newInteraction.postId as number,
+					notificationType: "interaction",
+					lastNotifyUserId: newInteraction.userId
+				})
+		}
+		else {
+			await db
+				.update(notificationsTable)
+				.set({
+					isRead: false,
+					createdAt: new Date(),
+					lastNotifyUserId: newInteraction.userId
+				})
+				.where(eq(notificationsTable.notificationId, notification.notificationId))
+		}
+	}
+
+	else if (newInteraction.questionId && newInteraction.actionType.startsWith('add')) {
+
+		const notification = await db.query.notificationsTable.findFirst({
+			where: (notification, { eq, and }) => and(
+				eq(notification.questionId, newInteraction.questionId as number),
+				eq(notification.notificationType, "interaction")
+			),
+			columns: {
+				notificationId: true
+			}
+		})
+		if (!notification) {
+			const question = await db.query.questionsTable.findFirst({
+				where: (question, { eq }) => eq(question.questionId, newInteraction.questionId as number),
+                columns: { questionerId: true }
+            })
+			if (!question) {
+				return NextResponse.json({ error: 'question not exist' }, { status: 404 });
+			}
+			await db
+				.insert(notificationsTable)
+				.values({
+					userId: question.questionerId,
+					questionId: newInteraction.questionId as number,
+					notificationType: "interaction",
+					lastNotifyUserId: newInteraction.userId
+				})
+		}
+		else {
+			await db
+				.update(notificationsTable)
+				.set({
+					isRead: false,
+					createdAt: new Date(),
+					lastNotifyUserId: newInteraction.userId
+				})
+				.where(eq(notificationsTable.notificationId, notification.notificationId))
+		}
+	}
+
 
 	return NextResponse.json({ success: true }, { status: 200 });
 }
