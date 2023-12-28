@@ -122,7 +122,7 @@ function Page() {
 						m: 2,
 						display: 'flex',
 						borderRadius: '10px',
-						backgroundColor: '#F7F9FD',
+						backgroundColor: '#FEFDFA',
 						position: 'relative',
 						margin: 'auto',
 					}}
@@ -173,7 +173,7 @@ function Page() {
 					</Box>
 				</Card>
 			)}
-			<Dialog open={openDialog} onClose={handleCloseDialog} sx={{ borderRadius: '10px' }}>
+			<Dialog open={openDialog} onClose={handleCloseDialog} sx={{ borderRadius: '10px', backgroundColor:'#FEFDFA' }}>
 				<DialogTitle sx={{ textAlign: 'center' }}>編輯個人資料</DialogTitle>
 				<DialogContent>
 					<Stack spacing={3} className="mt-[10px]">

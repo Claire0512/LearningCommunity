@@ -90,7 +90,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '32px',
+						fontSize: '28px',
 						textAlign: 'center',
 					}}
 				>
@@ -125,7 +125,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '32px',
+						fontSize: '28px',
 						textAlign: 'center',
 					}}
 				>

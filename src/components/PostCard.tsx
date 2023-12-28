@@ -82,7 +82,7 @@ function PostCard(post: PostCardType) {
 				display: 'flex',
 				flexDirection: 'column',
 				borderRadius: '5px',
-				backgroundColor: '#F7F9FD',
+				backgroundColor: '#FEFDFA',
 				position: 'relative',
 				'&::before': {
 					content: '""',

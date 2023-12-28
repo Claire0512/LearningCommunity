@@ -34,13 +34,13 @@ const cardData = [
 
 export default function Home() {
 	return (
-		<Box component="main" className="flex min-h-full flex-col bg-[#EFF3FB]">
+		<Box component="main" className="flex min-h-full flex-col bg-[#FCFAF5]">
 			<Bar activeButton="首頁" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">
 				<Box
 					sx={{
-						height: '75%',
+						height: '80%',
 						width: '100%',
 						overflow: 'visible',
 						display: 'flex',
