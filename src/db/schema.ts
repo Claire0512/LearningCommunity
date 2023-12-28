@@ -21,11 +21,17 @@ export const usersTable = pgTable('users', {
 	lastSigned: timestamp('last_signed').default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const usersRelations = relations(usersTable, ({ many }) => ({
+export const usersRelations = relations(usersTable, ({ one, many }) => ({
 	posts: many(postsTable),
 	questions: many(questionsTable),
 	favorites: many(favoritesTable),
 	comments: many(commentsTable, { relationName: 'user' }),
+	notifications: many(notificationsTable),
+	lastNotification: one(notificationsTable, {
+		fields: [usersTable.userId],
+		references: [notificationsTable.lastNotifyUserId],
+		relationName: 'lastNotification',
+	}),
 }));
 
 export const postsTable = pgTable('posts', {
@@ -43,6 +49,10 @@ export const postsRelations = relations(postsTable, ({ one, many }) => ({
 	user: one(usersTable, {
 		fields: [postsTable.posterId],
 		references: [usersTable.userId],
+	}),
+	notification: one(notificationsTable, {
+		fields: [postsTable.postId],
+		references: [notificationsTable.postId],
 	}),
 	comments: many(commentsTable, { relationName: 'post' }),
 	tags: many(postTagsTable),
@@ -250,5 +260,36 @@ export const favoriteRelations = relations(favoritesTable, ({ one }) => ({
 	post: one(postsTable, {
 		fields: [favoritesTable.postId],
 		references: [postsTable.postId],
+	}),
+}));
+
+export const notificationsTable = pgTable('notifications', {
+	notificationId: serial('notification_id').primaryKey(),
+	userId: integer('user_id').references(() => usersTable.userId),
+	lastNotifyUserId: integer('last_notify_user_id').references(() => usersTable.userId),
+	notificationType: varchar('notification_type').notNull(),
+	postId: integer('post_id').references(() => postsTable.postId),
+	questionId: integer('question_id').references(() => questionsTable.questionId),
+	isRead: boolean('is_read').default(false),
+	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const notificationRelations = relations(notificationsTable, ({ one }) => ({
+	user: one(usersTable, {
+		fields: [notificationsTable.userId],
+		references: [usersTable.userId],
+	}),
+	lastNotifyUser: one(usersTable, {
+		fields: [notificationsTable.lastNotifyUserId],
+        references: [usersTable.userId],
+		relationName: 'lastNotification',
+    }),
+	post: one(postsTable, {
+		fields: [notificationsTable.postId],
+		references: [postsTable.postId],
+	}),
+	question: one(questionsTable, {
+		fields: [notificationsTable.questionId],
+		references: [questionsTable.questionId],
 	}),
 }));

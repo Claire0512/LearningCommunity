@@ -84,4 +84,14 @@ export const dailySign = async (userId: number) => {
 		console.error('Error daily sign:', error);
 		throw error;
 	}
-};
+}
+
+export const getNotifications = async (userId: number) => {
+	try {
+        const response = await api.get(`/api/users/${userId}/notifications`);
+        return response.data;
+	} catch (error) {
+		console.error('Error getting notifications:', error);
+		throw error;
+	}
+}
