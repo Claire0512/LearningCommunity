@@ -6,7 +6,8 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { sampleNotification } from '../lib/types';
+import { getNotifications } from '../lib/api/users/apiEndpoints';
+import type { NotificationType } from '../lib/types';
 import { Button } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -17,129 +18,19 @@ import logOut from '@/lib/api/authentication/logout';
 
 import getTimeDifference from './getTimeDifference';
 
-const sampleNotification = [
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: false,
-		createdAt: '2023 11 05 19:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: false,
-		createdAt: '2023 11 05 18:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: true,
-		createdAt: '2023 11 05 19:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: false,
-		createdAt: '2023 11 05 19:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: false,
-		createdAt: '2023 11 05 18:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: true,
-		createdAt: '2023 11 05 19:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: false,
-		createdAt: '2023 11 05 19:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: false,
-		createdAt: '2023 11 05 18:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-	{
-		userId: 123,
-		replierId: 123,
-		replierName: 'Enip',
-		postTitle: 'hi',
-		questionTitle: null,
-		isRead: true,
-		createdAt: '2023 11 05 19:00',
-		NotificationId: 123,
-		postId: 123,
-		questionId: null,
-	},
-];
-
-function renderNotification(notification: sampleNotification) {
+function renderNotification(notification: NotificationType) {
+	console.log(notification);
 	const formattedTime = formatNotificationTime(notification.createdAt);
 	const href = notification.postId
 		? `/resources/post/${notification.postId}`
-		: `/discussion/question/${notification.questionId}`;
+		: `/discussions/question/${notification.questionId}`;
 	const textContent = notification.postId
-		? `${notification.replierName} 於 ${formattedTime} 回應了你的文章「${notification.postTitle}」`
-		: `${notification.replierName} 於 ${formattedTime} 回應了你的問題「${notification.questionTitle}」`;
+		? `${notification.lastNotifyUsername} 於 ${formattedTime} 回應了你的文章「${notification.postTitle}」`
+		: `${notification.lastNotifyUsername} 於 ${formattedTime} 回應了你的問題「${notification.questionTitle}」`;
 
 	return (
 		<div
-			key={notification.NotificationId}
+			key={notification.notificationId}
 			style={{ display: 'flex', alignItems: 'center', margin: '10px' }}
 		>
 			<span
@@ -160,7 +51,7 @@ function renderNotification(notification: sampleNotification) {
 						fontSize: '16px',
 						backgroundColor: 'white',
 
-						transition: 'background-color 0.3s', // 加上背景色變化的平滑過渡
+						transition: 'background-color 0.3s',
 					}}
 					onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')} // 懸停時背景變為淺灰色
 					onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')} // 不懸停時背景恢復為白色
@@ -182,11 +73,25 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 	const theme = useTheme();
 	const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 	const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+	const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
-	// Check for unread notifications
 	useEffect(() => {
-		setHasUnreadNotifications(sampleNotification.some((notification) => !notification.isRead));
-	}, [sampleNotification]);
+		const userId = session?.user.userId;
+		if (userId) {
+			getNotifications(userId)
+				.then((data) => {
+					setNotifications(data);
+					setHasUnreadNotifications(
+						data.some((notification: NotificationType) => !notification.isRead),
+					);
+				})
+				.catch((error) => {
+					console.error('Error fetching notifications:', error);
+					// Handle error appropriately
+				});
+		}
+	}, [session]);
+	// Check for unread notifications
 
 	// Close the notifications dropdown
 	const handleCloseNotifications = () => {
@@ -318,7 +223,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 									zIndex: 1000,
 								}}
 							>
-								{sampleNotification.map((notification) =>
+								{notifications.map((notification) =>
 									renderNotification(notification),
 								)}
 							</div>

@@ -227,12 +227,16 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 	};
 
 	try {
-		await db.update(notificationsTable)
-			.set({isRead: true})
-			.where(eq(notificationsTable.questionId, parsedDetail.questionId))
+		await db
+			.update(notificationsTable)
+			.set({ isRead: true })
+			.where(eq(notificationsTable.questionId, parsedDetail.questionId));
 	} catch (error) {
-		console.error("Update notification status failed in questions/[questionId]/route.ts", error);
-		return NextResponse.json({ error: "server error" }, { status: 500 })
+		console.error(
+			'Update notification status failed in questions/[questionId]/route.ts',
+			error,
+		);
+		return NextResponse.json({ error: 'server error' }, { status: 500 });
 	}
 	return NextResponse.json(data, { status: 200 });
 }
