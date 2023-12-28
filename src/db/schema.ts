@@ -18,6 +18,7 @@ export const usersTable = pgTable('users', {
 	profilePicture: varchar('profile_picture'),
 	resumeFile: varchar('resume_file'),
 	points: integer('points').default(0),
+	lastSigned: timestamp('last_signed').default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
@@ -205,7 +206,7 @@ export const upvoteRelations = relations(upvotesTable, ({ one }) => ({
 }));
 
 export const downvotesTable = pgTable('downvotes', {
-	downvoteId: serial('upvote_id').primaryKey(),
+	downvoteId: serial('downvote_id').primaryKey(),
 	userId: integer('user_id')
 		.notNull()
 		.references(() => usersTable.userId),

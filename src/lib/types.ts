@@ -134,4 +134,5 @@ export type UserInfoType = {
 	downvotes: number;
 	favorites: number;
 	checkmarks: number;
+	hasSigned: boolean;
 };

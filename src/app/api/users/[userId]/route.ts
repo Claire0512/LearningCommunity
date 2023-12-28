@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
+import { isSameDateInUTC8 } from '@/lib/utils';
 
 const GetRequestSchema = z.number().min(1);
 
@@ -14,6 +15,7 @@ const GetResponseSchema = z.object({
 	email: z.string(),
 	profilePicture: z.string().optional().nullable(),
 	points: z.number(),
+	lastSigned: z.date(),
 	posts: z.array(
 		z.object({
 			upvotes: z.array(
@@ -157,6 +159,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	const parsedUser = user as unknown as GetResponseType;
+	const hasSigned = isSameDateInUTC8(parsedUser.lastSigned, new Date());
 
 	const aggUser = {
 		userId: parsedUser.userId,
@@ -169,6 +172,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		hearts: 0,
 		favorites: 0,
 		checkmarks: 0,
+		hasSigned
 	};
 
 	parsedUser.posts.forEach((post) => {
