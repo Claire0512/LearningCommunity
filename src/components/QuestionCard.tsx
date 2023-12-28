@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Card, CardContent, Typography, Avatar, Chip, Stack, Box } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 
 import type { QuestionCardType } from '@/lib/types';
 
@@ -30,12 +31,12 @@ function QuestionCard(question: QuestionCardType) {
 	const [visibleTags, setVisibleTags] = useState<string[]>(question.tags);
 	const tagContainerRef = useRef<HTMLDivElement>(null);
 	const formattedTime = getTimeDifference(question.createdAt);
-
+	const router = useRouter();
 	useEffect(() => {
 		const updateVisibleTags = () => {
 			const container = tagContainerRef.current;
 			if (container) {
-				let visibleWidth = container.offsetWidth;
+				const visibleWidth = container.offsetWidth;
 				let accumulatedWidth = 0;
 				const newVisibleTags: string[] = [];
 
@@ -63,9 +64,12 @@ function QuestionCard(question: QuestionCardType) {
 			window.removeEventListener('resize', updateVisibleTags);
 		};
 	}, [question.tags]);
-
+	const handleCardClick = () => {
+		router.push(`/discussions/question/${question.questionId}`);
+	};
 	return (
 		<Card
+			onClick={handleCardClick}
 			sx={{
 				minWidth: 360,
 				maxWidth: 360,
@@ -73,7 +77,7 @@ function QuestionCard(question: QuestionCardType) {
 				display: 'flex',
 				flexDirection: 'column',
 				borderRadius: '5px',
-				backgroundColor: '#FCFAF5',
+				backgroundColor: '#F7F9FD',
 				position: 'relative',
 				'&::before': {
 					content: '""',

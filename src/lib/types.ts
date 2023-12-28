@@ -12,7 +12,39 @@ export type PostCardType = {
 	tags: string[];
 	createdAt: string;
 };
-
+export type Comment = {
+	commentId: number;
+	commenterId: number;
+	commenterName: string;
+	commenterProfilePicture: string | null | undefined;
+	upvotes: number;
+	hasUpvote: boolean;
+	downvotes: number;
+	hasDownvote: boolean;
+	text: string;
+	isHelpful: boolean;
+	createdAt: string;
+	replies: ReplyType[];
+};
+export type ReplyType = Omit<Comment, 'replies'>;
+export type PostCardDetailType = {
+	postId: number;
+	postTitle: string;
+	postContext: string;
+	posterId: number;
+	posterName: string;
+	profilePicture: string | null | undefined;
+	tags: string[];
+	createdAt: string;
+	upvotes: number;
+	hasUpvote: boolean;
+	downvotes: number;
+	hasDownvote: boolean;
+	favorites: number;
+	hasFavorite: boolean;
+	commentsCount: number;
+	comments: Comment[];
+};
 export type NewPostType = {
 	postTitle: string;
 	postContext: string;
@@ -43,6 +75,23 @@ export type QuestionCardType = {
 	tags: string[];
 	createdAt: string;
 };
+export type QuestionCardDetailType = {
+	questionId: number;
+	questionTitle: string;
+	questionContext: string;
+	questionerId: number;
+	questionerName: string;
+	profilePicture: string | null | undefined;
+	tags: string[];
+	createdAt: string;
+	upvotes: number;
+	hasUpvote: boolean;
+	favorites: number;
+	hasFavorite: boolean;
+	isSolved: boolean;
+	commentsCount: number;
+	comments: Comment[];
+};
 export type NotificationType = {
 	userId: number;
 	replierId: number;
@@ -56,16 +105,30 @@ export type NotificationType = {
 	questionId: null;
 };
 
-export type CommentType = {
-	commentId: number;
-	commenterId: string;
+export type NewCommentType = {
+	postId?: number;
+	commenterId: number;
 	commenterName: string;
-	commenterProfilePicture: string;
+	text: string;
+};
+
+export type NewUserInfoType = {
+	userId: number;
+	newName?: string;
+	newProfilePicture?: string;
+	currentPassword?: string;
+	newPassword?: string;
+};
+
+export type UserInfoType = {
+	userId: number;
+	profilePicture: string;
+	name: string;
+	resumeFile: string;
+	points: number;
+	hearts: number;
 	upvotes: number;
 	downvotes: number;
-	hasUpvoted: boolean;
-	hasDownvoted: boolean;
-	text: string;
-	createdAt: string;
-	replies?: Comment[];
+	favorites: number;
+	checkmarks: number;
 };

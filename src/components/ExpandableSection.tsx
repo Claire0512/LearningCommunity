@@ -1,27 +1,31 @@
 'use client';
 
-import React, { useState, ReactElement } from 'react';
+import React, { useState } from 'react';
+import type { ReactElement } from 'react';
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Typography, useTheme, Button, Box } from '@mui/material';
+import { Typography, Button, Box } from '@mui/material';
 
-import { PostCardType, QuestionCardType } from '@/lib/types';
+import type { PostCardType, QuestionCardType } from '@/lib/types';
 
-type Item = PostCardType | QuestionCardType;
+type RenderQuestionItem = (question: QuestionCardType) => ReactElement;
+type RenderPostItem = (post: PostCardType) => ReactElement;
 
 interface ExpandableSectionProps {
 	title: string;
-	items: Item[];
-	renderItem: (item: Item) => ReactElement;
+	items: PostCardType[] | QuestionCardType[];
+	renderQuestionItem?: RenderQuestionItem;
+	renderPostItem?: RenderPostItem;
 }
-export const ExpandableSection: React.FC<ExpandableSectionProps> = ({
+
+export function ExpandableSection({
 	title,
 	items,
-	renderItem,
-}) => {
+	renderQuestionItem,
+	renderPostItem,
+}: ExpandableSectionProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
-	const theme = useTheme();
 	const handleToggleExpand = () => {
 		setIsExpanded(!isExpanded);
 	};
@@ -78,8 +82,14 @@ export const ExpandableSection: React.FC<ExpandableSectionProps> = ({
 					mt: 2,
 				}}
 			>
-				{items.map((item, index) => (isExpanded || index < 3) && renderItem(item))}
+				{items.map(
+					(item, index) =>
+						(isExpanded || index < 3) &&
+						('questionId' in item
+							? renderQuestionItem?.(item)
+							: renderPostItem?.(item)),
+				)}
 			</Box>
 		</>
 	);
-};
+}

@@ -4,20 +4,14 @@ import React from 'react';
 
 import Bar from '../../components/AppBar';
 import { Box } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 
 type Props = {
 	children: React.ReactNode;
 };
 
 const layout = ({ children }: Props) => {
-	const theme = useTheme();
 	return (
-		<Box
-			component="main"
-			className="flex min-h-full flex-col"
-			sx={{ backgroundColor: theme.palette.background.default }}
-		>
+		<Box component="main" className="flex min-h-full flex-col">
 			<Bar activeButton="個人檔案" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">

@@ -225,7 +225,6 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		})),
 	};
 
-	console.log(data)
+	console.log(data);
 	return NextResponse.json(data, { status: 200 });
 }
-

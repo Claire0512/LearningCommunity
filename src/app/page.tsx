@@ -34,7 +34,7 @@ const cardData = [
 
 export default function Home() {
 	return (
-		<Box component="main" className="flex min-h-full flex-col bg-[#F9F5EB]">
+		<Box component="main" className="flex min-h-full flex-col bg-[#EFF3FB]">
 			<Bar activeButton="首頁" />
 
 			<Box className="mt-[100px] flex flex-1 flex-col items-center">
@@ -53,7 +53,7 @@ export default function Home() {
 						{cardData.map((card, index) => (
 							<Card
 								key={index}
-								className="relative mx-3 mb-1 h-[267px] flex-1 bg-[#FCFAF5]"
+								className="relative mx-3 mb-1 h-[267px] flex-1 bg-[#F7F9FD]"
 								sx={{
 									overflow: 'visible',
 									...(index === 0 && { marginRight: 'auto' }),

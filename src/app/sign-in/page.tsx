@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import Box from '@mui/material/Box';
 
-import logIn from '@/lib/api/users/login';
+import logIn from '@/lib/api/authentication/login';
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
 

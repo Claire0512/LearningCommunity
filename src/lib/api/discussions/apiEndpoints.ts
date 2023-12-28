@@ -1,5 +1,5 @@
 import api from '@/lib/api/base';
-import { QuestionCardType, NewQuestionType } from '@/lib/types';
+import type { QuestionCardType, NewQuestionType, QuestionCardDetailType } from '@/lib/types';
 
 export const getAllQuestions = async () => {
 	try {
@@ -31,7 +31,7 @@ export const getTop3HotQuestions = async () => {
 export const getQuestionDetail = async (questionId: number) => {
 	try {
 		const response = await api.get(`/api/questions/${questionId}`);
-		return response.data as QuestionCardType;
+		return response.data as QuestionCardDetailType;
 	} catch (error) {
 		console.error('Error getQuestionDetail :', error);
 		throw error;

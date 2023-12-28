@@ -71,7 +71,7 @@ function Page() {
 			(question: QuestionCardType) => filterByTags(question) && filterBySearch(question),
 		);
 		setFilteredQuestions(newFilteredQuestions);
-	}, [selectedTags, searchInput]);
+	}, [selectedTags, searchInput, filteredQuestions]);
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
