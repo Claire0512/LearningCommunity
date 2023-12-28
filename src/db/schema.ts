@@ -65,6 +65,7 @@ export const questionsTable = pgTable('questions', {
 	questionId: serial('question_id').primaryKey(),
 	questionTitle: varchar('question_title').notNull(),
 	questionContext: text('question_context').notNull(),
+	questionImage: varchar('question_image'),
 	questionerId: integer('questioner_id')
 		.notNull()
 		.references(() => usersTable.userId),
