@@ -75,3 +75,13 @@ export const updateUserPoints = async (userId: number, pointsDiff: number) => {
 		throw error;
 	}
 }
+
+export const dailySign = async (userId: number) => {
+	try {
+        const response = await api.put(`/api/users/${userId}/dailySign`);
+        return response.data;
+	} catch (error) {
+		console.error('Error daily sign:', error);
+		throw error;
+	}
+}
