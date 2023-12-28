@@ -1,13 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useSession } from 'next-auth/react';
 
 import Bar from '../components/AppBar';
+import { getUserInfo, dailySign } from '../lib/api/users/apiEndpoints';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import { Card, CardContent, Typography, CardMedia, Fab, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
+
+import type { UserInfoType } from '@/lib/types';
 
 const cardData = [
 	{
@@ -36,6 +39,33 @@ const cardData = [
 export default function Home() {
 	const theme = useTheme();
 	const { data: session } = useSession();
+	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
+
+	useEffect(() => {
+		if (session) {
+			getUserInfo(session.user.userId)
+				.then((userInfo) => setUserInfo(userInfo))
+				.catch(console.error);
+		}
+	}, [session]);
+
+	const handleSignInClick = async () => {
+		console.log(userInfo);
+		if (userInfo?.hasSigned) {
+			alert('你今天已經簽到過了哦！');
+		} else {
+			try {
+				await dailySign(session?.user.userId);
+				alert('簽到成功！獲得點數一點！');
+				getUserInfo(session?.user.userId)
+					.then((userInfo) => setUserInfo(userInfo))
+					.catch(console.error);
+			} catch (error) {
+				console.error('Error in daily sign:', error);
+			}
+		}
+	};
+
 	return (
 		<Box component="main" className="flex min-h-full flex-col ">
 			<Bar activeButton="首頁" />
@@ -125,18 +155,23 @@ export default function Home() {
 					</Box>
 				</Box>
 			</Box>
-			<Fab
-				color="secondary"
-				aria-label="我要簽到"
-				style={{
-					position: 'fixed',
-					bottom: 20,
-					right: 20,
-					backgroundColor: `${theme.palette.secondary.main} !important`,
-				}}
-			>
-				<EventAvailableIcon />
-			</Fab>
+			{session && (
+				<Fab
+					color="secondary"
+					aria-label="我要簽到"
+					style={{
+						position: 'fixed',
+						bottom: 20,
+						right: 20,
+						backgroundColor: userInfo?.hasSigned
+							? '#EBEBEB'
+							: `${theme.palette.secondary.main} !important`,
+					}}
+					onClick={handleSignInClick}
+				>
+					<EventAvailableIcon />
+				</Fab>
+			)}
 		</Box>
 	);
 }

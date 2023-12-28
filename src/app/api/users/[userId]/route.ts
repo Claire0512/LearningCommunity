@@ -173,7 +173,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		hearts: 0,
 		favorites: 0,
 		checkmarks: 0,
-		hasSigned
+		hasSigned,
 	};
 
 	parsedUser.posts.forEach((post) => {

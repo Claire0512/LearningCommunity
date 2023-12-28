@@ -56,7 +56,7 @@ function Page() {
 	const handleCloseDialog = () => {
 		setOpenDialog(false);
 	};
-	
+
 	const fetchData = async () => {
 		try {
 			const [posts, favoritePosts, questions, favoriteQuestions, userInfoData] =
