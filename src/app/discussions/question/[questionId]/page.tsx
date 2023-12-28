@@ -47,11 +47,11 @@ function Page() {
 	const [newComment, setNewComment] = useState('');
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
-
+	const userId = session?.user?.userId;
 	const fetchQuestionDetail = async () => {
 		if (questionId) {
 			try {
-				const questionData = await getQuestionDetail(Number(questionId));
+				const questionData = await getQuestionDetail(Number(questionId), userId);
 				setQuestion(questionData);
 				setFormattedTime(getTimeDifference(questionData.createdAt));
 			} catch (error) {
@@ -61,7 +61,7 @@ function Page() {
 	};
 	const handleCommentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
-		const questionData = await getQuestionDetail(Number(questionId));
+		const questionData = await getQuestionDetail(Number(questionId), userId);
 		setQuestion(questionData);
 	};
 	const handleReplyChange = async (
@@ -69,14 +69,14 @@ function Page() {
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
-		const questionData = await getQuestionDetail(Number(questionId));
+		const questionData = await getQuestionDetail(Number(questionId), userId);
 		setQuestion(questionData);
 	};
 	useEffect(() => {
 		const fetchQuestionDetail = async () => {
 			if (questionId) {
 				try {
-					const questionData = await getQuestionDetail(Number(questionId));
+					const questionData = await getQuestionDetail(Number(questionId), userId);
 					setQuestion(questionData);
 					setFormattedTime(getTimeDifference(questionData.createdAt));
 				} catch (error) {
@@ -265,7 +265,9 @@ function Page() {
 						</IconButton>
 						<Typography variant="body2">{question.upvotes}</Typography>
 
-						<IconButton>
+						<IconButton
+							color={question.hasComment ? 'secondary' : 'default'}
+						>
 							<CommentIcon />
 						</IconButton>
 						<Typography variant="body2">{question.commentsCount}</Typography>

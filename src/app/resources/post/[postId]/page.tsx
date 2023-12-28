@@ -45,15 +45,16 @@ function Page() {
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
 	const { data: session } = useSession();
+	const userId = session?.user?.userId;
 	const handleCommentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
-		const postData = await getPostDetail(Number(postId));
+		const postData = await getPostDetail(Number(postId), userId);
 		setPost(postData);
 	};
 	const fetchPostDetail = async () => {
 		if (postId) {
 			try {
-				const postData = await getPostDetail(Number(postId));
+				const postData = await getPostDetail(Number(postId), userId);
 				setPost(postData);
 				setFormattedTime(getTimeDifference(postData.createdAt));
 			} catch (error) {
@@ -66,14 +67,14 @@ function Page() {
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
-		const postData = await getPostDetail(Number(postId));
+		const postData = await getPostDetail(Number(postId), userId);
 		setPost(postData);
 	};
 	useEffect(() => {
 		const fetchPostDetail = async () => {
 			if (postId) {
 				try {
-					const postData = await getPostDetail(Number(postId));
+					const postData = await getPostDetail(Number(postId), userId);
 					setPost(postData);
 					setFormattedTime(getTimeDifference(postData.createdAt));
 				} catch (error) {
@@ -281,7 +282,9 @@ function Page() {
 							<ThumbDownAltIcon />
 						</IconButton>
 						<Typography variant="body2">{post.downvotes}</Typography>
-						<IconButton>
+						<IconButton
+							color={post.hasComment ? 'secondary' : 'default'}
+						>
 							<CommentIcon />
 						</IconButton>
 						<Typography variant="body2">{post.commentsCount}</Typography>

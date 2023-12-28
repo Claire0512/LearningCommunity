@@ -28,9 +28,9 @@ export const getTop3HotQuestions = async () => {
 	}
 };
 
-export const getQuestionDetail = async (questionId: number) => {
+export const getQuestionDetail = async (questionId: number, userId: number) => {
 	try {
-		const response = await api.get(`/api/questions/${questionId}`);
+		const response = await api.get(`/api/questions/${questionId}?userId=${userId}`);
 		return response.data as QuestionCardDetailType;
 	} catch (error) {
 		console.error('Error getQuestionDetail :', error);
