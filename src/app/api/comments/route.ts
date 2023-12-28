@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
 				eq(notification.notificationType, "comment")
 			),
 			columns: {
-				notificationId: true
+				notificationId: true,
+				userId: true,
 			}
 		})
 		if (!notification) {
@@ -50,24 +51,28 @@ export async function POST(req: NextRequest) {
 			if (!post) {
 				return NextResponse.json({ error: 'Post not exist' }, { status: 404 });
 			}
-			await db
-				.insert(notificationsTable)
-				.values({
-					userId: post.posterId,
-					postId: newComment.postId as number,
-					notificationType: "comment",
-					lastNotifyUserId: newComment.commenterId
-				})
+			if (post.posterId !== newComment.commenterId) {
+				await db
+					.insert(notificationsTable)
+					.values({
+						userId: post.posterId,
+						postId: newComment.postId as number,
+						notificationType: "comment",
+						lastNotifyUserId: newComment.commenterId
+					})
+			}
 		}
 		else {
-			await db
-				.update(notificationsTable)
-				.set({
-					isRead: false,
-					createdAt: new Date(),
-					lastNotifyUserId: newComment.commenterId
-				})
-				.where(eq(notificationsTable.notificationId, notification.notificationId))
+			if (notification.userId !== newComment.commenterId) {
+				await db
+					.update(notificationsTable)
+					.set({
+						isRead: false,
+						createdAt: new Date(),
+						lastNotifyUserId: newComment.commenterId
+					})
+					.where(eq(notificationsTable.notificationId, notification.notificationId))
+			}
 		}
 	}
 
@@ -78,7 +83,8 @@ export async function POST(req: NextRequest) {
 				eq(notification.notificationType, "comment")
 			),
 			columns: {
-				notificationId: true
+				notificationId: true,
+				userId: true
 			}
 		})
 		if (!notification) {
@@ -89,24 +95,28 @@ export async function POST(req: NextRequest) {
 			if (!question) {
 				return NextResponse.json({ error: 'question not exist' }, { status: 404 });
 			}
-			await db
-				.insert(notificationsTable)
-				.values({
-					userId: question.questionerId,
-					questionId: newComment.questionId as number,
-					notificationType: "comment",
-					lastNotifyUserId: newComment.commenterId
-				})
+			if (question.questionerId !== newComment.commenterId) {
+				await db
+					.insert(notificationsTable)
+					.values({
+						userId: question.questionerId,
+						questionId: newComment.questionId as number,
+						notificationType: "comment",
+						lastNotifyUserId: newComment.commenterId
+					})
+			}
 		}
 		else {
-			await db
-				.update(notificationsTable)
-				.set({
-					isRead: false,
-					createdAt: new Date(),
-					lastNotifyUserId: newComment.commenterId
-				})
-				.where(eq(notificationsTable.notificationId, notification.notificationId))
+			if (notification.userId !== newComment.commenterId) {
+				await db
+					.update(notificationsTable)
+					.set({
+						isRead: false,
+						createdAt: new Date(),
+						lastNotifyUserId: newComment.commenterId
+					})
+					.where(eq(notificationsTable.notificationId, notification.notificationId))
+			}
 		}
 	}
 
