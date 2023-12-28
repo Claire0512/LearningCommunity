@@ -185,7 +185,8 @@ export async function POST(req: NextRequest) {
 				eq(notification.notificationType, "interaction")
 			),
 			columns: {
-				notificationId: true
+				notificationId: true,
+				userId: true,
 			}
 		})
 		if (!notification) {
@@ -196,36 +197,40 @@ export async function POST(req: NextRequest) {
 			if (!post) {
 				return NextResponse.json({ error: 'Post not exist' }, { status: 404 });
 			}
-			await db
-				.insert(notificationsTable)
-				.values({
-					userId: post.posterId,
-					postId: newInteraction.postId as number,
-					notificationType: "interaction",
-					lastNotifyUserId: newInteraction.userId
-				})
+			if (post.posterId !== newInteraction.userId) {
+				await db
+					.insert(notificationsTable)
+					.values({
+						userId: post.posterId,
+						postId: newInteraction.postId as number,
+						notificationType: "interaction",
+						lastNotifyUserId: newInteraction.userId
+					})
+			}
 		}
 		else {
-			await db
-				.update(notificationsTable)
-				.set({
-					isRead: false,
-					createdAt: new Date(),
-					lastNotifyUserId: newInteraction.userId
-				})
-				.where(eq(notificationsTable.notificationId, notification.notificationId))
+			if (notification.userId !== newInteraction.userId) {
+				await db
+					.update(notificationsTable)
+					.set({
+						isRead: false,
+						createdAt: new Date(),
+						lastNotifyUserId: newInteraction.userId
+					})
+					.where(eq(notificationsTable.notificationId, notification.notificationId))
+			}
 		}
 	}
 
 	else if (newInteraction.questionId && newInteraction.actionType.startsWith('add')) {
-
 		const notification = await db.query.notificationsTable.findFirst({
 			where: (notification, { eq, and }) => and(
 				eq(notification.questionId, newInteraction.questionId as number),
 				eq(notification.notificationType, "interaction")
 			),
 			columns: {
-				notificationId: true
+				notificationId: true,
+				userId: true
 			}
 		})
 		if (!notification) {
@@ -236,24 +241,28 @@ export async function POST(req: NextRequest) {
 			if (!question) {
 				return NextResponse.json({ error: 'question not exist' }, { status: 404 });
 			}
-			await db
-				.insert(notificationsTable)
-				.values({
-					userId: question.questionerId,
-					questionId: newInteraction.questionId as number,
-					notificationType: "interaction",
-					lastNotifyUserId: newInteraction.userId
-				})
+			if (question.questionerId !== newInteraction.userId) {
+				await db
+					.insert(notificationsTable)
+					.values({
+						userId: question.questionerId,
+						questionId: newInteraction.questionId as number,
+						notificationType: "interaction",
+						lastNotifyUserId: newInteraction.userId
+					})
+			}
 		}
 		else {
-			await db
-				.update(notificationsTable)
-				.set({
-					isRead: false,
-					createdAt: new Date(),
-					lastNotifyUserId: newInteraction.userId
-				})
-				.where(eq(notificationsTable.notificationId, notification.notificationId))
+			if (notification.userId !== newInteraction.userId) {
+				await db
+					.update(notificationsTable)
+					.set({
+						isRead: false,
+						createdAt: new Date(),
+						lastNotifyUserId: newInteraction.userId
+					})
+					.where(eq(notificationsTable.notificationId, notification.notificationId))
+			}
 		}
 	}
 
