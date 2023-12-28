@@ -19,7 +19,7 @@ const GetResponseSchema = z.array(
 		questionId: z.number().min(1),
 		questionTitle: z.string().min(1),
 		questionContext: z.string().min(1),
-		questionImage: z.string().nullable(),
+		questionImages: z.array(z.string()).nullable(),
 		questionerId: z.number(),
 		createdAt: z.date(),
 		questionerName: z.string(),
@@ -36,8 +36,8 @@ const questionRequestSchema = z.object({
 	questionTitle: z.string().min(1),
 	questionContext: z.string().min(1),
 	questionerId: z.number(),
-	questionImage: z.string().optional(),
-	tags: z.array(z.string()),
+	questionImages: z.array(z.string()).optional(),
+	tags: z.array(z.string()).optional(),
 });
 
 type GetResponse = z.infer<typeof GetResponseSchema>;
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
 			questionId: questionsTable.questionId,
 			questionTitle: questionsTable.questionTitle,
 			questionContext: questionsTable.questionContext,
-			questionImage: questionsTable.questionImage,
+			questionImages: questionsTable.questionImages,
 			questionerId: questionsTable.questionerId,
 			isSolved: questionsTable.isSolved,
 			createdAt: questionsTable.createdAt,
@@ -115,6 +115,7 @@ export async function GET(req: NextRequest) {
 	const [details, allTags] = await Promise.all([questionDetails, questionTags]);
 	const combined = details.map((detail, index) => ({
 		...detail,
+		questionImages: detail.questionImages ? detail.questionImages : [],
 		upvotes: detail.upvotes ? detail.upvotes : 0,
 		favorites: detail.favorites ? detail.favorites : 0,
 		commentsCount: detail.commentsCount ? detail.commentsCount : 0,
@@ -179,7 +180,12 @@ export async function POST(req: NextRequest) {
 	}
 
 	try {
-		tagIds = await getTagIds(tags);
+		if (tags) {
+			tagIds = await getTagIds(tags);
+		}
+		else {
+			tagIds = [];
+		}
 	} catch (error) {
 		console.error('Failed getting id of tags!');
 		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
