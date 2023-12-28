@@ -44,6 +44,7 @@ export type PostCardDetailType = {
 	hasFavorite: boolean;
 	commentsCount: number;
 	comments: Comment[];
+	hasComment: boolean;
 };
 export type NewPostType = {
 	postTitle: string;
@@ -91,6 +92,7 @@ export type QuestionCardDetailType = {
 	isSolved: boolean;
 	commentsCount: number;
 	comments: Comment[];
+	hasComment: boolean;
 };
 export type NotificationType = {
 	userId: number;
@@ -122,8 +124,9 @@ export type NewUserInfoType = {
 
 export type UserInfoType = {
 	userId: number;
-	profilePicture: string;
 	name: string;
+	email: string;
+	profilePicture: string | null;
 	resumeFile: string;
 	points: number;
 	hearts: number;

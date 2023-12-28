@@ -189,13 +189,13 @@ export async function POST(req: NextRequest) {
 		tagId,
 	}));
 
-	if (questionTagIds) {
-		try {
+	try {
+		if (questionTagIds.length > 0) {
 			await db.insert(questionTagsTable).values(questionTagIds);
-			return NextResponse.json({ result: 'success' }, { status: 200 });
-		} catch (error) {
-			console.log('Failed inserting question and tags relationship!', error);
-			return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 		}
+		return NextResponse.json({ result: 'success' }, { status: 200 });
+	} catch (error) {
+		console.log('Failed inserting question and tags relationship!', error);
+		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 	}
 }

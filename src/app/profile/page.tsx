@@ -67,7 +67,7 @@ function Page() {
 				setUserQuestions(questions);
 				setUserFavoriteQuestions(favoriteQuestions);
 				setNewName(userInfoData?.name);
-				setNewProfilePicture(userInfoData?.profilePicture);
+				setNewProfilePicture(userInfoData?.profilePicture || '');
 			} catch (error) {
 				console.error('Error fetching data:', error);
 			}
@@ -101,6 +101,7 @@ function Page() {
 			alert('Failed to update user information');
 		}
 	};
+	console.log(userInfo);
 	return (
 		<div
 			style={{
@@ -139,7 +140,7 @@ function Page() {
 					>
 						<Avatar
 							alt={userInfo.name}
-							src={userInfo.profilePicture}
+							src={userInfo.profilePicture || ''}
 							sx={{ width: 70, height: 70 }}
 						/>
 					</Box>

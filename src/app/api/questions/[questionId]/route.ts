@@ -193,6 +193,13 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		favorites: parsedDetail.favorites.length,
 		hasFavorite: parsedDetail.favorites.some((favorite) => favorite.userId === userId),
 		commentsCount: parsedDetail.comments.length,
+		hasComment: parsedDetail.comments.some((comment) => {
+			if (comment.commenterId === userId) return true;
+			comment.replies.forEach((reply) => {
+				if (reply.commenterId === userId) return true;
+			})
+			return false;
+		}),
 		comments: parsedDetail.comments.map((comment) => ({
 			commentId: comment.commentId,
 			commenterId: comment.commenterId,

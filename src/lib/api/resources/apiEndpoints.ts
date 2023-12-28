@@ -25,9 +25,9 @@ export const getTop3HotPosts = async () => {
 	}
 };
 
-export const getPostDetail = async (postId: number) => {
+export const getPostDetail = async (postId: number, userId: number) => {
 	try {
-		const response = await api.get(`/api/posts/${postId}`);
+		const response = await api.get(`/api/posts/${postId}?userId=${userId}`);
 		return response.data as PostCardDetailType;
 	} catch (error) {
 		console.error('Error getPostDetail :', error);

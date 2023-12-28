@@ -140,8 +140,7 @@ export async function GET(req: NextRequest) {
 		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 
-	const data = combined;
-	return NextResponse.json(data, { status: 200 });
+	return NextResponse.json(combined, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
@@ -175,9 +174,6 @@ export async function POST(req: NextRequest) {
 				},
 				where: (tagsTable, { eq }) => eq(tagsTable.name, tag),
 			});
-
-			console.log(exist);
-
 			if (exist) {
 				return exist.tagId;
 			} else {
@@ -203,13 +199,13 @@ export async function POST(req: NextRequest) {
 		tagId,
 	}));
 
-	if (postTagIds) {
-		try {
+	try {
+		if (postTagIds.length > 0) {
 			await db.insert(postTagsTable).values(postTagIds);
-			return NextResponse.json({ result: 'success' }, { status: 200 });
-		} catch (error) {
-			console.log('Failed inserting post and tags relationship!', error);
-			return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 		}
+		return NextResponse.json({ result: 'success' }, { status: 200 });
+	} catch (error) {
+		console.log('Failed inserting post and tags relationship!', error);
+		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
 	}
 }
