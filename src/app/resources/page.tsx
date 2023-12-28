@@ -20,6 +20,7 @@ function Page() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<PostCardType[]>([]);
+	const [posts, setPosts] = useState<PostCardType[]>([]);
 	const [hotPosts, setHotPosts] = useState<PostCardType[]>([]);
 	const [searchInput, setSearchInput] = useState('');
 
@@ -55,6 +56,7 @@ function Page() {
 			try {
 				const allPosts = await getAllPosts();
 				const topHotPosts = await getTop3HotPosts();
+				setPosts(allPosts);
 				setFilteredPosts(allPosts);
 				setHotPosts(topHotPosts);
 			} catch (error) {
@@ -73,11 +75,11 @@ function Page() {
 		const filterBySearch = (post: PostCardType) =>
 			post.postTitle.toLowerCase().startsWith(searchInput.toLowerCase());
 
-		const newFilteredPosts = filteredPosts.filter(
+		const newFilteredPosts = posts.filter(
 			(post: PostCardType) => filterByTags(post) && filterBySearch(post),
 		);
 		setFilteredPosts(newFilteredPosts);
-	}, [selectedTags, searchInput]);
+	}, [selectedTags, searchInput, posts]);
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
@@ -90,7 +92,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '28px',
+						fontSize: '24px',
 						textAlign: 'center',
 					}}
 				>
@@ -106,7 +108,6 @@ function Page() {
 					gridTemplateColumns: 'repeat(3, 1fr)',
 					gap: 1,
 					width: '100%',
-					marginLeft: '50px',
 				}}
 			>
 				{hotPosts.map((post) => (
@@ -125,7 +126,7 @@ function Page() {
 					style={{
 						fontWeight: 'bold',
 						color: '#24282D',
-						fontSize: '28px',
+						fontSize: '24px',
 						textAlign: 'center',
 					}}
 				>
@@ -134,15 +135,35 @@ function Page() {
 				<ArticleIcon sx={{ color: '#9FAAE3', fontSize: '40px', ml: 1 }} />
 			</Box>
 
-			<Box display="flex" alignItems="center" gap={1} sx={{ mt: '8px' }}>
+			<Box
+				sx={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: 1,
+					mt: 4,
+					mb: 4,
+				}}
+			>
+				<TextField
+					fullWidth
+					placeholder="Search..."
+					value={searchInput}
+					onChange={handleSearchChange}
+					sx={{ flexGrow: 1 }}
+					InputProps={{
+						style: { borderRadius: '15px', height: '40px' },
+					}}
+				/>
 				<Button
 					variant="contained"
 					onClick={handleOpenModal}
 					color="secondary"
 					sx={{
 						bgcolor: `${theme.palette.secondary.main} !important`,
-
 						borderRadius: '20px',
+						height: '40px',
+						width: '115px',
+						minWidth: '115px',
 					}}
 				>
 					<Typography variant="body1" style={{ fontSize: '20px' }}>
@@ -152,7 +173,7 @@ function Page() {
 				{selectedTags.map((tag) => (
 					<Chip
 						key={tag}
-						label={<Typography style={{ fontSize: '26px' }}>{tag}</Typography>}
+						label={<Typography style={{ fontSize: '18px' }}>{tag}</Typography>}
 					/>
 				))}
 			</Box>
@@ -160,13 +181,6 @@ function Page() {
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
 				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />{' '}
 			</Dialog>
-			<TextField
-				fullWidth
-				placeholder="Search..."
-				value={searchInput}
-				onChange={handleSearchChange}
-				sx={{ mt: 4, mb: 4 }}
-			/>
 			<Box
 				sx={{
 					height: '90%',
@@ -174,7 +188,6 @@ function Page() {
 					gridTemplateColumns: 'repeat(3, 1fr)',
 					gap: 1,
 					width: '100%',
-					marginLeft: '50px',
 				}}
 			>
 				{filteredPosts.map((post) => (

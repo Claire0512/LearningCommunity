@@ -71,8 +71,8 @@ function QuestionCard(question: QuestionCardType) {
 		<Card
 			onClick={handleCardClick}
 			sx={{
-				minWidth: 360,
-				maxWidth: 360,
+				minWidth: 330,
+				maxWidth: 330,
 				m: 2,
 				display: 'flex',
 				flexDirection: 'column',

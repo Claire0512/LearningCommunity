@@ -121,17 +121,17 @@ function Page() {
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
-				width: '90%',
+				width: '100%',
 			}}
 		>
-			<Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', mt: 4, mb: 2 }}>
+			<Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', mt: 5, mb: 5 }}>
 				使用者資訊
 			</Typography>
 			{userInfo && (
 				<Card
 					sx={{
-						width: '45%',
-						height: '150px',
+						width: '55%',
+						height: '120px',
 						m: 2,
 						display: 'flex',
 						borderRadius: '10px',
@@ -380,22 +380,6 @@ function Page() {
 			>
 				<CreateIcon />
 			</Fab>
-			{/* <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-						<Button
-							variant="contained"
-							color="secondary"
-							onClick={handleOpenDialog}
-							sx={{
-								mt: 2,
-								ml: 1,
-								bgcolor: `${theme.palette.secondary.main} !important`,
-								height: '40px',
-								borderRadius: '20px',
-							}}
-						>
-							編輯
-						</Button>
-					</Box> */}
 		</div>
 	);
 }

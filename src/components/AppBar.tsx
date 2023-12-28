@@ -209,21 +209,21 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 		}
 	};
 	return (
-		<AppBar sx={{ height: '100px', bgcolor: `${theme.palette.secondary.main} !important` }}>
+		<AppBar sx={{ height: '80px', bgcolor: `${theme.palette.secondary.main} !important` }}>
 			<Toolbar
 				sx={{
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'flex-start',
-					height: '130px',
+					height: '80px',
 				}}
 			>
-				<Image src="/images/logo.png" alt="Logo" width={60} height={60} />
+				<Image src="/images/logo.png" alt="Logo" width={50} height={50} />
 				<p
 					style={{
 						fontWeight: 'bold',
 						color: '#104b76',
-						fontSize: '28px',
+						fontSize: '26px',
 						marginLeft: '20px',
 					}}
 				>
@@ -240,7 +240,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					<Link href="/" passHref>
 						<Button
 							style={{
-								fontSize: '22px',
+								fontSize: '20px',
 								color: activeButton === '首頁' ? '#104b76' : '#000000',
 							}}
 						>
@@ -250,7 +250,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					<Link href="/discussions" passHref>
 						<Button
 							style={{
-								fontSize: '22px',
+								fontSize: '20px',
 								color: activeButton === '討論專區' ? '#104b76' : '#000000',
 							}}
 						>
@@ -260,7 +260,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					<Link href="/resources" passHref>
 						<Button
 							style={{
-								fontSize: '22px',
+								fontSize: '20px',
 								color: activeButton === '學習資源' ? '#104b76' : '#000000',
 							}}
 						>
@@ -270,7 +270,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					<Link href="/profile" passHref>
 						<Button
 							style={{
-								fontSize: '22px',
+								fontSize: '20px',
 								color: activeButton === '個人檔案' ? '#104b76' : '#000000',
 							}}
 							onClick={(e) => handleClick(e, 'profile')}
@@ -280,7 +280,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					</Link>
 					<Button
 						style={{
-							fontSize: '22px',
+							fontSize: '20px',
 							color: activeButton === '通知' ? '#104b76' : '#000000',
 							position: 'relative', // Position the red dot absolutely inside the button
 						}}
@@ -328,7 +328,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					{session ? (
 						<Button
 							style={{
-								fontSize: '22px',
+								fontSize: '20px',
 								color: activeButton === '登出' ? '#104b76' : '#000000',
 							}}
 							onClick={handleLogout}
@@ -339,7 +339,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 						<Link href="/sign-in" passHref>
 							<Button
 								style={{
-									fontSize: '22px',
+									fontSize: '20px',
 									color: activeButton === '登入/註冊' ? '#104b76' : '#000000',
 								}}
 							>
