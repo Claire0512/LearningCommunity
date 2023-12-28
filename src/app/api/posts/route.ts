@@ -20,7 +20,7 @@ const GetResponseSchema = z.array(
 		postId: z.number().min(1),
 		postTitle: z.string().min(1),
 		postContext: z.string().min(1),
-		postImage: z.string().nullable(),
+		postImages: z.array(z.string()).nullable(),
 		posterId: z.number(),
 		createdAt: z.date(),
 		posterName: z.string(),
@@ -37,8 +37,8 @@ const PostRequestSchema = z.object({
 	postTitle: z.string().min(1),
 	postContext: z.string().min(1),
 	posterId: z.number(),
-	postImage: z.string().optional(),
-	tags: z.array(z.string()),
+	postImages: z.array(z.string()).optional(),
+	tags: z.array(z.string()).optional(),
 });
 
 type GetResponse = z.infer<typeof GetResponseSchema>;
@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
 			postId: postsTable.postId,
 			postTitle: postsTable.postTitle,
 			postContext: postsTable.postContext,
-			postImage: postsTable.postImage,
+			postImages: postsTable.postImages,
 			posterId: postsTable.posterId,
 			createdAt: postsTable.createdAt,
 			posterName: usersTable.name,
@@ -126,6 +126,7 @@ export async function GET(req: NextRequest) {
 	const [details, allTags] = await Promise.all([postDetails, postTags]);
 	const combined = details.map((detail, index) => ({
 		...detail,
+		postImages: detail.postImages? detail.postImages : [],
 		upvotes: detail.upvotes ? detail.upvotes : 0,
 		downvotes: detail.downvotes ? detail.downvotes : 0,
 		favorites: detail.favorites ? detail.favorites : 0,
@@ -189,7 +190,12 @@ export async function POST(req: NextRequest) {
 	}
 
 	try {
-		tagIds = await getTagIds(tags);
+		if (tags) {
+			tagIds = await getTagIds(tags);
+		}
+		else {
+			tagIds = []
+		}
 	} catch (error) {
 		console.error('Failed getting id of tags!');
 		return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });

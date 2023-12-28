@@ -18,7 +18,7 @@ const GetResponseSchema = z.array(
 		postId: z.number().min(1),
 		postTitle: z.string(),
 		postContext: z.string().min(1),
-		postImage: z.string().nullable(),
+		postImages: z.array(z.string()).nullable(),
 		posterId: z.number(),
 		upvotes: z.number(),
 		downvotes: z.number(),
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
 			postId: postsTable.postId,
 			postTitle: postsTable.postTitle,
 			postContext: postsTable.postContext,
-			postImage: postsTable.postImage,
+			postImages: postsTable.postImages,
 			posterId: postsTable.posterId,
 			createdAt: postsTable.createdAt,
 			posterName: usersTable.name,
@@ -111,6 +111,7 @@ export async function GET(req: NextRequest) {
 	const [details, allTags] = await Promise.all([postDetails, postTags]);
 	const combined = details.map((detail, index) => ({
 		...detail,
+		postImages: detail.postImages ? detail.postImages : [],
 		upvotes: detail.upvotes ? detail.upvotes : 0,
 		downvotes: detail.downvotes ? detail.downvotes : 0,
 		favorites: detail.favorites ? detail.favorites : 0,

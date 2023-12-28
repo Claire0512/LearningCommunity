@@ -2,7 +2,7 @@ export type PostCardType = {
 	postId: number;
 	postTitle: string;
 	postContext: string;
-	postImage?: string | null;
+	postImages: string[];
 	posterId: number;
 	posterName: string;
 	profilePicture: string | null;
@@ -32,7 +32,7 @@ export type PostCardDetailType = {
 	postId: number;
 	postTitle: string;
 	postContext: string;
-	postImage?: string | null;
+	postImages: string[];
 	posterId: number;
 	posterName: string;
 	profilePicture: string | null | undefined;
@@ -52,7 +52,7 @@ export type NewPostType = {
 	postTitle: string;
 	postContext: string;
 	posterId: number;
-	postImage?: string;
+	postImages: string[];
 	tags: string[];
 };
 
@@ -60,7 +60,7 @@ export type NewQuestionType = {
 	questionTitle: string;
 	questionContext: string;
 	questionerId: number;
-	questionImage?: string;
+	questionImages: string[];
 	tags: string[];
 };
 
@@ -68,7 +68,7 @@ export type QuestionCardType = {
 	questionId: number;
 	questionTitle: string;
 	questionContext: string;
-	questionImage?: string | null;
+	questionImages: string[];
 	questionerId: number;
 	questionerName: string;
 	profilePicture: string;
@@ -83,7 +83,7 @@ export type QuestionCardDetailType = {
 	questionId: number;
 	questionTitle: string;
 	questionContext: string;
-	questionImage?: string | null;
+	questionImages: string[];
 	questionerId: number;
 	questionerName: string;
 	profilePicture: string | null | undefined;
