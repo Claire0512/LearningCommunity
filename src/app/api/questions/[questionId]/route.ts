@@ -63,8 +63,8 @@ const GetResponseSchema = z.object({
 	questionId: z.number().min(1),
 	questionTitle: z.string(),
 	questionContext: z.string().min(1),
+	questionImage: z.string().nullable(),
 	questionerId: z.number(),
-	questionImage: z.string().nullable().optional(),
 	createdAt: z.date(),
 	isSolved: z.boolean(),
 	user: z.object({
@@ -180,6 +180,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		questionId: parsedDetail.questionId,
 		questionTitle: parsedDetail.questionTitle,
 		questionContext: parsedDetail.questionContext,
+		questionImage: parsedDetail.questionImage,
 		questionerId: parsedDetail.questionerId,
 		questionerName: parsedDetail.user.name,
 		profilePicture: parsedDetail.user.profilePicture,

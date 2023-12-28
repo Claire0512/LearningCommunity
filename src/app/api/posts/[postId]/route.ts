@@ -182,6 +182,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		postId: parsedDetail.postId,
 		postTitle: parsedDetail.postTitle,
 		postContext: parsedDetail.postContext,
+		postImage: parsedDetail.postImage,
 		posterId: parsedDetail.posterId,
 		posterName: parsedDetail.user.name,
 		profilePicture: parsedDetail.user.profilePicture,
