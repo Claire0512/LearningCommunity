@@ -50,20 +50,20 @@ function Page() {
 		setOpenSnackbar(false);
 	};
 	return (
-		<Box className="flex h-screen  w-screen justify-center ">
+		<Box className="flex h-screen  w-screen justify-center bg-[#FCFAF5]">
 			<Card
-				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 `}
+				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 bg-[#FCFAF5]`}
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '80px' }}>
-						<Image src="/images/logo.png" alt="Logo" width={120} height={120} />
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '60px' }}>
+						<Image src="/images/logo.png" alt="Logo" width={80} height={80} />
 					</div>
 					<p
 						style={{
 							fontWeight: 'bold',
 							color: '#104b76',
-							fontSize: '32px',
+							fontSize: '30px',
 							textAlign: 'center',
 							marginBottom: '20px',
 							marginTop: '20px',

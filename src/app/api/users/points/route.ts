@@ -23,20 +23,20 @@ export async function PUT(req: NextRequest) {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
-    if (data.pointsDiff < 0) {
-        return NextResponse.json({ error: 'pointsDiff cannot be negative' }, { status: 400 });
-    }
+	if (data.pointsDiff < 0) {
+		return NextResponse.json({ error: 'pointsDiff cannot be negative' }, { status: 400 });
+	}
 
-    const operation = data as PutRequestType;
+	const operation = data as PutRequestType;
 
 	const updatedUsers = await db
 		.update(usersTable)
-		.set({ points: sql`${usersTable.points} + ${operation.pointsDiff}`})
+		.set({ points: sql`${usersTable.points} + ${operation.pointsDiff}` })
 		.where(eq(usersTable.userId, data.userId))
 		.returning({
-            userId: usersTable.userId,
-            points: usersTable.points
-        });
+			userId: usersTable.userId,
+			points: usersTable.points,
+		});
 
 	if (updatedUsers.length !== 1) {
 		return NextResponse.json({ error: 'User not found' }, { status: 404 });

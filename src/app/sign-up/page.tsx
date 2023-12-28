@@ -61,20 +61,20 @@ function Page() {
 	};
 
 	return (
-		<Box className="flex h-screen w-screen justify-center ">
+		<Box className="flex h-screen w-screen justify-center bg-[#FCFAF5]">
 			<Card
-				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 `}
+				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 bg-[#FCFAF5]`}
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
-						<Image src="/images/logo.png" alt="Logo" width={100} height={100} />
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '25px' }}>
+						<Image src="/images/logo.png" alt="Logo" width={80} height={80} />
 					</div>
 					<p
 						style={{
 							fontWeight: 'bold',
 							color: '#104b76',
-							fontSize: '32px',
+							fontSize: '30px',
 							textAlign: 'center',
 							marginBottom: '20px',
 							marginTop: '20px',
@@ -84,7 +84,7 @@ function Page() {
 					</p>
 					<form onSubmit={handleSubmit}>
 						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
+							className={`mb-2 w-full ${commonTextClass}`}
 							label="電子郵件信箱"
 							variant="outlined"
 							type="email"
@@ -92,10 +92,11 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setEmail(e.target.value)
 							}
+							sx={{ input: { height: '20px' } }}
 						/>
 
 						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
+							className={`mb-2 w-full ${commonTextClass}`}
 							label="使用者名稱"
 							variant="outlined"
 							type="username"
@@ -103,9 +104,10 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setUsername(e.target.value)
 							}
+							sx={{ input: { height: '20px' } }}
 						/>
 						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
+							className={`mb-2 w-full ${commonTextClass}`}
 							label="密碼"
 							variant="outlined"
 							type="password"
@@ -113,9 +115,10 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setPassword(e.target.value)
 							}
+							sx={{ input: { height: '20px' } }}
 						/>
 						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
+							className={`mb-2 w-full ${commonTextClass}`}
 							label="再次確認密碼"
 							variant="outlined"
 							type="password"
@@ -123,19 +126,21 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setConfirmPassword(e.target.value)
 							}
+							sx={{ input: { height: '20px' } }}
 						/>
 						<Button
-							className={`mb-4 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
+							className={`mb-2 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
 							type="submit"
 							variant="contained"
-							sx={{ mt: 2, bgcolor: '#35A996' }}
+							style={{ backgroundColor: '#104b76', color: 'white' }}
+							sx={{ input: { height: '20px' } }}
 						>
 							註冊
 						</Button>
 						<Button
 							className={`${commonTextClass} w-full`}
-							sx={{ color: '#104b76' }}
-							onClick={() => router.push('/')}
+							sx={{ color: '#104b76', input: { height: '20px' } }}
+							onClick={() => router.push('/sign-in')}
 						>
 							回到登入介面
 						</Button>
