@@ -13,7 +13,7 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Toolbar from '@mui/material/Toolbar';
 import { useTheme } from '@mui/material/styles';
 
-import logOut from '@/lib/api/users/logout';
+import logOut from '@/lib/api/authentication/logout';
 
 import getTimeDifference from './getTimeDifference';
 

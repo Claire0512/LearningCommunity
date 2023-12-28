@@ -66,24 +66,24 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 										columns: {
 											name: true,
 										},
-									}
-								}
+									},
+								},
 							},
 							user: {
 								columns: {
 									name: true,
 									profilePicture: true,
-								}
+								},
 							},
 							upvotes: {
 								columns: {
 									userId: true,
-								}
+								},
 							},
 							favorites: {
 								columns: {
 									userId: true,
-								}
+								},
 							},
 							comments: {
 								fields: {
@@ -131,7 +131,6 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 		commentsCount: question.comments.length,
 		tags: question.tags.map((singleTag) => singleTag.tag.name),
 	}));
-
 
 	return NextResponse.json(questions, { status: 200 });
 }

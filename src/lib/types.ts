@@ -12,7 +12,7 @@ export type PostCardType = {
 	tags: string[];
 	createdAt: string;
 };
-export type CommentType = {
+export type Comment = {
 	commentId: number;
 	commenterId: number;
 	commenterName: string;
@@ -26,7 +26,7 @@ export type CommentType = {
 	createdAt: string;
 	replies: ReplyType[];
 };
-export type ReplyType = Omit<CommentType, 'replies'>;
+export type ReplyType = Omit<Comment, 'replies'>;
 export type PostCardDetailType = {
 	postId: number;
 	postTitle: string;
@@ -75,6 +75,23 @@ export type QuestionCardType = {
 	tags: string[];
 	createdAt: string;
 };
+export type QuestionCardDetailType = {
+	questionId: number;
+	questionTitle: string;
+	questionContext: string;
+	questionerId: number;
+	questionerName: string;
+	profilePicture: string | null | undefined;
+	tags: string[];
+	createdAt: string;
+	upvotes: number;
+	hasUpvote: boolean;
+	favorites: number;
+	hasFavorite: boolean;
+	isSolved: boolean;
+	commentsCount: number;
+	comments: Comment[];
+};
 export type NotificationType = {
 	userId: number;
 	replierId: number;
@@ -88,16 +105,30 @@ export type NotificationType = {
 	questionId: null;
 };
 
-// export type CommentType = {
-// 	commentId: number;
-// 	commenterId: string;
-// 	commenterName: string;
-// 	commenterProfilePicture: string;
-// 	upvotes: number;
-// 	downvotes: number;
-// 	hasUpvoted: boolean;
-// 	hasDownvoted: boolean;
-// 	text: string;
-// 	createdAt: string;
-// 	replies?: Comment[];
-// };
+export type NewCommentType = {
+	postId?: number;
+	commenterId: number;
+	commenterName: string;
+	text: string;
+};
+
+export type NewUserInfoType = {
+	userId: number;
+	newName?: string;
+	newProfilePicture?: string;
+	currentPassword?: string;
+	newPassword?: string;
+};
+
+export type UserInfoType = {
+	userId: number;
+	profilePicture: string;
+	name: string;
+	resumeFile: string;
+	points: number;
+	hearts: number;
+	upvotes: number;
+	downvotes: number;
+	favorites: number;
+	checkmarks: number;
+};

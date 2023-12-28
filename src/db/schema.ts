@@ -1,6 +1,5 @@
 import { sql, relations } from 'drizzle-orm';
 import {
-	index,
 	integer,
 	pgTable,
 	serial,
@@ -94,7 +93,7 @@ export const commentsRelations = relations(commentsTable, ({ one, many }) => ({
 	user: one(usersTable, {
 		fields: [commentsTable.commenterId],
 		references: [usersTable.userId],
-		relationName: 'user'
+		relationName: 'user',
 	}),
 	post: one(postsTable, {
 		fields: [commentsTable.postId],

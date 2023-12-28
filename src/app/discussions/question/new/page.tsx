@@ -1,44 +1,29 @@
 'use client';
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 import TagsSelector from '../../../../components/TagsSelector';
+import { addNewQuestion } from '../../../../lib/api/discussions/apiEndpoints';
+import { getAllTags } from '../../../../lib/api/tags/apiEndpoints';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button } from '@mui/material';
 import { Card, CardContent, Typography, TextField, Dialog, useTheme } from '@mui/material';
 import { Avatar, Chip, Stack, Box } from '@mui/material';
 
-interface Tag {
-	id: number;
-	name: string;
-}
-interface SelectedTag extends Tag {
-	category: string;
-}
-const sampleTags = {
-	grades: [
-		{ id: 1, name: 'Grade 1' },
-		{ id: 2, name: 'Grade 2' },
-	],
-	subjects: [
-		{ id: 101, name: 'Mathematics' },
-		{ id: 102, name: 'Science' },
-	],
-	others: [
-		{ id: 201, name: 'Homework Help' },
-		{ id: 202, name: 'Exam Prep' },
-	],
-};
 function Page() {
 	const theme = useTheme();
-	const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
+	const [tags, setTags] = useState<string[]>([]);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
 	const { data: session } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const handleSave = (selected: SelectedTag[]) => {
+	const router = useRouter();
+	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
 		console.log('Selected tags:', selected);
@@ -49,18 +34,54 @@ function Page() {
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
+	useEffect(() => {
+		const fetchTags = async () => {
+			try {
+				const fetchedTags = await getAllTags();
+				setTags(fetchedTags); // Assuming fetchedTags is an array of Tag objects
+			} catch (error) {
+				console.error('Failed to fetch tags:', error);
+			}
+		};
 
+		fetchTags();
+	}, []);
 	const handleContentChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setContent(event.target.value);
 	};
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (!title || !content) {
 			alert('標題和內文不能為空！');
 			return;
 		}
 
-		console.log('送出資料', { title, content, selectedTags });
+		// Assuming the user ID is available in the session object
+		const questionerId = session?.user.userId;
+
+		const newQuestion = {
+			questionTitle: title,
+			questionContext: content,
+			questionerId: questionerId,
+			tags: selectedTags,
+			// Add 'questionImage' if you are handling images
+		};
+
+		try {
+			await addNewQuestion(newQuestion);
+			// Handle success, e.g., show a success message or redirect
+			alert('問題已成功提交！');
+			// Optionally reset form fields
+			setTitle('');
+			setContent('');
+			setSelectedTags([]);
+			router.push('/discussions');
+		} catch (error) {
+			console.error('添加問題失敗:', error);
+			// Handle errors, e.g., show an error message
+			alert('提交問題時出現錯誤！');
+		}
 	};
+
 	return (
 		<div
 			style={{
@@ -93,7 +114,7 @@ function Page() {
 					display: 'flex',
 					flexDirection: 'column',
 					borderRadius: '20px',
-					backgroundColor: '#FCFAF5',
+					backgroundColor: '#F7F9FD',
 					position: 'relative',
 					margin: 'auto',
 				}}
@@ -155,10 +176,8 @@ function Page() {
 						</Button>
 						{selectedTags.map((tag) => (
 							<Chip
-								key={tag.id}
-								label={
-									<Typography style={{ fontSize: '16px' }}>{tag.name}</Typography>
-								}
+								key={tag}
+								label={<Typography style={{ fontSize: '16px' }}>{tag}</Typography>}
 							/>
 						))}
 					</Box>
@@ -186,7 +205,7 @@ function Page() {
 				</Box>
 			</Card>
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
-				<TagsSelector tags={sampleTags} onSave={handleSave} onCancel={handleCloseModal} />
+				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
 			</Dialog>
 		</div>
 	);

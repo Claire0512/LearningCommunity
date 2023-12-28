@@ -62,26 +62,26 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 						with: {
 							tag: {
 								columns: {
-                                    name: true,
-                                },
-							}
-						}
+									name: true,
+								},
+							},
+						},
 					},
 					user: {
 						columns: {
 							name: true,
-                            profilePicture: true,
-						}
+							profilePicture: true,
+						},
 					},
 					upvotes: {
 						columns: {
 							userId: true,
-						}
+						},
 					},
 					favorites: {
 						columns: {
 							userId: true,
-						}
+						},
 					},
 					comments: {
 						fields: {

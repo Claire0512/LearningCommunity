@@ -15,7 +15,6 @@ function getTimeDifference(createdAt: string) {
 	const postDate = new Date(createdAt).getTime();
 	const now = new Date().getTime();
 	const differenceInMilliseconds = now - postDate;
-	const router = useRouter();
 	const minutes = Math.floor(differenceInMilliseconds / 60000);
 	const hours = Math.floor(minutes / 60);
 	const days = Math.floor(hours / 24);
@@ -35,12 +34,12 @@ function PostCard(post: PostCardType) {
 	const theme = useTheme();
 	const router = useRouter();
 	const formattedTime = getTimeDifference(post.createdAt);
-	// console.log("post.tags", post.tags);
+
 	useEffect(() => {
 		const updateVisibleTags = () => {
 			const container = tagContainerRef.current;
 			if (container) {
-				let visibleWidth = container.offsetWidth;
+				const visibleWidth = container.offsetWidth;
 				let accumulatedWidth = 0;
 				const newVisibleTags: string[] = [];
 
@@ -83,7 +82,7 @@ function PostCard(post: PostCardType) {
 				display: 'flex',
 				flexDirection: 'column',
 				borderRadius: '5px',
-				backgroundColor: '#FCFAF5',
+				backgroundColor: '#F7F9FD',
 				position: 'relative',
 				'&::before': {
 					content: '""',

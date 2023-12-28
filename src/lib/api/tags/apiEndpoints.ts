@@ -12,7 +12,6 @@ export const addNewTags = async (tagName: string) => {
 export const getAllTags = async () => {
 	try {
 		const response = await api.get('/api/tags');
-		// console.log('response.data:', response.data);
 		return response.data as string[];
 	} catch (error) {
 		console.error('Error getAllTags :', error);

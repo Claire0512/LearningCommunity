@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -119,7 +120,7 @@ function Page() {
 					display: 'flex',
 					flexDirection: 'column',
 					borderRadius: '20px',
-					backgroundColor: '#FCFAF5',
+					backgroundColor: '#F7F9FD',
 					position: 'relative',
 					margin: 'auto',
 				}}

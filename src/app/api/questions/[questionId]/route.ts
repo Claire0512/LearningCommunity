@@ -1,12 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
-
 import { questionsTable, commentsTable } from '@/db/schema';
-
-import { eq } from 'drizzle-orm';
 
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
@@ -97,8 +95,8 @@ const GetResponseSchema = z.object({
 const PutRequestSchema = z.object({
 	questionId: z.number().min(1),
 	isSolved: z.boolean().optional(),
-	helpfulCommentId: z.number().optional()
-})
+	helpfulCommentId: z.number().optional(),
+});
 
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
@@ -228,7 +226,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 export async function PUT(req: NextRequest) {
 	const data = await req.json();
 	try {
-		PutRequestSchema.parse(data)
+		PutRequestSchema.parse(data);
 	} catch (error) {
 		console.log('Error parsing out request in api/questions/[questionId]/route.ts');
 		return NextResponse.json({ error: 'put request invalid' }, { status: 400 });
@@ -238,25 +236,27 @@ export async function PUT(req: NextRequest) {
 
 	if (request.isSolved) {
 		try {
-			await db.update(questionsTable)
-			.set({ isSolved: request.isSolved })
-			.where(eq(questionsTable.questionId, request.questionId));
+			await db
+				.update(questionsTable)
+				.set({ isSolved: request.isSolved })
+				.where(eq(questionsTable.questionId, request.questionId));
 		} catch (error) {
-			console.log("Error updating question");
+			console.log('Error updating question');
 			return NextResponse.json({ error: 'server error updating question' }, { status: 500 });
 		}
 	}
 
 	if (request.helpfulCommentId) {
 		try {
-			await db.update(commentsTable)
-			.set({ isHelpful: true })
-			.where(eq(commentsTable.commentId, request.helpfulCommentId));
+			await db
+				.update(commentsTable)
+				.set({ isHelpful: true })
+				.where(eq(commentsTable.commentId, request.helpfulCommentId));
 		} catch (error) {
-			console.log("Error updating helpful");
+			console.log('Error updating helpful');
 			return NextResponse.json({ error: 'server error updating helpful' }, { status: 500 });
 		}
 	}
 
-	return NextResponse.json({ success: true }, { status: 200 })
+	return NextResponse.json({ success: true }, { status: 200 });
 }

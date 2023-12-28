@@ -22,7 +22,7 @@ function Page() {
 	const [filteredPosts, setFilteredPosts] = useState<PostCardType[]>([]);
 	const [hotPosts, setHotPosts] = useState<PostCardType[]>([]);
 	const [searchInput, setSearchInput] = useState('');
-	const [loading, setLoading] = useState(true);
+
 	const [tags, setTags] = useState<string[]>([]);
 	const { data: session } = useSession();
 	const handleOpenModal = () => setIsModalOpen(true);
@@ -52,7 +52,6 @@ function Page() {
 	}, []);
 	useEffect(() => {
 		async function fetchData() {
-			setLoading(true);
 			try {
 				const allPosts = await getAllPosts();
 				const topHotPosts = await getTop3HotPosts();
@@ -60,8 +59,6 @@ function Page() {
 				setHotPosts(topHotPosts);
 			} catch (error) {
 				console.error('Error fetching data:', error);
-			} finally {
-				setLoading(false);
 			}
 		}
 		fetchData();

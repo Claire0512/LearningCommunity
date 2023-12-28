@@ -1,5 +1,5 @@
 import api from '@/lib/api/base';
-import { PostCardType, NewPostType , PostCardDetailType} from '@/lib/types';
+import type { PostCardType, NewPostType, PostCardDetailType } from '@/lib/types';
 
 export const getAllPosts = async () => {
 	try {

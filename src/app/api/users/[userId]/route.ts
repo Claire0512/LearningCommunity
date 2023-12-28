@@ -14,35 +14,55 @@ const GetResponseSchema = z.object({
 	email: z.string(),
 	profilePicture: z.string().optional().nullable(),
 	points: z.number(),
-	posts: z.array(z.object({
-		upvotes: z.array(z.object({
-			userId: z.number(),
-		})),
-		downvotes: z.array(z.object({
-			userId: z.number(),
-		})),
-		favorites: z.array(z.object({
-			userId: z.number(),
-		})),
-	})),
-	questions: z.array(z.object({
-		upvotes: z.array(z.object({
-			userId: z.number(),
-		})),
-		favorites: z.array(z.object({
-			userId: z.number(),
-		})),
-	})),
-	comments: z.array(z.object({
-		upvotes: z.array(z.object({
-			userId: z.number(),
-		})),
-		downvotes: z.array(z.object({
-			userId: z.number(),
-		})),
-		isHelpful: z.boolean()
-	}))
-})
+	posts: z.array(
+		z.object({
+			upvotes: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+			downvotes: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+			favorites: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+		}),
+	),
+	questions: z.array(
+		z.object({
+			upvotes: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+			favorites: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+		}),
+	),
+	comments: z.array(
+		z.object({
+			upvotes: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+			downvotes: z.array(
+				z.object({
+					userId: z.number(),
+				}),
+			),
+			isHelpful: z.boolean(),
+		}),
+	),
+});
 
 const PutRequestSchema = z.object({
 	userId: z.number().min(1),
@@ -68,7 +88,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 	const user = await db.query.usersTable.findFirst({
 		where: (user, { eq }) => eq(user.userId, userId),
 		columns: {
-			password: false
+			password: false,
 		},
 		with: {
 			posts: {
@@ -76,56 +96,56 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 				with: {
 					upvotes: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
 					downvotes: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
 					favorites: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
-				}
+				},
 			},
 			questions: {
 				columns: {},
 				with: {
 					upvotes: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
 					favorites: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
-				}
+				},
 			},
 			comments: {
 				columns: {
-					isHelpful: true
+					isHelpful: true,
 				},
 				with: {
 					upvotes: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
 					downvotes: {
 						columns: {
-							userId: true
-						}
+							userId: true,
+						},
 					},
-				}
-			}
-		}
+				},
+			},
+		},
 	});
-	
+
 	if (!user) {
 		return NextResponse.json({ error: 'User not found' }, { status: 404 });
 	}
@@ -143,33 +163,33 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
 	const aggUser = {
 		userId: parsedUser.userId,
-        name: parsedUser.name,
-        email: parsedUser.email,
-        profilePicture: parsedUser.profilePicture,
-        points: parsedUser.points,
+		name: parsedUser.name,
+		email: parsedUser.email,
+		profilePicture: parsedUser.profilePicture,
+		points: parsedUser.points,
 		upvotes: 0,
 		downvotes: 0,
 		hearts: 0,
 		favorites: 0,
 		checkmarks: 0,
-	}
+	};
 
-	parsedUser.posts.forEach(post => {
+	parsedUser.posts.forEach((post) => {
 		aggUser.upvotes += post.upvotes.length;
-        aggUser.downvotes += post.downvotes.length;
-        aggUser.favorites += post.favorites.length;
-	})
+		aggUser.downvotes += post.downvotes.length;
+		aggUser.favorites += post.favorites.length;
+	});
 
-	parsedUser.questions.forEach(question => {
+	parsedUser.questions.forEach((question) => {
 		aggUser.hearts += question.upvotes.length;
-        aggUser.favorites += question.favorites.length;
-	})
+		aggUser.favorites += question.favorites.length;
+	});
 
-	parsedUser.comments.forEach(comment => {
+	parsedUser.comments.forEach((comment) => {
 		aggUser.upvotes += comment.upvotes.length;
 		aggUser.downvotes += comment.downvotes.length;
-		aggUser.checkmarks += (comment.isHelpful === true) ? 1 : 0;
-	})
+		aggUser.checkmarks += comment.isHelpful === true ? 1 : 0;
+	});
 
 	return NextResponse.json(aggUser, { status: 200 });
 }
