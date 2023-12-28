@@ -282,9 +282,7 @@ function Page() {
 							<ThumbDownAltIcon />
 						</IconButton>
 						<Typography variant="body2">{post.downvotes}</Typography>
-						<IconButton
-							color={post.hasComment ? 'secondary' : 'default'}
-						>
+						<IconButton color={post.hasComment ? 'secondary' : 'default'}>
 							<CommentIcon />
 						</IconButton>
 						<Typography variant="body2">{post.commentsCount}</Typography>

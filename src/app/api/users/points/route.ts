@@ -8,13 +8,12 @@ import { usersTable } from '@/db/schema';
 
 const PutRequestSchema = z.object({
 	userId: z.number().min(1),
-	pointsDiff: z.number()
+	pointsDiff: z.number(),
 });
 
 type PutRequestType = z.infer<typeof PutRequestSchema>;
 
 export async function PUT(req: NextRequest) {
-
 	const data = await req.json();
 
 	try {

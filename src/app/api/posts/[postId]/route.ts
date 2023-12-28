@@ -201,7 +201,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			if (comment.commenterId === userId) return true;
 			comment.replies.forEach((reply) => {
 				if (reply.commenterId === userId) return true;
-			})
+			});
 			return false;
 		}),
 		comments: parsedDetail.comments.map((comment) => ({
