@@ -230,13 +230,15 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		})),
 	};
 
-	try {
-		await db.update(notificationsTable)
-			.set({isRead: true})
-			.where(eq(notificationsTable.postId, parsedDetail.postId))
-	} catch (error) {
-		console.error("Update notification status failed in posts/[postId]/route.ts", error);
-		return NextResponse.json({ error: "server error" }, { status: 500 })
+	if (userId === data.posterId) {
+		try {
+			await db.update(notificationsTable)
+				.set({isRead: true})
+				.where(eq(notificationsTable.postId, parsedDetail.postId))
+		} catch (error) {
+			console.error("Update notification status failed in posts/[postId]/route.ts", error);
+			return NextResponse.json({ error: "server error" }, { status: 500 })
+		}
 	}
 
 	return NextResponse.json(data, { status: 200 });
