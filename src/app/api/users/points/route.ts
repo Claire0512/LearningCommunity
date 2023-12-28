@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
@@ -23,13 +23,20 @@ export async function PUT(req: NextRequest) {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 
-	const newUser = data as PutRequestType;
+    if (data.pointsDiff < 0) {
+        return NextResponse.json({ error: 'pointsDiff cannot be negative' }, { status: 400 });
+    }
+
+    const operation = data as PutRequestType;
 
 	const updatedUsers = await db
 		.update(usersTable)
-		.set(newUser)
+		.set({ points: sql`${usersTable.points} + ${operation.pointsDiff}`})
 		.where(eq(usersTable.userId, data.userId))
-		.returning();
+		.returning({
+            userId: usersTable.userId,
+            points: usersTable.points
+        });
 
 	if (updatedUsers.length !== 1) {
 		return NextResponse.json({ error: 'User not found' }, { status: 404 });

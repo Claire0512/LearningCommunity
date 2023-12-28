@@ -55,7 +55,6 @@ export const getUserFavoriteQuestions = async (userId: number) => {
 export const updateUserInfo = async (newUserInfo: NewUserInfoType) => {
 	try {
 		const requestBody = newUserInfo;
-
 		const response = await api.put(`/api/users/${newUserInfo.userId}`, requestBody);
 		return response.data;
 	} catch (error) {
@@ -63,3 +62,17 @@ export const updateUserInfo = async (newUserInfo: NewUserInfoType) => {
 		throw error;
 	}
 };
+
+export const updateUserPoints = async (userId: number, pointsDiff: number) => {
+	try {
+		const requestBody = {
+            userId,
+            pointsDiff
+        };
+        const response = await api.put(`/api/users/points`, requestBody);
+        return response.data;
+	} catch (error) {
+		console.error('Error updating user points:', error);
+		throw error;
+	}
+}
