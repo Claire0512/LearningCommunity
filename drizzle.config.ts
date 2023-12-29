@@ -4,7 +4,7 @@ import type { Config } from 'drizzle-kit';
 dotenv.config({ path: './.env' });
 
 if (!process.env.POSTGRES_URL) {
-	throw new Error('POSTGRES_URL must be defined in .env.local');
+	throw new Error('POSTGRES_URL must be defined in .env');
 }
 
 export default {
