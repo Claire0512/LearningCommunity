@@ -285,9 +285,9 @@ export const notificationRelations = relations(notificationsTable, ({ one }) => 
 	}),
 	lastNotifyUser: one(usersTable, {
 		fields: [notificationsTable.lastNotifyUserId],
-        references: [usersTable.userId],
+		references: [usersTable.userId],
 		relationName: 'lastNotification',
-    }),
+	}),
 	post: one(postsTable, {
 		fields: [notificationsTable.postId],
 		references: [postsTable.postId],

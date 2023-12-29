@@ -43,88 +43,83 @@ export async function POST(req: NextRequest) {
 
 	if (newComment.postId) {
 		const notification = await db.query.notificationsTable.findFirst({
-			where: (notification, { eq, and }) => and(
-				eq(notification.postId, newComment.postId as number),
-				eq(notification.notificationType, "comment")
-			),
+			where: (notification, { eq, and }) =>
+				and(
+					eq(notification.postId, newComment.postId as number),
+					eq(notification.notificationType, 'comment'),
+				),
 			columns: {
 				notificationId: true,
 				userId: true,
-			}
-		})
+			},
+		});
 		if (!notification) {
 			const post = await db.query.postsTable.findFirst({
 				where: (post, { eq }) => eq(post.postId, newComment.postId as number),
-                columns: { posterId: true }
-            })
+				columns: { posterId: true },
+			});
 			if (!post) {
 				return NextResponse.json({ error: 'Post not exist' }, { status: 404 });
 			}
 			if (post.posterId !== newComment.commenterId) {
-				await db
-					.insert(notificationsTable)
-					.values({
-						userId: post.posterId,
-						postId: newComment.postId as number,
-						notificationType: "comment",
-						lastNotifyUserId: newComment.commenterId
-					})
+				await db.insert(notificationsTable).values({
+					userId: post.posterId,
+					postId: newComment.postId as number,
+					notificationType: 'comment',
+					lastNotifyUserId: newComment.commenterId,
+				});
 			}
-		}
-		else {
+		} else {
 			if (notification.userId !== newComment.commenterId) {
 				await db
 					.update(notificationsTable)
 					.set({
 						isRead: false,
 						createdAt: new Date(),
-						lastNotifyUserId: newComment.commenterId
+						lastNotifyUserId: newComment.commenterId,
 					})
-					.where(eq(notificationsTable.notificationId, notification.notificationId))
+					.where(eq(notificationsTable.notificationId, notification.notificationId));
 			}
 		}
-	}
-
-	else if (newComment.questionId) {
+	} else if (newComment.questionId) {
 		const notification = await db.query.notificationsTable.findFirst({
-			where: (notification, { eq, and }) => and(
-				eq(notification.questionId, newComment.questionId as number),
-				eq(notification.notificationType, "comment")
-			),
+			where: (notification, { eq, and }) =>
+				and(
+					eq(notification.questionId, newComment.questionId as number),
+					eq(notification.notificationType, 'comment'),
+				),
 			columns: {
 				notificationId: true,
-				userId: true
-			}
-		})
+				userId: true,
+			},
+		});
 		if (!notification) {
 			const question = await db.query.questionsTable.findFirst({
-				where: (question, { eq }) => eq(question.questionId, newComment.questionId as number),
-                columns: { questionerId: true }
-            })
+				where: (question, { eq }) =>
+					eq(question.questionId, newComment.questionId as number),
+				columns: { questionerId: true },
+			});
 			if (!question) {
 				return NextResponse.json({ error: 'question not exist' }, { status: 404 });
 			}
 			if (question.questionerId !== newComment.commenterId) {
-				await db
-					.insert(notificationsTable)
-					.values({
-						userId: question.questionerId,
-						questionId: newComment.questionId as number,
-						notificationType: "comment",
-						lastNotifyUserId: newComment.commenterId
-					})
+				await db.insert(notificationsTable).values({
+					userId: question.questionerId,
+					questionId: newComment.questionId as number,
+					notificationType: 'comment',
+					lastNotifyUserId: newComment.commenterId,
+				});
 			}
-		}
-		else {
+		} else {
 			if (notification.userId !== newComment.commenterId) {
 				await db
 					.update(notificationsTable)
 					.set({
 						isRead: false,
 						createdAt: new Date(),
-						lastNotifyUserId: newComment.commenterId
+						lastNotifyUserId: newComment.commenterId,
 					})
-					.where(eq(notificationsTable.notificationId, notification.notificationId))
+					.where(eq(notificationsTable.notificationId, notification.notificationId));
 			}
 		}
 	}

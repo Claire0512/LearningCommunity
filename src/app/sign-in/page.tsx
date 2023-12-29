@@ -30,7 +30,11 @@ function Page() {
 			showSnackbar('帳號或密碼錯誤', 'error');
 			return;
 		}
-		showSnackbar('Sign in success!', 'success');
+
+		showSnackbar('登入成功！', 'success');
+		setTimeout(() => {
+			router.push('/');
+		}, 3000);
 		router.push('/');
 	};
 
