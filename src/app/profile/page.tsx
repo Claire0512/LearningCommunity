@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 
 import { ExpandableSection } from '../../components/ExpandableSection';
 import PostCard from '../../components/PostCard';
@@ -23,9 +24,21 @@ import StarIcon from '@mui/icons-material/Star';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { Button } from '@mui/material';
-import { Fab, Card, Typography, TextField, Dialog, useTheme } from '@mui/material';
-import { Avatar, Stack, Box } from '@mui/material';
-import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+	Fab,
+	Card,
+	Typography,
+	TextField,
+	Dialog,
+	useTheme,
+	Avatar,
+	Stack,
+	Box,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	DialogContentText,
+} from '@mui/material';
 import type { AxiosError } from 'axios';
 
 import type { PostCardType, QuestionCardType, NewUserInfoType, UserInfoType } from '@/lib/types';
@@ -33,7 +46,7 @@ import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
 
 	const [openDialog, setOpenDialog] = useState(false);
@@ -49,7 +62,17 @@ function Page() {
 	const [userQuestions, setUserQuestions] = useState<QuestionCardType[]>([]);
 
 	const [userFavoriteQuestions, setUserFavoriteQuestions] = useState<QuestionCardType[]>([]);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleOpenDialog = () => {
 		setOpenDialog(true);
 	};
@@ -87,11 +110,11 @@ function Page() {
 	const handleSave = async () => {
 		if (!userInfo) return;
 		if (!newName.trim() || !currentPassword.trim()) {
-			alert('名字和當前密碼不能為空！');
+			openModal('名字和當前密碼不能為空！');
 			return;
 		}
 		if (newPassword && newPassword !== newPasswordConfirm) {
-			alert('新密碼和確認密碼不匹配！');
+			openModal('新密碼和確認密碼不匹配！');
 			return;
 		}
 
@@ -110,9 +133,9 @@ function Page() {
 		} catch (error) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response?.status === 400) {
-				alert('密碼錯誤！');
+				openModal('密碼錯誤！');
 			} else {
-				alert('更新個人資訊失敗！');
+				openModal('更新個人資訊失敗！');
 			}
 		}
 	};
@@ -150,7 +173,8 @@ function Page() {
 			</Typography>
 		</Card>
 	);
-
+	if (status === 'loading') return <div>Loading...</div>;
+	if (status === 'unauthenticated') redirect('/');
 	return (
 		<div
 			style={{
@@ -258,7 +282,7 @@ function Page() {
 			<Dialog
 				open={openDialog}
 				onClose={handleCloseDialog}
-				sx={{ borderRadius: '10px', backgroundColor: '#FEFDFA' }}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
 			>
 				<DialogTitle sx={{ textAlign: 'center' }}>編輯個人資料</DialogTitle>
 				<DialogContent>
@@ -292,7 +316,7 @@ function Page() {
 								setNewProfilePicture(res[0].url);
 							}}
 							onUploadError={(error: Error) => {
-								alert(`ERROR! ${error.message}`);
+								openModal(`ERROR! ${error.message}`);
 							}}
 						/>
 
@@ -403,6 +427,19 @@ function Page() {
 			>
 				<CreateIcon />
 			</Fab>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }

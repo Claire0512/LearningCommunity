@@ -12,6 +12,11 @@ import { Button } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Badge from '@mui/material/Badge';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Toolbar from '@mui/material/Toolbar';
 import { useTheme } from '@mui/material/styles';
 
@@ -97,13 +102,24 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 				});
 		}
 	}, [session]);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleCloseNotifications = () => {
 		setIsNotificationsOpen(false);
 	};
 	const handleClick = (event: React.SyntheticEvent, type: string) => {
 		if (!session) {
-			window.alert(`登入後才可查看${type === 'profile' ? '個人檔案' : '通知'}哦！`);
+			openModal(`登入後才可查看${type === 'profile' ? '個人檔案' : '通知'}哦！`);
+
 			event.preventDefault();
 		} else {
 			if (type === 'notifications') {
@@ -260,6 +276,19 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 					)}
 				</div>
 			</Toolbar>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</AppBar>
 	);
 }

@@ -36,6 +36,11 @@ import {
 	Divider,
 	IconButton,
 } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import MobileStepper from '@mui/material/MobileStepper';
 
 import type { PostCardDetailType } from '@/lib/types';
@@ -51,6 +56,18 @@ function Page() {
 	const { data: session } = useSession();
 	const [activeStep, setActiveStep] = useState(0);
 	const [maxSteps, setMaxSteps] = useState(0);
+
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
+
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -96,7 +113,7 @@ function Page() {
 	}
 	const handleUpvote = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = post.hasUpvote ? 'remove_upvote' : 'add_upvote';
@@ -110,7 +127,7 @@ function Page() {
 
 	const handleDownvote = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = post.hasDownvote ? 'remove_downvote' : 'add_downvote';
@@ -124,7 +141,7 @@ function Page() {
 
 	const handleFavorite = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = post.hasFavorite ? 'remove_favorite' : 'add_favorite';
@@ -138,17 +155,17 @@ function Page() {
 
 	const handleSubmitComment = async () => {
 		if (!session) {
-			alert('登入後才可留言哦');
+			openModal('登入後才可留言哦');
 			return;
 		}
 		if (!newComment.trim()) {
-			alert('評論不能為空');
+			openModal('評論不能為空');
 			return;
 		}
 
 		try {
 			await addCommentToPost(Number(postId), session.user.userId, newComment);
-			alert('評論成功添加！');
+			openModal('評論成功添加！');
 			setNewComment('');
 			await fetchPostDetail();
 		} catch (error) {
@@ -158,18 +175,18 @@ function Page() {
 
 	const handleSubmitReply = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可回覆哦');
+			openModal('登入後才可回覆哦');
 			return;
 		}
 		const replyText = newReply[commentId];
 		if (!replyText.trim()) {
-			alert('回覆不能為空');
+			openModal('回覆不能為空');
 			return;
 		}
 
 		try {
 			await addReplyToComment(commentId, session.user.userId, replyText);
-			alert('回覆成功添加！');
+			openModal('回覆成功添加！');
 			setNewReply({ ...newReply, [commentId]: '' });
 			await fetchPostDetail();
 		} catch (error) {
@@ -178,7 +195,7 @@ function Page() {
 	};
 	const handleCommentUpvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -196,7 +213,7 @@ function Page() {
 
 	const handleCommentDownvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -269,7 +286,7 @@ function Page() {
 					<Typography
 						variant="h4"
 						component="div"
-						sx={{ marginTop: '10px', marginLeft: '5px' }}
+						sx={{ marginTop: '10px', marginLeft: '5px', marginBottom: '10px' }}
 					>
 						{post.postTitle}
 					</Typography>
@@ -623,6 +640,19 @@ function Page() {
 					</List>
 				</CardContent>
 			</Card>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }

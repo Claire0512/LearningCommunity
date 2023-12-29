@@ -12,6 +12,10 @@ import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { useTheme, Fab, Box, Button, Dialog, TextField, Chip, Typography } from '@mui/material';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import type { PostCardType } from '@/lib/types';
 
@@ -26,6 +30,25 @@ function Page() {
 
 	const [tags, setTags] = useState<string[]>([]);
 	const { data: session } = useSession();
+
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
+
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
+
+	const handleCreatePostClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+		if (!session) {
+			openModal('登入後才可發文哦');
+			event.preventDefault();
+		}
+	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleSave = (selected: string[]) => {
@@ -33,12 +56,7 @@ function Page() {
 		handleCloseModal();
 		console.log('Selected tags:', selected);
 	};
-	const handleCreatePostClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-		if (!session) {
-			alert('登入後才可發文哦');
-			event.preventDefault();
-		}
-	};
+
 	useEffect(() => {
 		async function fetchTags() {
 			try {
@@ -212,6 +230,19 @@ function Page() {
 					<CreateIcon />
 				</Fab>
 			</a>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</>
 	);
 }

@@ -5,6 +5,7 @@ import type { ChangeEvent } from 'react';
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 import TagsSelector from '../../../../components/TagsSelector';
 import { addNewPost } from '../../../../lib/api/resources/apiEndpoints';
@@ -17,24 +18,38 @@ import {
 	CardContent,
 	Typography,
 	TextField,
-	Dialog,
 	Chip,
 	Box,
 	useTheme,
 } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
 	const router = useRouter();
-	const { data: session } = useSession();
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
 	const [tags, setTags] = useState<string[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [images, setImages] = useState<string[]>([]);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
+	const { data: session, status } = useSession();
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
@@ -46,13 +61,16 @@ function Page() {
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
+	const onUploadError = (error: Error) => {
+		openModal(`錯誤！ ${error.message}`);
+	};
 
 	const handleContentChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setContent(event.target.value);
 	};
 	const handleSubmit = async () => {
 		if (!title || !content) {
-			alert('標題和內文不能為空！');
+			openModal('標題和內文不能為空！');
 			return;
 		}
 
@@ -69,14 +87,15 @@ function Page() {
 		try {
 			console.log(newPost);
 			await addNewPost(newPost);
-			alert('文章發布成功！');
+			openModal('文章發布成功！');
+
 			setTitle('');
 			setContent('');
 			setSelectedTags([]);
 			router.push('/resources');
 		} catch (error) {
 			console.error('Error submitting post:', error);
-			alert('發布文章失敗，請重試。');
+			openModal('發布文章失敗，請重試。');
 		}
 	};
 	useEffect(() => {
@@ -90,6 +109,8 @@ function Page() {
 		};
 		fetchTags();
 	}, []);
+	if (status === 'loading') return <div>Loading...</div>;
+	if (status === 'unauthenticated') redirect('/resources');
 	return (
 		<div
 			style={{
@@ -210,9 +231,7 @@ function Page() {
 							const imageUrls = res.map((item) => item.url);
 							setImages(imageUrls);
 						}}
-						onUploadError={(error: Error) => {
-							alert(`ERROR! ${error.message}`);
-						}}
+						onUploadError={onUploadError}
 					/>
 				</CardContent>
 				<Box
@@ -238,8 +257,25 @@ function Page() {
 					</Button>
 				</Box>
 			</Card>
-			<Dialog open={isModalOpen} onClose={handleCloseModal}>
+			<Dialog
+				open={isModalOpen}
+				onClose={handleCloseModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
 				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
+			</Dialog>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
 			</Dialog>
 		</div>
 	);

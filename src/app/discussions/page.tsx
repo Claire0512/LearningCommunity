@@ -13,6 +13,10 @@ import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { Box, Button, Dialog, TextField, Chip, Typography, Fab, useTheme } from '@mui/material';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import type { QuestionCardType, UserInfoType } from '@/lib/types';
 
@@ -26,7 +30,17 @@ function Page() {
 	const [hotQuestions, setHotQuestions] = useState<QuestionCardType[]>([]);
 	const [tags, setTags] = useState<string[]>([]);
 	const [searchInput, setSearchInput] = useState('');
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleSave = (selected: string[]) => {
@@ -37,7 +51,7 @@ function Page() {
 
 	const handleCreateQuestionClick = async (event: React.MouseEvent<HTMLAnchorElement>) => {
 		if (!session) {
-			alert('登入後才可發問哦');
+			openModal('登入後才可發問哦');
 			event.preventDefault();
 			return;
 		}
@@ -45,12 +59,12 @@ function Page() {
 		try {
 			const userInfo: UserInfoType = await getUserInfo(session.user.userId);
 			if (userInfo.points < 3) {
-				alert('點數不足三點，幫忙回答別人問題或分享技術文章來獲取點數吧！');
+				openModal('點數不足三點，幫忙回答別人問題或分享技術文章來獲取點數吧！');
 				event.preventDefault();
 			}
 		} catch (error) {
 			console.error('Error fetching user info:', error);
-			alert('無法獲取用戶信息，請稍後重試。');
+			openModal('無法獲取用戶信息，請稍後重試。');
 			event.preventDefault();
 		}
 	};
@@ -219,6 +233,19 @@ function Page() {
 					<CreateIcon />
 				</Fab>
 			</a>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</>
 	);
 }

@@ -7,8 +7,13 @@ import { useSession } from 'next-auth/react';
 import Bar from '../components/AppBar';
 import { getUserInfo, dailySign } from '../lib/api/users/apiEndpoints';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import { Card, CardContent, Typography, CardMedia, Fab, useTheme } from '@mui/material';
+import { Card, CardContent, Typography, CardMedia, Fab, useTheme, Button } from '@mui/material';
 import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import type { UserInfoType } from '@/lib/types';
 
@@ -40,7 +45,17 @@ export default function Home() {
 	const theme = useTheme();
 	const { data: session } = useSession();
 	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	useEffect(() => {
 		if (session) {
 			getUserInfo(session.user.userId)
@@ -52,11 +67,11 @@ export default function Home() {
 	const handleSignInClick = async () => {
 		console.log(userInfo);
 		if (userInfo?.hasSigned) {
-			alert('你今天已經簽到過了哦！');
+			openModal('你今天已經簽到過了哦！');
 		} else {
 			try {
 				await dailySign(session?.user.userId);
-				alert('簽到成功！獲得點數一點！');
+				openModal('簽到成功！獲得點數一點！');
 				getUserInfo(session?.user.userId)
 					.then((userInfo) => setUserInfo(userInfo))
 					.catch(console.error);
@@ -204,6 +219,20 @@ export default function Home() {
 					<EventAvailableIcon />
 				</Fab>
 			)}
+
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</Box>
 	);
 }

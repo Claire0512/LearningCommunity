@@ -35,6 +35,8 @@ import {
 	Dialog,
 	DialogContent,
 	DialogActions,
+	DialogTitle,
+	DialogContentText,
 } from '@mui/material';
 import { Button, TextField } from '@mui/material';
 import {
@@ -70,7 +72,17 @@ function Page() {
 	const [maxSteps, setMaxSteps] = useState(0);
 	const [isSolved, setIsSolved] = useState(false);
 	const [openSolvedDialog, setOpenSolvedDialog] = useState(false);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1);
 	};
@@ -103,7 +115,7 @@ function Page() {
 	const markAsBestAnswer = async (commentId: number) => {
 		try {
 			await updateQuestionStatus(Number(questionId), undefined, commentId);
-			alert('留言已標記為最佳解答');
+			openModal('留言已標記為最佳解答');
 			setOpenConfirmDialog(false);
 			fetchQuestionDetail();
 		} catch (error) {
@@ -128,7 +140,7 @@ function Page() {
 
 	const handleUpvote = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = question.hasUpvote ? 'remove_upvote' : 'add_upvote';
@@ -142,7 +154,7 @@ function Page() {
 
 	const handleFavorite = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = question.hasFavorite ? 'remove_favorite' : 'add_favorite';
@@ -155,17 +167,17 @@ function Page() {
 	};
 	const handleSubmitComment = async () => {
 		if (!session) {
-			alert('登入後才可留言哦');
+			openModal('登入後才可留言哦');
 			return;
 		}
 		if (!newComment.trim()) {
-			alert('評論不能為空');
+			openModal('評論不能為空');
 			return;
 		}
 
 		try {
 			await addCommentToQuestion(Number(questionId), session.user.userId, newComment);
-			alert('評論成功添加！');
+			openModal('評論成功添加！');
 			setNewComment('');
 			await fetchQuestionDetail();
 		} catch (error) {
@@ -175,18 +187,18 @@ function Page() {
 
 	const handleSubmitReply = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可回覆哦');
+			openModal('登入後才可回覆哦');
 			return;
 		}
 		const replyText = newReply[commentId];
 		if (!replyText.trim()) {
-			alert('回覆不能為空');
+			openModal('回覆不能為空');
 			return;
 		}
 
 		try {
 			await addReplyToComment(commentId, session.user.userId, replyText);
-			alert('回覆成功添加！');
+			openModal('回覆成功添加！');
 			setNewReply({ ...newReply, [commentId]: '' });
 			await fetchQuestionDetail();
 		} catch (error) {
@@ -195,7 +207,7 @@ function Page() {
 	};
 	const handleCommentUpvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -213,7 +225,7 @@ function Page() {
 
 	const handleCommentDownvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -306,7 +318,7 @@ function Page() {
 					<Typography
 						variant="h4"
 						component="div"
-						sx={{ marginTop: '10px', marginLeft: '5px' }}
+						sx={{ marginTop: '10px', marginLeft: '5px', marginBottom: '10px' }}
 					>
 						{question.questionTitle}
 					</Typography>
@@ -718,7 +730,11 @@ function Page() {
 					</List>
 				</CardContent>
 			</Card>
-			<Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+			<Dialog
+				open={openConfirmDialog}
+				onClose={() => setOpenConfirmDialog(false)}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
 				{session?.user.userId !== selectedCommenterId && (
 					<>
 						<DialogContent>
@@ -751,13 +767,30 @@ function Page() {
 					</>
 				)}
 			</Dialog>
-			<Dialog open={openSolvedDialog} onClose={() => setOpenSolvedDialog(false)}>
+			<Dialog
+				open={openSolvedDialog}
+				onClose={() => setOpenSolvedDialog(false)}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
 				<DialogContent>
 					<Typography>是否將這個問題標記為已解決？標記後不能再更改。</Typography>
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={() => setOpenSolvedDialog(false)}>取消</Button>
 					<Button onClick={() => handleMarkAsSolved()}>確認</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
 				</DialogActions>
 			</Dialog>
 		</div>

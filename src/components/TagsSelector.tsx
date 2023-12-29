@@ -51,7 +51,16 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				選擇分類
 			</DialogTitle>
 			<DialogContent>
-				<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+				<Box
+					sx={{
+						display: 'flex',
+						flexWrap: 'wrap',
+						gap: 0.5,
+						justifyContent: 'center',
+						alignItems: 'center',
+						padding: 1,
+					}}
+				>
 					{tags.map((tagName) => (
 						<Chip
 							label={tagName}
