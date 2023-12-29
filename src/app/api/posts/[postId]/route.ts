@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
 import { notificationsTable } from '@/db/schema';
-
+import { eq } from 'drizzle-orm';
+import { getSessionUserId } from '@/utils/apiAuthentication';
 const GetRequestSchema = z.object({
 	postId: z.string().min(1),
 });
@@ -99,9 +99,10 @@ const GetResponseSchema = z.object({
 type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
+	const sessionUserId = await getSessionUserId();
+
 	const postId = parseInt(params.postId);
-	const searchParams = req.nextUrl.searchParams;
-	const userId = parseInt(searchParams.get('userId') || '');
+	const userId = sessionUserId;
 
 	if (!postId) {
 		return NextResponse.json({ error: 'Post id invalid' }, { status: 400 });

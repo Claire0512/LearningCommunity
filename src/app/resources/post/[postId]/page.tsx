@@ -66,13 +66,13 @@ function Page() {
 	};
 	const handleCommentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
-		const postData = await getPostDetail(Number(postId), userId);
+		const postData = await getPostDetail(Number(postId));
 		setPost(postData);
 	};
 	const fetchPostDetail = async () => {
 		if (postId) {
 			try {
-				const postData = await getPostDetail(Number(postId), userId);
+				const postData = await getPostDetail(Number(postId));
 				setPost(postData);
 				setFormattedTime(getTimeDifference(postData.createdAt));
 				setMaxSteps(postData.postImages.length);
@@ -86,7 +86,7 @@ function Page() {
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
-		const postData = await getPostDetail(Number(postId), userId);
+		const postData = await getPostDetail(Number(postId));
 		setPost(postData);
 	};
 	useEffect(() => {

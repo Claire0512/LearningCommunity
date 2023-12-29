@@ -4,8 +4,7 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { tagsTable } from '@/db/schema';
-
-const GetRequestSchema = z.array(z.object({}));
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const PostRequestSchema = z.object({
 	name: z.string().min(1),
@@ -20,6 +19,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+    const userId = await getSessionUserId();
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 	const data = await req.json();
 	try {
 		PostRequestSchema.parse(data);
