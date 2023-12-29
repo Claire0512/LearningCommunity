@@ -25,12 +25,9 @@ export const theme = createTheme({
 		fontFamily: ['Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
 	},
 	components: {
-		// Name of the component
 		MuiButton: {
 			styleOverrides: {
-				// Name of the slot
 				root: {
-					// Some CSS
 					backgroundColor: '#BFD1ED',
 				},
 			},

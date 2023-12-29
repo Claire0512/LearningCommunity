@@ -33,8 +33,6 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 			if (!user.points) user.points = 0;
 
 			const currentDate = new Date();
-			//
-			// currentDate.setDate(currentDate.getDate() - 1);
 			if (isSameDateInUTC8(user.lastSigned as Date, currentDate)) {
 				tx.rollback();
 				return;
