@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { sql, eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
+import { questionCost } from '@/lib/constants';
 
 import { db } from '@/db';
 import {
@@ -153,6 +154,35 @@ export async function POST(req: NextRequest) {
 
 	if (newQuestion.questionerId !== sessionUserId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	try {
+		const updatedUsers = await db.transaction(async (tx) => {
+			const [user] = await tx
+				.select({points: usersTable.points})
+				.from(usersTable)
+				.where(eq(usersTable.userId, sessionUserId));
+			if (!user || !user.points){
+				tx.rollback();
+				return;
+			}
+			if (user.points < questionCost) {
+				tx.rollback();
+				return;
+			}
+			const results = await tx
+				.update(usersTable)
+				.set({ points: user.points - questionCost })
+				.where(eq(usersTable.userId, sessionUserId))
+				.returning({userId: usersTable.userId, points: usersTable.points});
+			return results;
+		});
+		if (!updatedUsers) {
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+		console.log(updatedUsers[0]);
+	} catch (error) {
+		return NextResponse.json({ error: 'Points not enough!' }, { status: 400 });
 	}
 
 	let questionId = -1;

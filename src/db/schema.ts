@@ -18,7 +18,7 @@ export const usersTable = pgTable('users', {
 	profilePicture: varchar('profile_picture'),
 	resumeFile: varchar('resume_file'),
 	points: integer('points').default(10),
-	lastSigned: timestamp('last_signed').default(sql`CURRENT_TIMESTAMP`),
+	lastSigned: timestamp('last_signed').default(sql`TIMESTAMP '1970-01-01 00:00:00'`),
 });
 
 export const usersRelations = relations(usersTable, ({ one, many }) => ({
