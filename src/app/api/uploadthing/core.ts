@@ -5,7 +5,7 @@ import { getSessionUserId } from '@/utils/apiAuthentication';
 const f = createUploadthing();
 
 export const ourFileRouter = {
-	imageUploader: f({ image: { maxFileSize: '4MB' } })
+	imageUploader: f({ image: { maxFileSize: '4MB', maxFileCount: 3 } })
 		.middleware(async () => {
 			const userId = await getSessionUserId();
 			if (!userId) throw new Error('Unauthorized');

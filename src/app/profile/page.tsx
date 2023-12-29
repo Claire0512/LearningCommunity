@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
@@ -308,6 +309,9 @@ function Page() {
 							color="secondary"
 							onChange={(e) => setNewProfilePicture(e.target.value)}
 						/>
+						<Box className="flex justify-center">
+							{newProfilePicture && <Image src={newProfilePicture} alt="Profile picture" width={100} height={100}/>}
+						</Box>
 						<UploadButton
 							className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]
 						ut-button:focus-within:ring-offset-2 ut-button:ut-uploading:bg-[#BFD1ED] ut-button:ut-uploading:focus-within:ring-[#BFD1ED] "
@@ -319,7 +323,6 @@ function Page() {
 								openModal(`ERROR! ${error.message}`);
 							}}
 						/>
-
 						<TextField
 							margin="dense"
 							label="當前密碼"
