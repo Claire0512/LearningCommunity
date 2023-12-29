@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { redirect, useRouter } from 'next/navigation';
 
@@ -214,6 +214,18 @@ function Page() {
 							<Chip
 								key={tag}
 								label={<Typography style={{ fontSize: '16px' }}>{tag}</Typography>}
+							/>
+						))}
+					</Box>
+
+					<Box className="flex justify-center">
+						{images.map((image, index) => (
+							<Image
+								src={image}
+								alt={`Image ${index}`}
+								width={100}
+								height={100}
+								key={index}
 							/>
 						))}
 					</Box>

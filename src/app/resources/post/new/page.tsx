@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { redirect } from 'next/navigation';
@@ -219,6 +219,19 @@ function Page() {
 							/>
 						))}
 					</Box>
+
+					<Box className="flex justify-center">
+						{images.map((image, index) => (
+							<Image
+								src={image}
+								alt={`Image ${index}`}
+								width={100}
+								height={100}
+								key={index}
+							/>
+						))}
+					</Box>
+
 
 					<UploadButton
 						className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]
