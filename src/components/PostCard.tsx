@@ -110,19 +110,19 @@ function PostCard(post: PostCardType) {
 						alt={post.posterName}
 						src={post.profilePicture ? post.profilePicture : ''}
 					/>
-					<Typography
-						variant="subtitle1"
-						component="div"
-						noWrap
-						sx={{ paddingTop: '5px' }}
-					>
+					<Typography variant="subtitle1" component="div" noWrap>
 						{post.posterName}
 					</Typography>
 					<Typography variant="body2" sx={{ marginLeft: 1 }}>
 						{formattedTime}
 					</Typography>
 				</Stack>
-				<Typography variant="h6" component="div" noWrap>
+				<Typography
+					variant="h6"
+					component="div"
+					noWrap
+					sx={{ paddingTop: '5px', fontWeight: '500' }}
+				>
 					{post.postTitle}
 				</Typography>
 				<Typography

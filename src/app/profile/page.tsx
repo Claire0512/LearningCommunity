@@ -110,9 +110,9 @@ function Page() {
 		} catch (error) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response?.status === 400) {
-				alert('Password is incorrect!');
+				alert('密碼錯誤！');
 			} else {
-				alert('Failed to update user information');
+				alert('更新個人資訊失敗！');
 			}
 		}
 	};
@@ -147,7 +147,6 @@ function Page() {
 						marginBottom: '6px',
 					}}
 				/>{' '}
-				{/* 添加 marginLeft */}
 			</Typography>
 		</Card>
 	);

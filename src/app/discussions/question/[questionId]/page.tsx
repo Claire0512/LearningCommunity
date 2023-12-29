@@ -311,15 +311,6 @@ function Page() {
 						{question.questionTitle}
 					</Typography>
 
-					<Divider
-						sx={{
-							borderWidth: 1,
-							borderStyle: 'solid',
-							borderRadius: '2px',
-							bgcolor: theme.palette.background.default,
-							my: 1,
-						}}
-					/>
 					{maxSteps > 0 && (
 						<Box>
 							<SwipeableViews
@@ -364,7 +355,7 @@ function Page() {
 										onClick={handleNext}
 										disabled={activeStep === maxSteps - 1}
 									>
-										Next
+										下一頁
 										{theme.direction === 'rtl' ? (
 											<KeyboardArrowLeft />
 										) : (
@@ -383,7 +374,7 @@ function Page() {
 										) : (
 											<KeyboardArrowLeft />
 										)}
-										Back
+										上一頁
 									</Button>
 								}
 							/>
@@ -674,7 +665,7 @@ function Page() {
 													}}
 													color="secondary"
 												>
-													Submit
+													留言
 												</Button>
 											</Stack>
 										</ListItemText>

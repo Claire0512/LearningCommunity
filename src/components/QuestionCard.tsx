@@ -109,7 +109,12 @@ function QuestionCard(question: QuestionCardType) {
 						{formattedTime}
 					</Typography>
 				</Stack>
-				<Typography variant="h6" component="div" noWrap sx={{ paddingTop: '5px' }}>
+				<Typography
+					variant="h6"
+					component="div"
+					noWrap
+					sx={{ paddingTop: '5px', fontWeight: '500' }}
+				>
 					{question.questionTitle}
 				</Typography>
 				<Typography

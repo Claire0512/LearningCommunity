@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth/next';
-import { Inter } from 'next/font/google';
 
+// import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 
-import { authOptions } from '@/utils/authOptions';
 import Provider from '@/app/context/client-provider';
 import { theme } from '@/theme/Theme';
+import { authOptions } from '@/utils/authOptions';
 
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+// const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -29,7 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
 				<Provider session={session}>
-					<body className={`min-h-screen ${inter.className} bg-[#FCFAF5]`}>
+					<body style={{ minHeight: '100vh', backgroundColor: '#FCFAF5' }}>
 						{children}
 					</body>
 				</Provider>

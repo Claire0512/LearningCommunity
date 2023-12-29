@@ -22,7 +22,6 @@ function Page() {
 	const [snackbarMessage, setSnackbarMessage] = useState('');
 	const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('info');
 	const router = useRouter();
-	const commonTextClass = 'text-base';
 
 	const showSnackbar = (message: string, severity: AlertColor) => {
 		setSnackbarMessage(message);
@@ -64,13 +63,28 @@ function Page() {
 	};
 
 	return (
-		<Box className="flex h-screen w-screen justify-center bg-[#FCFAF5]">
+		<Box
+			sx={{
+				display: 'flex',
+				height: '100vh',
+				width: '100vw',
+				justifyContent: 'center',
+				backgroundColor: '#FCFAF5',
+			}}
+		>
 			<Card
-				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 bg-[#FCFAF5]`}
+				sx={{
+					display: 'flex',
+					width: '33%',
+					flexDirection: 'column',
+					borderRadius: 0,
+					border: 0,
+					backgroundColor: '#FCFAF5',
+				}}
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '25px' }}>
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
 						<Image src="/images/logo.png" alt="Logo" width={80} height={80} />
 					</div>
 					<p
@@ -79,15 +93,19 @@ function Page() {
 							color: '#104b76',
 							fontSize: '30px',
 							textAlign: 'center',
-							marginBottom: '20px',
-							marginTop: '20px',
+							marginBottom: '10px',
+							marginTop: '10px',
 						}}
 					>
 						學習互助平台
 					</p>
 					<form onSubmit={handleSubmit}>
 						<TextField
-							className={`mb-2 w-full ${commonTextClass}`}
+							sx={{
+								marginBottom: 1.5,
+								width: '100%',
+								input: { height: '20px' },
+							}}
 							label="電子郵件信箱"
 							variant="outlined"
 							type="email"
@@ -95,11 +113,14 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setEmail(e.target.value)
 							}
-							sx={{ input: { height: '20px' } }}
 						/>
 
 						<TextField
-							className={`mb-2 w-full ${commonTextClass}`}
+							sx={{
+								marginBottom: 1.5,
+								width: '100%',
+								input: { height: '20px' },
+							}}
 							label="使用者名稱"
 							variant="outlined"
 							type="username"
@@ -107,10 +128,13 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setUsername(e.target.value)
 							}
-							sx={{ input: { height: '20px' } }}
 						/>
 						<TextField
-							className={`mb-2 w-full ${commonTextClass}`}
+							sx={{
+								marginBottom: 1.5,
+								width: '100%',
+								input: { height: '20px' },
+							}}
 							label="密碼"
 							variant="outlined"
 							type="password"
@@ -118,10 +142,13 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setPassword(e.target.value)
 							}
-							sx={{ input: { height: '20px' } }}
 						/>
 						<TextField
-							className={`mb-2 w-full ${commonTextClass}`}
+							sx={{
+								marginBottom: 1.5,
+								width: '100%',
+								input: { height: '20px' },
+							}}
 							label="再次確認密碼"
 							variant="outlined"
 							type="password"
@@ -129,20 +156,27 @@ function Page() {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setConfirmPassword(e.target.value)
 							}
-							sx={{ input: { height: '20px' } }}
 						/>
 						<Button
-							className={`mb-2 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
+							sx={{
+								marginBottom: '0.5rem',
+								height: '3.5rem',
+								width: '100%',
+								backgroundColor: '#104b76',
+								color: 'white',
+								input: { height: '20px' },
+							}}
 							type="submit"
 							variant="contained"
-							style={{ backgroundColor: '#104b76', color: 'white' }}
-							sx={{ input: { height: '20px' } }}
 						>
 							註冊
 						</Button>
 						<Button
-							className={`${commonTextClass} w-full`}
-							sx={{ color: '#104b76', input: { height: '20px' } }}
+							sx={{
+								width: '100%',
+								color: '#104b76',
+								input: { height: '20px' },
+							}}
 							onClick={() => router.push('/sign-in')}
 						>
 							回到登入介面

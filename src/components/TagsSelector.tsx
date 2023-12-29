@@ -73,8 +73,8 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				</Box>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onCancel}>Cancel</Button>
-				<Button onClick={onSaveClicked}>Save</Button>
+				<Button onClick={onCancel}>取消</Button>
+				<Button onClick={onSaveClicked}>儲存</Button>
 			</DialogActions>
 		</Dialog>
 	);
