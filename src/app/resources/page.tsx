@@ -16,6 +16,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 import type { PostCardType } from '@/lib/types';
 
@@ -33,7 +35,7 @@ function Page() {
 
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalContent, setModalContent] = useState('');
-
+	const [sortMethod, setSortMethod] = useState('');
 	const openModal = (content: string) => {
 		setModalContent(content);
 		setModalOpen(true);
@@ -54,14 +56,12 @@ function Page() {
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
-		console.log('Selected tags:', selected);
 	};
 
 	useEffect(() => {
 		async function fetchTags() {
 			try {
 				const fetchedTags = await getAllTags();
-				console.log('Fetched tags:', fetchedTags);
 				setTags(fetchedTags);
 			} catch (error) {
 				console.error('Error fetching tags:', error);
@@ -98,7 +98,44 @@ function Page() {
 		);
 		setFilteredPosts(newFilteredPosts);
 	}, [selectedTags, searchInput, posts]);
+	useEffect(() => {
+		const sortedPosts = [...posts];
 
+		switch (sortMethod) {
+			case 'lovesHighToLow':
+				sortedPosts.sort((a, b) => b.upvotes - a.upvotes);
+				break;
+			case 'lovesLowToHigh':
+				sortedPosts.sort((a, b) => a.upvotes - b.upvotes);
+				break;
+			case 'newToOld':
+				sortedPosts.sort(
+					(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+				);
+				break;
+			case 'oldToNew':
+				sortedPosts.sort(
+					(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+				);
+				break;
+			default:
+		}
+
+		const filterByTags =
+			selectedTags.length > 0
+				? (post: PostCardType) =>
+						selectedTags.every((tagName) => post.tags.includes(tagName))
+				: (_: PostCardType) => true;
+
+		const filterBySearch = (post: PostCardType) =>
+			searchInput === '' || post.postTitle.toLowerCase().includes(searchInput.toLowerCase());
+
+		const newFilteredPosts = sortedPosts.filter(
+			(post: PostCardType) => filterByTags(post) && filterBySearch(post),
+		);
+
+		setFilteredPosts(newFilteredPosts);
+	}, [selectedTags, searchInput, posts, sortMethod]);
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
 	};
@@ -164,6 +201,7 @@ function Page() {
 			>
 				<TextField
 					fullWidth
+					color="secondary"
 					placeholder="Search..."
 					value={searchInput}
 					onChange={handleSearchChange}
@@ -172,6 +210,35 @@ function Page() {
 						style: { borderRadius: '15px', height: '40px' },
 					}}
 				/>
+				<Select
+					color="secondary"
+					value={sortMethod}
+					onChange={(event) => setSortMethod(event.target.value as string)}
+					displayEmpty
+					inputProps={{ 'aria-label': 'Without label' }}
+					sx={{
+						width: 200,
+						height: '38px',
+						borderRadius: '10px',
+						bgcolor: `${theme.palette.secondary.main} !important`,
+						border: 'none',
+						'& .MuiOutlinedInput-notchedOutline': {
+							border: 'none',
+						},
+						'&:focus': {
+							border: 'none',
+						},
+						'&:hover': {
+							border: 'none',
+						},
+					}}
+				>
+					<MenuItem value="">選擇排序方式</MenuItem>
+					<MenuItem value="lovesHighToLow">讚數由高到低</MenuItem>
+					<MenuItem value="lovesLowToHigh">讚數由低到高</MenuItem>
+					<MenuItem value="newToOld">由新到舊</MenuItem>
+					<MenuItem value="oldToNew">由舊到新</MenuItem>
+				</Select>
 				<Button
 					variant="contained"
 					onClick={handleOpenModal}

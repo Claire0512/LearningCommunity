@@ -17,6 +17,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 import type { QuestionCardType, UserInfoType } from '@/lib/types';
 
@@ -32,6 +34,7 @@ function Page() {
 	const [searchInput, setSearchInput] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalContent, setModalContent] = useState('');
+	const [sortMethod, setSortMethod] = useState('');
 
 	const openModal = (content: string) => {
 		setModalContent(content);
@@ -46,7 +49,6 @@ function Page() {
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
-		console.log('Selected tags:', selected);
 	};
 
 	const handleCreateQuestionClick = async (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -87,6 +89,34 @@ function Page() {
 	}, []);
 
 	useEffect(() => {
+		let sortedQuestions = [...questions];
+
+		switch (sortMethod) {
+			case 'solved':
+				sortedQuestions = sortedQuestions.filter((q) => q.isSolved);
+				break;
+			case 'unsolved':
+				sortedQuestions = sortedQuestions.filter((q) => !q.isSolved);
+				break;
+			case 'lovesHighToLow':
+				sortedQuestions.sort((a, b) => b.upvotes - a.upvotes);
+				break;
+			case 'lovesLowToHigh':
+				sortedQuestions.sort((a, b) => a.upvotes - b.upvotes);
+				break;
+			case 'newToOld':
+				sortedQuestions.sort(
+					(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+				);
+				break;
+			case 'oldToNew':
+				sortedQuestions.sort(
+					(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+				);
+				break;
+			default:
+		}
+
 		const filterByTags =
 			selectedTags.length > 0
 				? (question: QuestionCardType) =>
@@ -97,11 +127,12 @@ function Page() {
 			searchInput === '' ||
 			question.questionTitle.toLowerCase().includes(searchInput.toLowerCase());
 
-		const newFilteredQuestions = questions.filter(
+		const newFilteredQuestions = sortedQuestions.filter(
 			(question: QuestionCardType) => filterByTags(question) && filterBySearch(question),
 		);
+
 		setFilteredQuestions(newFilteredQuestions);
-	}, [selectedTags, searchInput, questions]);
+	}, [selectedTags, searchInput, questions, sortMethod]);
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
@@ -168,6 +199,7 @@ function Page() {
 			>
 				<TextField
 					fullWidth
+					color="secondary"
 					placeholder="Search..."
 					value={searchInput}
 					onChange={handleSearchChange}
@@ -176,6 +208,38 @@ function Page() {
 						style: { borderRadius: '15px', height: '40px' },
 					}}
 				/>
+				<Select
+					color="secondary"
+					value={sortMethod}
+					onChange={(event) => setSortMethod(event.target.value as string)}
+					displayEmpty
+					inputProps={{ 'aria-label': 'Without label' }}
+					sx={{
+						width: 200,
+						height: '38px',
+						borderRadius: '10px',
+						bgcolor: `${theme.palette.secondary.main} !important`,
+						border: 'none',
+						'& .MuiOutlinedInput-notchedOutline': {
+							border: 'none',
+						},
+						'&:focus': {
+							border: 'none',
+						},
+						'&:hover': {
+							border: 'none',
+						},
+					}}
+				>
+					<MenuItem value="">選擇排序方式</MenuItem>
+					<MenuItem value="solved">只顯示已解決的問題</MenuItem>
+					<MenuItem value="unsolved">只顯示未解決的問題</MenuItem>
+					<MenuItem value="lovesHighToLow">愛心由高到低</MenuItem>
+					<MenuItem value="lovesLowToHigh">愛心由低到高</MenuItem>
+					<MenuItem value="newToOld">由新到舊</MenuItem>
+					<MenuItem value="oldToNew">由舊到新</MenuItem>
+				</Select>
+
 				<Button
 					variant="contained"
 					onClick={handleOpenModal}

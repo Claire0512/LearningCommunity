@@ -52,15 +52,13 @@ function Page() {
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
-		console.log('Selected tags:', selected);
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
-	if (status === 'loading') return <div>Loading...</div>;
-	if (status === 'unauthenticated') redirect('/discussions');
+
 	useEffect(() => {
 		const fetchTags = async () => {
 			try {
@@ -73,6 +71,8 @@ function Page() {
 
 		fetchTags();
 	}, []);
+	if (status === 'loading') return <div>Loading...</div>;
+	if (status === 'unauthenticated') redirect('/discussions');
 	const handleContentChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setContent(event.target.value);
 	};

@@ -53,7 +53,6 @@ function Page() {
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
-		console.log('Selected tags:', selected);
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
@@ -75,7 +74,6 @@ function Page() {
 		}
 
 		const posterId = session?.user.userId;
-		console.log('posterId:', posterId);
 		const newPost: NewPostType = {
 			postTitle: title,
 			postContext: content,
@@ -85,7 +83,6 @@ function Page() {
 		};
 
 		try {
-			console.log(newPost);
 			await addNewPost(newPost);
 			openModal('文章發布成功！');
 

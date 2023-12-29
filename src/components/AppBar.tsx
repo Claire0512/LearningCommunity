@@ -25,7 +25,6 @@ import logOut from '@/lib/api/authentication/logout';
 import getTimeDifference from './getTimeDifference';
 
 function renderNotification(notification: NotificationType) {
-	console.log(notification);
 	const formattedTime = formatNotificationTime(notification.createdAt);
 	const href = notification.postId
 		? `/resources/post/${notification.postId}`

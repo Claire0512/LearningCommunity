@@ -65,7 +65,6 @@ export default function Home() {
 	}, [session]);
 
 	const handleSignInClick = async () => {
-		console.log(userInfo);
 		if (userInfo?.hasSigned) {
 			openModal('你今天已經簽到過了哦！');
 		} else {
