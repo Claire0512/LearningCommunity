@@ -1,8 +1,8 @@
-import axios from 'axios';
+import api from '@/lib/api/base';
 
 export default async function signUp(email: string, username: string, password: string) {
 	try {
-		await axios.post('http://localhost:3000/api/users', {
+		await api.post('/api/users', {
 			email,
 			name: username,
 			password,
