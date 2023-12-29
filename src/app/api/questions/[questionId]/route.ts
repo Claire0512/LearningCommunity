@@ -227,29 +227,19 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		})),
 	};
 
-<<<<<<< HEAD
-	try {
-		await db
-			.update(notificationsTable)
-			.set({ isRead: true })
-			.where(eq(notificationsTable.questionId, parsedDetail.questionId));
-	} catch (error) {
-		console.error(
-			'Update notification status failed in questions/[questionId]/route.ts',
-			error,
-		);
-		return NextResponse.json({ error: 'server error' }, { status: 500 });
-=======
 	if (userId === data.questionerId) {
 		try {
-			await db.update(notificationsTable)
-				.set({isRead: true})
-				.where(eq(notificationsTable.questionId, parsedDetail.questionId))
+			await db
+				.update(notificationsTable)
+				.set({ isRead: true })
+				.where(eq(notificationsTable.questionId, parsedDetail.questionId));
 		} catch (error) {
-			console.error("Update notification status failed in questions/[questionId]/route.ts", error);
-			return NextResponse.json({ error: "server error" }, { status: 500 })
+			console.error(
+				'Update notification status failed in questions/[questionId]/route.ts',
+				error,
+			);
+			return NextResponse.json({ error: 'server error' }, { status: 500 });
 		}
->>>>>>> 8ffc763a19065b63fee44ce55c26053d69dfee55
 	}
 
 	return NextResponse.json(data, { status: 200 });

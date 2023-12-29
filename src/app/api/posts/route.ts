@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
 	const [details, allTags] = await Promise.all([postDetails, postTags]);
 	const combined = details.map((detail, index) => ({
 		...detail,
-		postImages: detail.postImages? detail.postImages : [],
+		postImages: detail.postImages ? detail.postImages : [],
 		upvotes: detail.upvotes ? detail.upvotes : 0,
 		downvotes: detail.downvotes ? detail.downvotes : 0,
 		favorites: detail.favorites ? detail.favorites : 0,
@@ -192,9 +192,8 @@ export async function POST(req: NextRequest) {
 	try {
 		if (tags) {
 			tagIds = await getTagIds(tags);
-		}
-		else {
-			tagIds = []
+		} else {
+			tagIds = [];
 		}
 	} catch (error) {
 		console.error('Failed getting id of tags!');

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 
 import { useSession } from 'next-auth/react';
-import { UploadButton } from "@/utils/uploadthing";
 
 import { ExpandableSection } from '../../components/ExpandableSection';
 import PostCard from '../../components/PostCard';
@@ -30,6 +29,7 @@ import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import type { AxiosError } from 'axios';
 
 import type { PostCardType, QuestionCardType, NewUserInfoType, UserInfoType } from '@/lib/types';
+import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
@@ -279,7 +279,7 @@ function Page() {
 							onChange={(e) => setNewProfilePicture(e.target.value)}
 						/>
 						<UploadButton
-							endpoint="imageUploader"
+							endpoint="profileUploader"
 							onClientUploadComplete={(res) => {
 								setNewProfilePicture(res[0].url);
 							}}

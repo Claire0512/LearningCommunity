@@ -139,12 +139,12 @@ function QuestionCard(question: QuestionCardType) {
 				alignItems="center"
 				sx={{ p: 2, pl: 4, pt: 0, mt: 'auto' }}
 			>
-				<FavoriteIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<FavoriteIcon sx={{ color: '#EDC0C0' }}  />
 				<Typography variant="body2">{question.upvotes}</Typography>
 
-				<CommentIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<CommentIcon sx={{ color: "#C0DCED" }} />
 				<Typography variant="body2">{question.commentsCount}</Typography>
-				<BookmarkIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<BookmarkIcon sx={{ color: '#D2C0ED' }}/>
 				<Typography variant="body2">{question.favorites}</Typography>
 			</Stack>
 		</Card>

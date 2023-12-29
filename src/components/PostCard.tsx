@@ -102,7 +102,10 @@ function PostCard(post: PostCardType) {
 					alignItems="center"
 					sx={{ flexWrap: 'nowrap', overflow: 'hidden' }}
 				>
-					<Avatar alt={post.posterName} src={post.profilePicture} />
+					<Avatar
+						alt={post.posterName}
+						src={post.profilePicture ? post.profilePicture : ''}
+					/>
 					<Typography
 						variant="subtitle1"
 						component="div"
@@ -149,13 +152,13 @@ function PostCard(post: PostCardType) {
 				alignItems="center"
 				sx={{ p: 2, pl: 4, pt: 0, mt: 'auto' }}
 			>
-				<ThumbUpAltIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<ThumbUpAltIcon sx={{ color: '#BFD1ED' }} />
 				<Typography variant="body2">{post.upvotes}</Typography>
-				<ThumbDownAltIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<ThumbDownAltIcon sx={{ color: '#EDD9C0' }}/>
 				<Typography variant="body2">{post.downvotes}</Typography>
-				<CommentIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<CommentIcon sx={{ color: "#C0DCED" }} />
 				<Typography variant="body2">{post.commentsCount}</Typography>
-				<BookmarkIcon sx={{ color: (theme) => theme.palette.text.secondary }} />
+				<BookmarkIcon sx={{ color: '#D2C0ED' }} />
 				<Typography variant="body2">{post.favorites}</Typography>
 			</Stack>
 		</Card>
