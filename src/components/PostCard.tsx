@@ -84,6 +84,7 @@ function PostCard(post: PostCardType) {
 				borderRadius: '5px',
 				backgroundColor: '#FEFDFA',
 				position: 'relative',
+				cursor: 'pointer', // 添加此行以改变鼠标悬停时的指针样式
 				'&::before': {
 					content: '""',
 					position: 'absolute',
@@ -92,6 +93,9 @@ function PostCard(post: PostCardType) {
 					bottom: 0,
 					width: '15px',
 					backgroundColor: theme.palette.secondary.main,
+				},
+				'&:hover': {
+					boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', // 添加悬停效果，例如增加阴影
 				},
 			}}
 		>

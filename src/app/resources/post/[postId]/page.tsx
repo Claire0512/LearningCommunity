@@ -311,73 +311,75 @@ function Page() {
 							my: 1,
 						}}
 					/>
-					<Box>
-						<SwipeableViews
-							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-							index={activeStep}
-							onChangeIndex={handleStepChange}
-							enableMouseEvents
-						>
-							{post.postImages.map((path, index) => (
-								<div key={index} className="flex justify-center">
-									{activeStep == index ? (
-										<Box
-											component="img"
-											sx={{
-												height: 303,
-												width: 540,
-												minHeight: 303,
-												minWidth: 540,
-												objectFit: 'cover',
-												objectPosition: 'center',
-												maxHeight: 303,
-												maxWidth: 540,
-											}}
-											src={path}
-											alt={'image '}
-										/>
-									) : null}
-								</div>
-							))}
-						</SwipeableViews>
-						<MobileStepper
-							steps={maxSteps}
-							position="static"
-							activeStep={activeStep}
-							sx={{
-								bgcolor: '#FFFFFF',
-								height: '25%',
-							}}
-							nextButton={
-								<Button
-									size="small"
-									onClick={handleNext}
-									disabled={activeStep === maxSteps - 1}
-								>
-									Next
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowLeft />
-									) : (
-										<KeyboardArrowRight />
-									)}
-								</Button>
-							}
-							backButton={
-								<Button
-									size="small"
-									onClick={handleBack}
-									disabled={activeStep === 0}
-								>
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowRight />
-									) : (
-										<KeyboardArrowLeft />
-									)}
-									Back
-								</Button>
-							}
-						/>
-					</Box>
+					{maxSteps > 0 && (
+						<Box>
+							<SwipeableViews
+								axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+								index={activeStep}
+								onChangeIndex={handleStepChange}
+								enableMouseEvents
+							>
+								{post.postImages.map((path, index) => (
+									<div key={index} className="flex justify-center">
+										{activeStep == index ? (
+											<Box
+												component="img"
+												sx={{
+													height: 303,
+													width: 540,
+													minHeight: 303,
+													minWidth: 540,
+													objectFit: 'cover',
+													objectPosition: 'center',
+													maxHeight: 303,
+													maxWidth: 540,
+												}}
+												src={path}
+												alt={'image '}
+											/>
+										) : null}
+									</div>
+								))}
+							</SwipeableViews>
+							<MobileStepper
+								steps={maxSteps}
+								position="static"
+								activeStep={activeStep}
+								sx={{
+									bgcolor: '#FFFFFF',
+									height: '25%',
+								}}
+								nextButton={
+									<Button
+										size="small"
+										onClick={handleNext}
+										disabled={activeStep === maxSteps - 1}
+									>
+										Next
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowLeft />
+										) : (
+											<KeyboardArrowRight />
+										)}
+									</Button>
+								}
+								backButton={
+									<Button
+										size="small"
+										onClick={handleBack}
+										disabled={activeStep === 0}
+									>
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowRight />
+										) : (
+											<KeyboardArrowLeft />
+										)}
+										Back
+									</Button>
+								}
+							/>
+						</Box>
+					)}
 					<Typography
 						variant="body1"
 						color="text.main"

@@ -312,27 +312,6 @@ function Page() {
 						{question.questionTitle}
 					</Typography>
 
-					<Stack direction="row" spacing={1} alignItems="center">
-						<IconButton
-							onClick={handleUpvote}
-							color={question.hasUpvote ? 'secondary' : 'default'}
-						>
-							<FavoriteIcon />
-						</IconButton>
-						<Typography variant="body2">{question.upvotes}</Typography>
-
-						<IconButton color={question.hasComment ? 'secondary' : 'default'}>
-							<CommentIcon />
-						</IconButton>
-						<Typography variant="body2">{question.commentsCount}</Typography>
-						<IconButton
-							onClick={handleFavorite}
-							color={question.hasFavorite ? 'secondary' : 'default'}
-						>
-							<BookmarkIcon />
-						</IconButton>
-						<Typography variant="body2">{question.favorites}</Typography>
-					</Stack>
 					<Divider
 						sx={{
 							borderWidth: 1,
@@ -342,74 +321,76 @@ function Page() {
 							my: 1,
 						}}
 					/>
+					{maxSteps > 0 && (
+						<Box>
+							<SwipeableViews
+								axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+								index={activeStep}
+								onChangeIndex={handleStepChange}
+								enableMouseEvents
+							>
+								{question.questionImages.map((path, index) => (
+									<div key={index} className="flex justify-center">
+										{activeStep == index ? (
+											<Box
+												component="img"
+												sx={{
+													height: 303,
+													width: 540,
+													minHeight: 303,
+													minWidth: 540,
+													objectFit: 'cover',
+													objectPosition: 'center',
+													maxHeight: 303,
+													maxWidth: 540,
+												}}
+												src={path}
+												alt={'image '}
+											/>
+										) : null}
+									</div>
+								))}
+							</SwipeableViews>
+							<MobileStepper
+								steps={maxSteps}
+								position="static"
+								activeStep={activeStep}
+								sx={{
+									bgcolor: '#FFFFFF',
+									height: '25%',
+								}}
+								nextButton={
+									<Button
+										size="small"
+										onClick={handleNext}
+										disabled={activeStep === maxSteps - 1}
+									>
+										Next
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowLeft />
+										) : (
+											<KeyboardArrowRight />
+										)}
+									</Button>
+								}
+								backButton={
+									<Button
+										size="small"
+										onClick={handleBack}
+										disabled={activeStep === 0}
+									>
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowRight />
+										) : (
+											<KeyboardArrowLeft />
+										)}
+										Back
+									</Button>
+								}
+							/>
+						</Box>
+					)}
 
-					<Box>
-						<SwipeableViews
-							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-							index={activeStep}
-							onChangeIndex={handleStepChange}
-							enableMouseEvents
-						>
-							{question.questionImages.map((path, index) => (
-								<div key={index} className="flex justify-center">
-									{activeStep == index ? (
-										<Box
-											component="img"
-											sx={{
-												height: 303,
-												width: 540,
-												minHeight: 303,
-												minWidth: 540,
-												objectFit: 'cover',
-												objectPosition: 'center',
-												maxHeight: 303,
-												maxWidth: 540,
-											}}
-											src={path}
-											alt={'image '}
-										/>
-									) : null}
-								</div>
-							))}
-						</SwipeableViews>
-						<MobileStepper
-							steps={maxSteps}
-							position="static"
-							activeStep={activeStep}
-							sx={{
-								bgcolor: '#FFFFFF',
-								height: '25%',
-							}}
-							nextButton={
-								<Button
-									size="small"
-									onClick={handleNext}
-									disabled={activeStep === maxSteps - 1}
-								>
-									Next
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowLeft />
-									) : (
-										<KeyboardArrowRight />
-									)}
-								</Button>
-							}
-							backButton={
-								<Button
-									size="small"
-									onClick={handleBack}
-									disabled={activeStep === 0}
-								>
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowRight />
-									) : (
-										<KeyboardArrowLeft />
-									)}
-									Back
-								</Button>
-							}
-						/>
-					</Box>
 					<Typography
 						variant="body1"
 						color="text.main"
@@ -438,7 +419,27 @@ function Page() {
 						))}
 					</Box>
 				</CardContent>
+				<Stack direction="row" spacing={1} alignItems="center">
+					<IconButton
+						onClick={handleUpvote}
+						color={question.hasUpvote ? 'secondary' : 'default'}
+					>
+						<FavoriteIcon />
+					</IconButton>
+					<Typography variant="body2">{question.upvotes}</Typography>
 
+					<IconButton color={question.hasComment ? 'secondary' : 'default'}>
+						<CommentIcon />
+					</IconButton>
+					<Typography variant="body2">{question.commentsCount}</Typography>
+					<IconButton
+						onClick={handleFavorite}
+						color={question.hasFavorite ? 'secondary' : 'default'}
+					>
+						<BookmarkIcon />
+					</IconButton>
+					<Typography variant="body2">{question.favorites}</Typography>
+				</Stack>
 				<CardContent sx={{ paddingTop: '5px' }}>
 					<List sx={{ borderRadius: '30px' }}>
 						{question.comments.map((comment, index) => (

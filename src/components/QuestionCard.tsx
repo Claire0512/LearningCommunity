@@ -79,6 +79,7 @@ function QuestionCard(question: QuestionCardType) {
 				borderRadius: '5px',
 				backgroundColor: '#FEFDFA',
 				position: 'relative',
+				cursor: 'pointer',
 				'&::before': {
 					content: '""',
 					position: 'absolute',
@@ -87,6 +88,9 @@ function QuestionCard(question: QuestionCardType) {
 					bottom: 0,
 					width: '15px',
 					backgroundColor: question.isSolved ? '#C0EDCA' : '#EDC0C0',
+				},
+				'&:hover': {
+					boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
 				},
 			}}
 		>

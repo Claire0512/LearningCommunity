@@ -13,10 +13,14 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
 	const toggleTag = (tagName: string) => {
-		const updatedSelectedTags = selectedTags.includes(tagName)
-			? selectedTags.filter((tag) => tag !== tagName)
-			: [...selectedTags, tagName];
-		setSelectedTags(updatedSelectedTags);
+		if (selectedTags.includes(tagName)) {
+			// Remove the tag if it's already selected
+			setSelectedTags(selectedTags.filter((tag) => tag !== tagName));
+		} else if (selectedTags.length < 5) {
+			// Add the tag if less than 3 tags are already selected
+			setSelectedTags([...selectedTags, tagName]);
+		}
+		// If there are already 3 tags selected, do nothing
 	};
 
 	const isTagSelected = (tagName: string) => {
@@ -43,7 +47,7 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				color="primary"
 				sx={{
 					fontWeight: 'bold',
-					fontSize: '26px',
+					fontSize: '22px',
 					textAlign: 'center',
 				}}
 			>

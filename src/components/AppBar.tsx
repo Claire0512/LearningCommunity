@@ -98,13 +98,10 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 				})
 				.catch((error) => {
 					console.error('Error fetching notifications:', error);
-					// Handle error appropriately
 				});
 		}
 	}, [session]);
-	// Check for unread notifications
 
-	// Close the notifications dropdown
 	const handleCloseNotifications = () => {
 		setIsNotificationsOpen(false);
 	};

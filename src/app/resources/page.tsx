@@ -160,13 +160,13 @@ function Page() {
 					color="secondary"
 					sx={{
 						bgcolor: `${theme.palette.secondary.main} !important`,
-						borderRadius: '20px',
-						height: '40px',
-						width: '115px',
-						minWidth: '115px',
+						borderRadius: '10px',
+						height: '35px',
+						width: '105px',
+						minWidth: '105px',
 					}}
 				>
-					<Typography variant="body1" style={{ fontSize: '20px' }}>
+					<Typography variant="body1" style={{ fontSize: '18px' }}>
 						{selectedTags.length > 0 ? '所選分類' : '選擇分類'}
 					</Typography>
 				</Button>
