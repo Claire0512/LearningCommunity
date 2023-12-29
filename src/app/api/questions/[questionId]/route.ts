@@ -185,6 +185,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		questionContext: parsedDetail.questionContext,
 		questionImages: parsedDetail.questionImages || [],
 		questionerId: parsedDetail.questionerId,
+		isSolved: parsedDetail.isSolved,
 		questionerName: parsedDetail.user.name,
 		profilePicture: parsedDetail.user.profilePicture,
 		tags: parsedDetail.tags.map((singleTag) => {
