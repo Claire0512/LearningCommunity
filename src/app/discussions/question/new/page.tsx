@@ -4,15 +4,27 @@ import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 import TagsSelector from '../../../../components/TagsSelector';
 import { addNewQuestion } from '../../../../lib/api/discussions/apiEndpoints';
 import { getAllTags } from '../../../../lib/api/tags/apiEndpoints';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Button } from '@mui/material';
-import { Card, CardContent, Typography, TextField, Dialog, useTheme } from '@mui/material';
-import { Chip, Box } from '@mui/material';
+import {
+	Button,
+	Card,
+	CardContent,
+	Typography,
+	TextField,
+	Dialog,
+	useTheme,
+	Chip,
+	Box,
+} from '@mui/material';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import { UploadButton } from '@/utils/uploadthing';
 
@@ -22,20 +34,31 @@ function Page() {
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [images, setImages] = useState<string[]>([]);
 	const router = useRouter();
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
+
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
-		console.log('Selected tags:', selected);
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
+
 	useEffect(() => {
 		const fetchTags = async () => {
 			try {
@@ -48,12 +71,14 @@ function Page() {
 
 		fetchTags();
 	}, []);
+	if (status === 'loading') return <div>Loading...</div>;
+	if (status === 'unauthenticated') redirect('/discussions');
 	const handleContentChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setContent(event.target.value);
 	};
 	const handleSubmit = async () => {
 		if (!title || !content) {
-			alert('標題和內文不能為空！');
+			openModal('標題和內文不能為空！');
 			return;
 		}
 
@@ -70,14 +95,14 @@ function Page() {
 		try {
 			await addNewQuestion(newQuestion);
 
-			alert('問題已成功提交！');
+			openModal('問題已成功提交！');
 			setTitle('');
 			setContent('');
 			setSelectedTags([]);
 			router.push('/discussions');
 		} catch (error) {
 			console.error('添加問題失敗:', error);
-			alert('提交問題時出現錯誤！');
+			openModal('提交問題時出現錯誤！');
 		}
 	};
 
@@ -202,7 +227,7 @@ function Page() {
 							setImages(imageUrls);
 						}}
 						onUploadError={(error: Error) => {
-							alert(`ERROR! ${error.message}`);
+							openModal(`ERROR! ${error.message}`);
 						}}
 					/>
 				</CardContent>
@@ -231,6 +256,19 @@ function Page() {
 			</Card>
 			<Dialog open={isModalOpen} onClose={handleCloseModal}>
 				<TagsSelector tags={tags} onSave={handleSave} onCancel={handleCloseModal} />
+			</Dialog>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
 			</Dialog>
 		</div>
 	);

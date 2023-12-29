@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 
 import { ExpandableSection } from '../../components/ExpandableSection';
 import PostCard from '../../components/PostCard';
@@ -23,9 +24,21 @@ import StarIcon from '@mui/icons-material/Star';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { Button } from '@mui/material';
-import { Fab, Card, Typography, TextField, Dialog, useTheme } from '@mui/material';
-import { Avatar, Stack, Box } from '@mui/material';
-import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+	Fab,
+	Card,
+	Typography,
+	TextField,
+	Dialog,
+	useTheme,
+	Avatar,
+	Stack,
+	Box,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	DialogContentText,
+} from '@mui/material';
 import type { AxiosError } from 'axios';
 
 import type { PostCardType, QuestionCardType, NewUserInfoType, UserInfoType } from '@/lib/types';
@@ -33,7 +46,7 @@ import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
 
 	const [openDialog, setOpenDialog] = useState(false);
@@ -49,7 +62,17 @@ function Page() {
 	const [userQuestions, setUserQuestions] = useState<QuestionCardType[]>([]);
 
 	const [userFavoriteQuestions, setUserFavoriteQuestions] = useState<QuestionCardType[]>([]);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleOpenDialog = () => {
 		setOpenDialog(true);
 	};
@@ -82,16 +105,16 @@ function Page() {
 
 	useEffect(() => {
 		fetchData();
-	}, [userId]);
+	}, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const handleSave = async () => {
 		if (!userInfo) return;
 		if (!newName.trim() || !currentPassword.trim()) {
-			alert('名字和當前密碼不能為空！');
+			openModal('名字和當前密碼不能為空！');
 			return;
 		}
 		if (newPassword && newPassword !== newPasswordConfirm) {
-			alert('新密碼和確認密碼不匹配！');
+			openModal('新密碼和確認密碼不匹配！');
 			return;
 		}
 
@@ -110,13 +133,48 @@ function Page() {
 		} catch (error) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response?.status === 400) {
-				alert('Password is incorrect!');
+				openModal('密碼錯誤！');
 			} else {
-				alert('Failed to update user information');
+				openModal('更新個人資訊失敗！');
 			}
 		}
 	};
-
+	const createStatCard = (
+		label: string,
+		IconComponent: React.ElementType,
+		iconColor: string,
+		quantity: number,
+	) => (
+		<Card
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+				width: '33%',
+				height: '100%',
+				boxShadow: 'none',
+				backgroundColor: 'transparent',
+			}}
+		>
+			<Typography variant="caption" component="div" sx={{ textAlign: 'center' }}>
+				{label}
+			</Typography>
+			<Typography variant="h6" component="div" sx={{ textAlign: 'center' }}>
+				{quantity}
+				<IconComponent
+					sx={{
+						color: iconColor,
+						verticalAlign: 'middle',
+						marginLeft: '8px',
+						marginBottom: '6px',
+					}}
+				/>{' '}
+			</Typography>
+		</Card>
+	);
+	if (status === 'loading') return <div>Loading...</div>;
+	if (status === 'unauthenticated') redirect('/');
 	return (
 		<div
 			style={{
@@ -133,9 +191,9 @@ function Page() {
 			{userInfo && (
 				<Card
 					sx={{
-						width: '55%',
-						height: '120px',
-						m: 2,
+						width: '60%',
+						height: '140px',
+						m: 4,
 						display: 'flex',
 						borderRadius: '10px',
 						backgroundColor: '#FEFDFA',
@@ -144,25 +202,29 @@ function Page() {
 						flexDirection: 'row',
 					}}
 				>
-					<Box
+					<Card
 						sx={{
-							width: '50%',
+							width: '35%',
+							height: '100%',
 							display: 'flex',
-							flexDirection: 'row', // 更新為 row
+							flexDirection: 'row',
 							alignItems: 'center',
 							justifyContent: 'center',
+							borderRadius: '10px',
+							backgroundColor: 'transparent',
+							boxShadow: 'none',
 						}}
 					>
 						<Avatar
 							alt={userInfo.name}
 							src={userInfo.profilePicture || ''}
-							sx={{ width: 70, height: 70 }}
+							sx={{ width: 60, height: 60 }}
 						/>
 						<Box
 							sx={{
 								display: 'flex',
-								flexDirection: 'column', // 新增
-								ml: 3, // 新增間距
+								flexDirection: 'column',
+								marginLeft: '15px',
 							}}
 						>
 							<Typography variant="h5" component="div">
@@ -172,78 +234,46 @@ function Page() {
 								{userInfo.email}
 							</Typography>
 						</Box>
-					</Box>
+					</Card>
+
 					<Box
 						sx={{
-							width: '50%',
+							width: '65%',
+							height: '100%',
 							display: 'flex',
 							flexDirection: 'column',
 							justifyContent: 'center',
 						}}
 					>
-						<Stack direction="row" spacing={2} alignItems="center">
-							<FavoriteIcon sx={{ color: '#EDC0C0' }} />
-							<Box
-								sx={{
-									minWidth: '3ch',
-									display: 'flex',
-									justifyContent: 'flex-end',
-								}}
-							>
-								<span>{userInfo.hearts.toString().padStart(3, ' ')}</span>
-							</Box>
-							<ThumbUpIcon sx={{ color: '#BFD1ED' }} />
-							<Box
-								sx={{
-									minWidth: '3ch',
-									display: 'flex',
-									justifyContent: 'flex-end',
-								}}
-							>
-								<span>{userInfo.upvotes.toString().padStart(3, ' ')}</span>
-							</Box>
-							<ThumbDownIcon sx={{ color: '#EDD9C0' }} />
-							<Box
-								sx={{
-									minWidth: '3ch',
-									display: 'flex',
-									justifyContent: 'flex-end',
-								}}
-							>
-								<span>{userInfo.downvotes.toString().padStart(3, ' ')}</span>
-							</Box>
+						<Stack direction="row" alignItems="center">
+							{createStatCard(
+								'文章獲得愛心',
+								FavoriteIcon,
+								'#EDC0C0',
+								userInfo.hearts,
+							)}
+							{createStatCard('文章獲得讚', ThumbUpIcon, '#BFD1ED', userInfo.upvotes)}
+							{createStatCard(
+								'文章/問題獲得倒讚',
+								ThumbDownIcon,
+								'#EDD9C0',
+								userInfo.downvotes,
+							)}
 						</Stack>
-						<Stack direction="row" spacing={2} alignItems="center" mt={1}>
-							<BookmarkIcon sx={{ color: '#D2C0ED' }} />
-							<Box
-								sx={{
-									minWidth: '3ch',
-									display: 'flex',
-									justifyContent: 'flex-end',
-								}}
-							>
-								<span>{userInfo.favorites.toString().padStart(3, ' ')}</span>
-							</Box>
-							<CheckCircleIcon sx={{ color: '#C0EDD4' }} />
-							<Box
-								sx={{
-									minWidth: '3ch',
-									display: 'flex',
-									justifyContent: 'flex-end',
-								}}
-							>
-								<span>{userInfo.checkmarks.toString().padStart(3, ' ')}</span>
-							</Box>
-							<StarIcon sx={{ color: '#EDE7C0' }} />
-							<Box
-								sx={{
-									minWidth: '3ch',
-									display: 'flex',
-									justifyContent: 'flex-end',
-								}}
-							>
-								<span>{userInfo.points.toString().padStart(3, ' ')}</span>
-							</Box>
+						<Stack direction="row" alignItems="center" mt={1}>
+							{createStatCard(
+								'文章/問題收藏數',
+								BookmarkIcon,
+								'#D2C0ED',
+								userInfo.favorites,
+							)}
+							{createStatCard(
+								'認證最佳回答',
+								CheckCircleIcon,
+								'#C0EDD4',
+								userInfo.checkmarks,
+							)}
+							{createStatCard('總點數', StarIcon, '#EDE7C0', userInfo.points)}
 						</Stack>
 					</Box>
 				</Card>
@@ -252,7 +282,7 @@ function Page() {
 			<Dialog
 				open={openDialog}
 				onClose={handleCloseDialog}
-				sx={{ borderRadius: '10px', backgroundColor: '#FEFDFA' }}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
 			>
 				<DialogTitle sx={{ textAlign: 'center' }}>編輯個人資料</DialogTitle>
 				<DialogContent>
@@ -286,7 +316,7 @@ function Page() {
 								setNewProfilePicture(res[0].url);
 							}}
 							onUploadError={(error: Error) => {
-								alert(`ERROR! ${error.message}`);
+								openModal(`ERROR! ${error.message}`);
 							}}
 						/>
 
@@ -397,6 +427,19 @@ function Page() {
 			>
 				<CreateIcon />
 			</Fab>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }

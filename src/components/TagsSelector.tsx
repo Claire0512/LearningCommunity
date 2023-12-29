@@ -4,7 +4,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Chip } from 
 import { Box } from '@mui/system';
 
 interface TagsSelectorProps {
-	tags: string[]; // 現在 tags 只是一個字串陣列
+	tags: string[];
 	onSave: (selected: string[]) => void;
 	onCancel: () => void;
 }
@@ -13,10 +13,11 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
 	const toggleTag = (tagName: string) => {
-		const updatedSelectedTags = selectedTags.includes(tagName)
-			? selectedTags.filter((tag) => tag !== tagName)
-			: [...selectedTags, tagName];
-		setSelectedTags(updatedSelectedTags);
+		if (selectedTags.includes(tagName)) {
+			setSelectedTags(selectedTags.filter((tag) => tag !== tagName));
+		} else if (selectedTags.length < 5) {
+			setSelectedTags([...selectedTags, tagName]);
+		}
 	};
 
 	const isTagSelected = (tagName: string) => {
@@ -43,14 +44,23 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				color="primary"
 				sx={{
 					fontWeight: 'bold',
-					fontSize: '26px',
+					fontSize: '22px',
 					textAlign: 'center',
 				}}
 			>
 				選擇分類
 			</DialogTitle>
 			<DialogContent>
-				<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+				<Box
+					sx={{
+						display: 'flex',
+						flexWrap: 'wrap',
+						gap: 0.5,
+						justifyContent: 'center',
+						alignItems: 'center',
+						padding: 1,
+					}}
+				>
 					{tags.map((tagName) => (
 						<Chip
 							label={tagName}
@@ -72,8 +82,8 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				</Box>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onCancel}>Cancel</Button>
-				<Button onClick={onSaveClicked}>Save</Button>
+				<Button onClick={onCancel}>取消</Button>
+				<Button onClick={onSaveClicked}>儲存</Button>
 			</DialogActions>
 		</Dialog>
 	);

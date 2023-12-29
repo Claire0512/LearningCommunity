@@ -12,6 +12,12 @@ import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { useTheme, Fab, Box, Button, Dialog, TextField, Chip, Typography } from '@mui/material';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 import type { PostCardType } from '@/lib/types';
 
@@ -26,24 +32,36 @@ function Page() {
 
 	const [tags, setTags] = useState<string[]>([]);
 	const { data: session } = useSession();
+
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
+	const [sortMethod, setSortMethod] = useState('');
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
+
+	const handleCreatePostClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+		if (!session) {
+			openModal('登入後才可發文哦');
+			event.preventDefault();
+		}
+	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
-		console.log('Selected tags:', selected);
 	};
-	const handleCreatePostClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-		if (!session) {
-			alert('登入後才可發文哦');
-			event.preventDefault();
-		}
-	};
+
 	useEffect(() => {
 		async function fetchTags() {
 			try {
 				const fetchedTags = await getAllTags();
-				console.log('Fetched tags:', fetchedTags);
 				setTags(fetchedTags);
 			} catch (error) {
 				console.error('Error fetching tags:', error);
@@ -71,7 +89,7 @@ function Page() {
 			selectedTags.length > 0
 				? (post: PostCardType) =>
 						selectedTags.every((tagName) => post.tags.includes(tagName))
-				: (post: PostCardType) => true;
+				: (_: PostCardType) => true;
 		const filterBySearch = (post: PostCardType) =>
 			post.postTitle.toLowerCase().startsWith(searchInput.toLowerCase());
 
@@ -80,7 +98,44 @@ function Page() {
 		);
 		setFilteredPosts(newFilteredPosts);
 	}, [selectedTags, searchInput, posts]);
+	useEffect(() => {
+		const sortedPosts = [...posts];
 
+		switch (sortMethod) {
+			case 'lovesHighToLow':
+				sortedPosts.sort((a, b) => b.upvotes - a.upvotes);
+				break;
+			case 'lovesLowToHigh':
+				sortedPosts.sort((a, b) => a.upvotes - b.upvotes);
+				break;
+			case 'newToOld':
+				sortedPosts.sort(
+					(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+				);
+				break;
+			case 'oldToNew':
+				sortedPosts.sort(
+					(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+				);
+				break;
+			default:
+		}
+
+		const filterByTags =
+			selectedTags.length > 0
+				? (post: PostCardType) =>
+						selectedTags.every((tagName) => post.tags.includes(tagName))
+				: (_: PostCardType) => true;
+
+		const filterBySearch = (post: PostCardType) =>
+			searchInput === '' || post.postTitle.toLowerCase().includes(searchInput.toLowerCase());
+
+		const newFilteredPosts = sortedPosts.filter(
+			(post: PostCardType) => filterByTags(post) && filterBySearch(post),
+		);
+
+		setFilteredPosts(newFilteredPosts);
+	}, [selectedTags, searchInput, posts, sortMethod]);
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchInput(event.target.value);
 	};
@@ -110,8 +165,8 @@ function Page() {
 					width: '100%',
 				}}
 			>
-				{hotPosts.map((post) => (
-					<PostCard {...post} />
+				{hotPosts.map((post, index) => (
+					<PostCard key={index} {...post} />
 				))}
 			</Box>
 			<Box
@@ -146,6 +201,7 @@ function Page() {
 			>
 				<TextField
 					fullWidth
+					color="secondary"
 					placeholder="Search..."
 					value={searchInput}
 					onChange={handleSearchChange}
@@ -154,19 +210,48 @@ function Page() {
 						style: { borderRadius: '15px', height: '40px' },
 					}}
 				/>
+				<Select
+					color="secondary"
+					value={sortMethod}
+					onChange={(event) => setSortMethod(event.target.value as string)}
+					displayEmpty
+					inputProps={{ 'aria-label': 'Without label' }}
+					sx={{
+						width: 200,
+						height: '38px',
+						borderRadius: '10px',
+						bgcolor: `${theme.palette.secondary.main} !important`,
+						border: 'none',
+						'& .MuiOutlinedInput-notchedOutline': {
+							border: 'none',
+						},
+						'&:focus': {
+							border: 'none',
+						},
+						'&:hover': {
+							border: 'none',
+						},
+					}}
+				>
+					<MenuItem value="">選擇排序方式</MenuItem>
+					<MenuItem value="lovesHighToLow">讚數由高到低</MenuItem>
+					<MenuItem value="lovesLowToHigh">讚數由低到高</MenuItem>
+					<MenuItem value="newToOld">由新到舊</MenuItem>
+					<MenuItem value="oldToNew">由舊到新</MenuItem>
+				</Select>
 				<Button
 					variant="contained"
 					onClick={handleOpenModal}
 					color="secondary"
 					sx={{
 						bgcolor: `${theme.palette.secondary.main} !important`,
-						borderRadius: '20px',
-						height: '40px',
-						width: '115px',
-						minWidth: '115px',
+						borderRadius: '10px',
+						height: '35px',
+						width: '105px',
+						minWidth: '105px',
 					}}
 				>
-					<Typography variant="body1" style={{ fontSize: '20px' }}>
+					<Typography variant="body1" style={{ fontSize: '18px' }}>
 						{selectedTags.length > 0 ? '所選分類' : '選擇分類'}
 					</Typography>
 				</Button>
@@ -190,8 +275,8 @@ function Page() {
 					width: '100%',
 				}}
 			>
-				{filteredPosts.map((post) => (
-					<PostCard {...post} />
+				{filteredPosts.map((post, index) => (
+					<PostCard key={index} {...post} />
 				))}
 			</Box>
 			<a
@@ -212,6 +297,19 @@ function Page() {
 					<CreateIcon />
 				</Fab>
 			</a>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</>
 	);
 }

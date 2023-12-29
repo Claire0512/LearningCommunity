@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { sql, eq, desc } from 'drizzle-orm';
+import { sql, eq, desc, gt } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
@@ -11,6 +11,8 @@ import {
 	favoritesTable,
 	upvotesTable,
 } from '@/db/schema';
+
+export const dynamic = 'force-dynamic';
 
 const GetResponseSchema = z.array(
 	z.object({
@@ -30,17 +32,7 @@ const GetResponseSchema = z.array(
 	}),
 );
 
-const questionRequestSchema = z.object({
-	questionTitle: z.string().min(1),
-	questionContext: z.string().min(1),
-	questionerId: z.number(),
-	questionImage: z.string().optional(),
-	tags: z.array(z.string()),
-});
-
-type GetResponse = z.infer<typeof GetResponseSchema>;
-
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
 	const upvotesSubQuery = db
 		.select({
 			questionId: upvotesTable.questionId,
@@ -68,6 +60,8 @@ export async function GET(req: NextRequest) {
 		.groupBy(favoritesTable.questionId)
 		.as('favoritesSubQuery');
 
+	const oneDayAgo = new Date(Date.now() - 24 * 3600 * 1000);
+
 	const questionDetails = db
 		.select({
 			questionId: questionsTable.questionId,
@@ -84,6 +78,7 @@ export async function GET(req: NextRequest) {
 			favorites: favoritesSubQuery.favoritesCount,
 		})
 		.from(questionsTable)
+		.where(gt(questionsTable.createdAt, oneDayAgo))
 		.leftJoin(upvotesSubQuery, eq(upvotesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(commentsSubQuery, eq(commentsSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
@@ -105,6 +100,7 @@ export async function GET(req: NextRequest) {
 				},
 			},
 		},
+		where: (question, { gt }) => gt(question.createdAt, oneDayAgo),
 		orderBy: [desc(questionsTable.createdAt)],
 	});
 
@@ -128,8 +124,8 @@ export async function GET(req: NextRequest) {
 	}
 
 	const sorted = combined.sort((a, b) => {
-		const popularityA = a.upvotes + a.favorites;
-		const popularityB = b.upvotes + b.favorites;
+		const popularityA = a.upvotes + a.favorites + a.commentsCount * 5;
+		const popularityB = b.upvotes + b.favorites + b.commentsCount * 5;
 		return popularityB - popularityA;
 	});
 

@@ -79,6 +79,7 @@ function QuestionCard(question: QuestionCardType) {
 				borderRadius: '5px',
 				backgroundColor: '#FEFDFA',
 				position: 'relative',
+				cursor: 'pointer',
 				'&::before': {
 					content: '""',
 					position: 'absolute',
@@ -87,6 +88,9 @@ function QuestionCard(question: QuestionCardType) {
 					bottom: 0,
 					width: '15px',
 					backgroundColor: question.isSolved ? '#C0EDCA' : '#EDC0C0',
+				},
+				'&:hover': {
+					boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
 				},
 			}}
 		>
@@ -105,7 +109,12 @@ function QuestionCard(question: QuestionCardType) {
 						{formattedTime}
 					</Typography>
 				</Stack>
-				<Typography variant="h6" component="div" noWrap sx={{ paddingTop: '5px' }}>
+				<Typography
+					variant="h6"
+					component="div"
+					noWrap
+					sx={{ paddingTop: '5px', fontWeight: '500' }}
+				>
 					{question.questionTitle}
 				</Typography>
 				<Typography
@@ -117,7 +126,7 @@ function QuestionCard(question: QuestionCardType) {
 						WebkitBoxOrient: 'vertical',
 						overflow: 'hidden',
 						lineHeight: '20px',
-						height: '30px',
+						height: '25px',
 						paddingLeft: '1px',
 						paddingTop: '5px',
 					}}

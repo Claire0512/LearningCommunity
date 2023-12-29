@@ -84,6 +84,7 @@ function PostCard(post: PostCardType) {
 				borderRadius: '5px',
 				backgroundColor: '#FEFDFA',
 				position: 'relative',
+				cursor: 'pointer',
 				'&::before': {
 					content: '""',
 					position: 'absolute',
@@ -92,6 +93,9 @@ function PostCard(post: PostCardType) {
 					bottom: 0,
 					width: '15px',
 					backgroundColor: theme.palette.secondary.main,
+				},
+				'&:hover': {
+					boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
 				},
 			}}
 		>
@@ -106,19 +110,19 @@ function PostCard(post: PostCardType) {
 						alt={post.posterName}
 						src={post.profilePicture ? post.profilePicture : ''}
 					/>
-					<Typography
-						variant="subtitle1"
-						component="div"
-						noWrap
-						sx={{ paddingTop: '5px' }}
-					>
+					<Typography variant="subtitle1" component="div" noWrap>
 						{post.posterName}
 					</Typography>
 					<Typography variant="body2" sx={{ marginLeft: 1 }}>
 						{formattedTime}
 					</Typography>
 				</Stack>
-				<Typography variant="h6" component="div" noWrap>
+				<Typography
+					variant="h6"
+					component="div"
+					noWrap
+					sx={{ paddingTop: '5px', fontWeight: '500' }}
+				>
 					{post.postTitle}
 				</Typography>
 				<Typography
@@ -130,7 +134,7 @@ function PostCard(post: PostCardType) {
 						WebkitBoxOrient: 'vertical',
 						overflow: 'hidden',
 						lineHeight: '20px',
-						height: '30px',
+						height: '25px',
 						paddingLeft: '1px',
 						paddingTop: '5px',
 					}}

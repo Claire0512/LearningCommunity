@@ -12,17 +12,17 @@ const PostRequestSchema = z.object({
 
 type PostRequestType = z.infer<typeof PostRequestSchema>;
 
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
 	const result = await db.query.tagsTable.findMany();
 	const data = result.map((tag) => tag.name);
 	return NextResponse.json(data, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
-    const userId = await getSessionUserId();
-    if (!userId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+	const userId = await getSessionUserId();
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 	const data = await req.json();
 	try {
 		PostRequestSchema.parse(data);

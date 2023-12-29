@@ -20,6 +20,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CommentIcon from '@mui/icons-material/Comment';
+import DoneIcon from '@mui/icons-material/Done';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
@@ -34,6 +35,8 @@ import {
 	Dialog,
 	DialogContent,
 	DialogActions,
+	DialogTitle,
+	DialogContentText,
 } from '@mui/material';
 import { Button, TextField } from '@mui/material';
 import {
@@ -62,13 +65,24 @@ function Page() {
 	const [newComment, setNewComment] = useState('');
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
-	const userId = session?.user?.userId;
 	const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 	const [selectedCommentId, setSelectedCommentId] = useState<number | null>(null);
-
+	const [selectedCommenterId, setSelectedCommenterId] = useState<number | null>(null);
 	const [activeStep, setActiveStep] = useState(0);
 	const [maxSteps, setMaxSteps] = useState(0);
+	const [isSolved, setIsSolved] = useState(false);
+	const [openSolvedDialog, setOpenSolvedDialog] = useState(false);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1);
 	};
@@ -85,6 +99,7 @@ function Page() {
 			try {
 				const questionData = await getQuestionDetail(Number(questionId));
 				setQuestion(questionData);
+				setIsSolved(questionData.isSolved);
 				setFormattedTime(getTimeDifference(questionData.createdAt));
 				setMaxSteps(questionData.questionImages.length);
 			} catch (error) {
@@ -100,7 +115,7 @@ function Page() {
 	const markAsBestAnswer = async (commentId: number) => {
 		try {
 			await updateQuestionStatus(Number(questionId), undefined, commentId);
-			alert('留言已標記為最佳解答');
+			openModal('留言已標記為最佳解答');
 			setOpenConfirmDialog(false);
 			fetchQuestionDetail();
 		} catch (error) {
@@ -118,14 +133,14 @@ function Page() {
 	};
 	useEffect(() => {
 		fetchQuestionDetail();
-	}, [questionId]);
+	}, [questionId]); // eslint-disable-line react-hooks/exhaustive-deps
 	if (!question) {
 		return <div>Loading...</div>;
 	}
 
 	const handleUpvote = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = question.hasUpvote ? 'remove_upvote' : 'add_upvote';
@@ -139,7 +154,7 @@ function Page() {
 
 	const handleFavorite = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = question.hasFavorite ? 'remove_favorite' : 'add_favorite';
@@ -152,17 +167,17 @@ function Page() {
 	};
 	const handleSubmitComment = async () => {
 		if (!session) {
-			alert('登入後才可留言哦');
+			openModal('登入後才可留言哦');
 			return;
 		}
 		if (!newComment.trim()) {
-			alert('評論不能為空');
+			openModal('評論不能為空');
 			return;
 		}
 
 		try {
 			await addCommentToQuestion(Number(questionId), session.user.userId, newComment);
-			alert('評論成功添加！');
+			openModal('評論成功添加！');
 			setNewComment('');
 			await fetchQuestionDetail();
 		} catch (error) {
@@ -172,18 +187,18 @@ function Page() {
 
 	const handleSubmitReply = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可回覆哦');
+			openModal('登入後才可回覆哦');
 			return;
 		}
 		const replyText = newReply[commentId];
 		if (!replyText.trim()) {
-			alert('回覆不能為空');
+			openModal('回覆不能為空');
 			return;
 		}
 
 		try {
 			await addReplyToComment(commentId, session.user.userId, replyText);
-			alert('回覆成功添加！');
+			openModal('回覆成功添加！');
 			setNewReply({ ...newReply, [commentId]: '' });
 			await fetchQuestionDetail();
 		} catch (error) {
@@ -192,7 +207,7 @@ function Page() {
 	};
 	const handleCommentUpvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -210,7 +225,7 @@ function Page() {
 
 	const handleCommentDownvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -223,6 +238,15 @@ function Page() {
 			await fetchQuestionDetail();
 		} catch (error) {
 			console.error('按倒讚出错', error);
+		}
+	};
+	const handleMarkAsSolved = async () => {
+		try {
+			await updateQuestionStatus(question.questionId, true);
+			setIsSolved(true);
+			setOpenSolvedDialog(false);
+		} catch (error) {
+			console.error('Error marking question as solved:', error);
 		}
 	};
 
@@ -262,6 +286,17 @@ function Page() {
 					position: 'relative',
 				}}
 			>
+				{session?.user.userId === question.questionerId && (
+					<IconButton
+						sx={{ position: 'absolute', top: 8, right: 8 }}
+						onClick={() => setOpenSolvedDialog(true)}
+						disabled={isSolved}
+					>
+						<DoneIcon
+							sx={{ color: isSolved ? theme.palette.secondary.main : 'grey' }}
+						/>
+					</IconButton>
+				)}
 				<CardContent sx={{ flex: '1 0 auto', paddingBottom: '0px' }}>
 					<Stack
 						direction="row"
@@ -283,12 +318,118 @@ function Page() {
 					<Typography
 						variant="h4"
 						component="div"
-						sx={{ marginTop: '10px', marginLeft: '5px' }}
+						sx={{ marginTop: '10px', marginLeft: '5px', marginBottom: '10px' }}
 					>
 						{question.questionTitle}
 					</Typography>
 
-					<Stack direction="row" spacing={1} alignItems="center">
+					{maxSteps > 0 && (
+						<Box>
+							<SwipeableViews
+								axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+								index={activeStep}
+								onChangeIndex={handleStepChange}
+								enableMouseEvents
+							>
+								{question.questionImages.map((path, index) => (
+									<div key={index} className="flex justify-center">
+										{activeStep == index ? (
+											<Box
+												component="img"
+												sx={{
+													height: 303,
+													width: 540,
+													minHeight: 303,
+													minWidth: 540,
+													objectFit: 'cover',
+													objectPosition: 'center',
+													maxHeight: 303,
+													maxWidth: 540,
+												}}
+												src={path}
+												alt={'image '}
+											/>
+										) : null}
+									</div>
+								))}
+							</SwipeableViews>
+							<MobileStepper
+								steps={maxSteps}
+								position="static"
+								activeStep={activeStep}
+								sx={{
+									bgcolor: '#FFFFFF',
+									height: '25%',
+								}}
+								nextButton={
+									<Button
+										size="small"
+										onClick={handleNext}
+										disabled={activeStep === maxSteps - 1}
+									>
+										下一頁
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowLeft />
+										) : (
+											<KeyboardArrowRight />
+										)}
+									</Button>
+								}
+								backButton={
+									<Button
+										size="small"
+										onClick={handleBack}
+										disabled={activeStep === 0}
+									>
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowRight />
+										) : (
+											<KeyboardArrowLeft />
+										)}
+										上一頁
+									</Button>
+								}
+							/>
+						</Box>
+					)}
+
+					<Typography
+						variant="body1"
+						color="text.main"
+						component="div"
+						sx={{
+							lineHeight: '30px',
+							fontSize: '22px',
+							marginLeft: '10px',
+							whiteSpace: 'pre-line',
+							wordWrap: 'break-word',
+						}}
+					>
+						{question.questionContext}
+					</Typography>
+
+					<Box
+						sx={{
+							display: 'flex',
+							gap: 0.5,
+							overflow: 'hidden',
+							flexWrap: 'wrap',
+							paddingLeft: '0px',
+							marginLeft: '10px',
+							marginTop: '10px',
+							marginBottom: '10px',
+						}}
+					>
+						{question.tags.map((tag) => (
+							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
+						))}
+					</Box>
+					<Stack
+						direction="row"
+						spacing={1}
+						alignItems="center"
+						sx={{ marginTop: '10px' }}
+					>
 						<IconButton
 							onClick={handleUpvote}
 							color={question.hasUpvote ? 'secondary' : 'default'}
@@ -309,136 +450,36 @@ function Page() {
 						</IconButton>
 						<Typography variant="body2">{question.favorites}</Typography>
 					</Stack>
-					<Divider
-						sx={{
-							borderWidth: 1,
-							borderStyle: 'solid',
-							borderRadius: '2px',
-							bgcolor: theme.palette.background.default,
-							my: 1,
-						}}
-					/>
-
-					<Box>
-						<SwipeableViews
-							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-							index={activeStep}
-							onChangeIndex={handleStepChange}
-							enableMouseEvents
-						>
-							{question.questionImages.map((path, index) => (
-								<div key={index} className="flex justify-center">
-									{activeStep == index ? (
-										<Box
-											component="img"
-											sx={{
-												height: 303,
-												width: 540,
-												minHeight: 303,
-												minWidth: 540,
-												objectFit: 'cover',
-												objectPosition: 'center',
-												maxHeight: 303,
-												maxWidth: 540,
-											}}
-											src={path}
-											alt={'image '}
-										/>
-									) : null}
-								</div>
-							))}
-						</SwipeableViews>
-						<MobileStepper
-							steps={maxSteps}
-							position="static"
-							activeStep={activeStep}
-							sx={{
-								bgcolor: '#FFFFFF',
-								height: '25%',
-							}}
-							nextButton={
-								<Button
-									size="small"
-									onClick={handleNext}
-									disabled={activeStep === maxSteps - 1}
-								>
-									Next
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowLeft />
-									) : (
-										<KeyboardArrowRight />
-									)}
-								</Button>
-							}
-							backButton={
-								<Button
-									size="small"
-									onClick={handleBack}
-									disabled={activeStep === 0}
-								>
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowRight />
-									) : (
-										<KeyboardArrowLeft />
-									)}
-									Back
-								</Button>
-							}
-						/>
-					</Box>
-					<Typography
-						variant="body1"
-						color="text.main"
-						component="div"
-						sx={{
-							lineHeight: '30px',
-							fontSize: '22px',
-							marginLeft: '10px',
-						}}
-					>
-						{question.questionContext}
-					</Typography>
-					<Box
-						sx={{
-							display: 'flex',
-							gap: 0.5,
-							overflow: 'hidden',
-							flexWrap: 'wrap',
-							// padding: '30px',
-							paddingLeft: '0px',
-							marginLeft: '10px',
-							marginTop: '10px',
-						}}
-					>
-						{question.tags.map((tag) => (
-							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
-						))}
-					</Box>
 				</CardContent>
-
 				<CardContent sx={{ paddingTop: '5px' }}>
 					<List sx={{ borderRadius: '30px' }}>
 						{question.comments.map((comment, index) => (
 							<React.Fragment key={comment.commentId}>
 								{index >= 0 && <Divider />}
 								<ListItem alignItems="flex-start">
-									{comment.isHelpful ? (
-										<CheckCircleIcon
-											sx={{ color: '#C0EDD4', marginRight: 2, marginTop: 2 }}
-										/>
-									) : (
-										<div style={{ width: 24, marginRight: 8 }} /> 
-									)}
-									<ListItemAvatar>
-										<Avatar
-											alt={comment.commenterName}
-											src={
-												comment.commenterProfilePicture
-													? comment.commenterProfilePicture
-													: ''
-											}
-										/>
-									</ListItemAvatar>
+									<Box sx={{ display: 'flex', alignItems: 'center' }}>
+										{comment.isHelpful ? (
+											<CheckCircleIcon
+												sx={{
+													color: '#C0EDD4',
+													marginRight: 2,
+													marginTop: '8px',
+												}}
+											/>
+										) : (
+											<div style={{ width: 24, marginRight: 15 }} />
+										)}
+										<ListItemAvatar>
+											<Avatar
+												alt={comment.commenterName}
+												src={
+													comment.commenterProfilePicture
+														? comment.commenterProfilePicture
+														: ''
+												}
+											/>
+										</ListItemAvatar>
+									</Box>
 									<ListItemText
 										primary={comment.commenterName}
 										primaryTypographyProps={{ variant: 'body1' }}
@@ -471,16 +512,18 @@ function Page() {
 											<ThumbDownAltIcon />
 										</IconButton>
 										<Typography variant="body2">{comment.downvotes}</Typography>
-										{session?.user.userId === question.questionerId && (
-											<IconButton
-												onClick={() => {
-													setOpenConfirmDialog(true);
-													setSelectedCommentId(comment.commentId);
-												}}
-											>
-												<MoreVertIcon />
-											</IconButton>
-										)}
+										{session?.user.userId === question.questionerId &&
+											!question.hasHelpfulComment && (
+												<IconButton
+													onClick={() => {
+														setOpenConfirmDialog(true);
+														setSelectedCommentId(comment.commentId);
+														setSelectedCommenterId(comment.commenterId);
+													}}
+												>
+													<MoreVertIcon />
+												</IconButton>
+											)}
 									</Stack>
 								</ListItem>
 
@@ -491,27 +534,31 @@ function Page() {
 												<Divider variant="inset" component="li" />
 											)}
 											<ListItem alignItems="flex-start" sx={{ pl: 8 }}>
-												{reply.isHelpful ? (
-													<CheckCircleIcon
-														sx={{
-															color: '#C0EDD4',
-															marginRight: 2,
-															marginTop: 2,
-														}}
-													/>
-												) : (
-													<div style={{ width: 24, marginRight: 8 }} />
-												)}
-												<ListItemAvatar>
-													<Avatar
-														alt={reply.commenterName}
-														src={
-															reply.commenterProfilePicture
-																? reply.commenterProfilePicture
-																: ''
-														}
-													/>
-												</ListItemAvatar>
+												<Box sx={{ display: 'flex', alignItems: 'center' }}>
+													{reply.isHelpful ? (
+														<CheckCircleIcon
+															sx={{
+																color: '#C0EDD4',
+																marginRight: 2,
+																marginTop: '8px',
+															}}
+														/>
+													) : (
+														<div
+															style={{ width: 24, marginRight: 16 }}
+														/>
+													)}
+													<ListItemAvatar>
+														<Avatar
+															alt={reply.commenterName}
+															src={
+																reply.commenterProfilePicture
+																	? reply.commenterProfilePicture
+																	: ''
+															}
+														/>
+													</ListItemAvatar>
+												</Box>
 												<ListItemText
 													primary={reply.commenterName}
 													primaryTypographyProps={{ variant: 'body1' }}
@@ -567,18 +614,22 @@ function Page() {
 														{reply.downvotes}
 													</Typography>
 													{session?.user.userId ===
-														question.questionerId && (
-														<IconButton
-															onClick={() => {
-																setOpenConfirmDialog(true);
-																setSelectedCommentId(
-																	reply.commentId,
-																);
-															}}
-														>
-															<MoreVertIcon />
-														</IconButton>
-													)}
+														question.questionerId &&
+														!question.hasHelpfulComment && (
+															<IconButton
+																onClick={() => {
+																	setOpenConfirmDialog(true);
+																	setSelectedCommentId(
+																		reply.commentId,
+																	);
+																	setSelectedCommenterId(
+																		reply.commenterId,
+																	);
+																}}
+															>
+																<MoreVertIcon />
+															</IconButton>
+														)}
 												</Stack>
 											</ListItem>
 										</React.Fragment>
@@ -626,7 +677,7 @@ function Page() {
 													}}
 													color="secondary"
 												>
-													Submit
+													留言
 												</Button>
 											</Stack>
 										</ListItemText>
@@ -679,21 +730,67 @@ function Page() {
 					</List>
 				</CardContent>
 			</Card>
-			<Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+			<Dialog
+				open={openConfirmDialog}
+				onClose={() => setOpenConfirmDialog(false)}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				{session?.user.userId !== selectedCommenterId && (
+					<>
+						<DialogContent>
+							<Typography>
+								是否將這則留言標記為最佳解答？標記後不能再更改。
+							</Typography>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={() => setOpenConfirmDialog(false)}>取消</Button>
+							<Button
+								onClick={() => {
+									if (selectedCommentId !== null) {
+										markAsBestAnswer(selectedCommentId);
+									}
+								}}
+							>
+								確認
+							</Button>
+						</DialogActions>
+					</>
+				)}
+				{session?.user.userId === selectedCommenterId && (
+					<>
+						<DialogContent>
+							<Typography>不能將自己的留言標記為最佳解答哦！</Typography>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={() => setOpenConfirmDialog(false)}>關閉</Button>
+						</DialogActions>
+					</>
+				)}
+			</Dialog>
+			<Dialog
+				open={openSolvedDialog}
+				onClose={() => setOpenSolvedDialog(false)}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
 				<DialogContent>
-					<Typography>是否將這則留言標記為最佳解答？標記後不能再更改。</Typography>
+					<Typography>是否將這個問題標記為已解決？標記後不能再更改。</Typography>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setOpenConfirmDialog(false)}>取消</Button>
-					<Button
-						onClick={() => {
-							if (selectedCommentId !== null) {
-								markAsBestAnswer(selectedCommentId);
-							}
-						}}
-					>
-						確認
-					</Button>
+					<Button onClick={() => setOpenSolvedDialog(false)}>取消</Button>
+					<Button onClick={() => handleMarkAsSolved()}>確認</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
 				</DialogActions>
 			</Dialog>
 		</div>

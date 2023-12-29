@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { sql, eq, desc } from 'drizzle-orm';
+import { sql, eq, desc, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
@@ -13,6 +13,7 @@ import {
 	tagsTable,
 	questionTagsTable,
 } from '@/db/schema';
+import { questionCost } from '@/lib/constants';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const GetResponseSchema = z.array(
@@ -41,11 +42,9 @@ const questionRequestSchema = z.object({
 	tags: z.array(z.string()).optional(),
 });
 
-type GetResponse = z.infer<typeof GetResponseSchema>;
-
 type questionRequest = z.infer<typeof questionRequestSchema>;
 
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
 	const upvotesSubQuery = db
 		.select({
 			questionId: upvotesTable.questionId,
@@ -137,7 +136,6 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-
 	const sessionUserId = await getSessionUserId();
 	if (!sessionUserId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -154,6 +152,38 @@ export async function POST(req: NextRequest) {
 
 	if (newQuestion.questionerId !== sessionUserId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	try {
+		const [user] = await db
+			.select({ points: usersTable.points })
+			.from(usersTable)
+			.where(eq(usersTable.userId, sessionUserId));
+
+		if (!user || !user.points) {
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+
+		if (user.points < questionCost) {
+			return NextResponse.json({ error: 'Points not enough!' }, { status: 400 });
+		}
+
+		const [updatedUser] = await db
+			.update(usersTable)
+			.set({ points: user.points - questionCost })
+			.where(
+				and(
+					eq(usersTable.userId, sessionUserId),
+					eq(usersTable.points, user.points), // avoid race condition
+				),
+			)
+			.returning({ userId: usersTable.userId });
+		if (!updatedUser) {
+			return NextResponse.json({ error: 'Race condition' }, { status: 500 });
+		}
+	} catch (error) {
+		console.error(error);
+		return NextResponse.json({ error: 'Server error' }, { status: 500 });
 	}
 
 	let questionId = -1;
@@ -176,7 +206,6 @@ export async function POST(req: NextRequest) {
 				},
 				where: (tagsTable, { eq }) => eq(tagsTable.name, tag),
 			});
-
 			if (exist) {
 				return exist.tagId;
 			} else {

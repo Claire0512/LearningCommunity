@@ -4,7 +4,8 @@ import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
-import { questionsTable, commentsTable, notificationsTable } from '@/db/schema';
+import { questionsTable, commentsTable, notificationsTable, usersTable } from '@/db/schema';
+import { answerReward } from '@/lib/constants';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const GetRequestSchema = z.object({
@@ -183,6 +184,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 		questionContext: parsedDetail.questionContext,
 		questionImages: parsedDetail.questionImages || [],
 		questionerId: parsedDetail.questionerId,
+		isSolved: parsedDetail.isSolved,
 		questionerName: parsedDetail.user.name,
 		profilePicture: parsedDetail.user.profilePicture,
 		tags: parsedDetail.tags.map((singleTag) => {
@@ -198,6 +200,13 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			if (comment.commenterId === userId) return true;
 			comment.replies.forEach((reply) => {
 				if (reply.commenterId === userId) return true;
+			});
+			return false;
+		}),
+		hasHelpfulComment: parsedDetail.comments.some((comment) => {
+			if (comment.isHelpful) return true;
+			comment.replies.forEach((reply) => {
+				if (reply.isHelpful) return true;
 			});
 			return false;
 		}),
@@ -264,12 +273,15 @@ export async function PUT(req: NextRequest) {
 	try {
 		const question = await db.query.questionsTable.findFirst({
 			where: (question, { eq }) => eq(question.questionId, request.questionId),
-		})
+		});
 		if (!question) {
 			return NextResponse.json({ error: 'question not found' }, { status: 404 });
 		}
 		if (question.questionerId !== sessionUserId) {
-			return NextResponse.json({ error: "You are not the owner of the question"}, {status: 401});
+			return NextResponse.json(
+				{ error: 'You are not the owner of the question' },
+				{ status: 401 },
+			);
 		}
 	} catch (error) {
 		return NextResponse.json({ error: 'database error' }, { status: 500 });
@@ -284,8 +296,8 @@ export async function PUT(req: NextRequest) {
 					and(
 						eq(questionsTable.questionId, request.questionId),
 						eq(questionsTable.questionerId, sessionUserId),
-					)
-				)
+					),
+				);
 		} catch (error) {
 			console.error('Error updating question');
 			return NextResponse.json({ error: 'server error updating question' }, { status: 500 });
@@ -294,10 +306,26 @@ export async function PUT(req: NextRequest) {
 
 	if (request.helpfulCommentId) {
 		try {
-			await db
+			const [comment] = await db
 				.update(commentsTable)
 				.set({ isHelpful: true })
-				.where(eq(commentsTable.commentId, request.helpfulCommentId));
+				.where(eq(commentsTable.commentId, request.helpfulCommentId))
+				.returning({ commenterId: commentsTable.commenterId });
+			if (comment) {
+				const user = await db.query.usersTable.findFirst({
+					columns: {
+						points: true,
+					},
+					where: (user, { eq }) => eq(user.userId, comment.commenterId),
+				});
+				if (user) {
+					const userPoints = user.points || 0;
+					await db
+						.update(usersTable)
+						.set({ points: userPoints + answerReward })
+						.where(eq(usersTable.userId, comment.commenterId));
+				}
+			}
 		} catch (error) {
 			console.error('Error updating helpful');
 			return NextResponse.json({ error: 'server error updating helpful' }, { status: 500 });

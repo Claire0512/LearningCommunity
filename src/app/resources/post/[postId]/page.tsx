@@ -36,6 +36,11 @@ import {
 	Divider,
 	IconButton,
 } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import MobileStepper from '@mui/material/MobileStepper';
 
 import type { PostCardDetailType } from '@/lib/types';
@@ -49,9 +54,20 @@ function Page() {
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
 	const { data: session } = useSession();
-	const userId = session?.user?.userId;
 	const [activeStep, setActiveStep] = useState(0);
 	const [maxSteps, setMaxSteps] = useState(0);
+
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
+
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -91,13 +107,13 @@ function Page() {
 	};
 	useEffect(() => {
 		fetchPostDetail();
-	}, [postId]);
+	}, [postId]); // eslint-disable-line react-hooks/exhaustive-deps
 	if (!post) {
 		return <div>Loading...</div>;
 	}
 	const handleUpvote = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = post.hasUpvote ? 'remove_upvote' : 'add_upvote';
@@ -111,7 +127,7 @@ function Page() {
 
 	const handleDownvote = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = post.hasDownvote ? 'remove_downvote' : 'add_downvote';
@@ -125,7 +141,7 @@ function Page() {
 
 	const handleFavorite = async () => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 		const actionType = post.hasFavorite ? 'remove_favorite' : 'add_favorite';
@@ -139,17 +155,17 @@ function Page() {
 
 	const handleSubmitComment = async () => {
 		if (!session) {
-			alert('登入後才可留言哦');
+			openModal('登入後才可留言哦');
 			return;
 		}
 		if (!newComment.trim()) {
-			alert('評論不能為空');
+			openModal('評論不能為空');
 			return;
 		}
 
 		try {
 			await addCommentToPost(Number(postId), session.user.userId, newComment);
-			alert('評論成功添加！');
+			openModal('評論成功添加！');
 			setNewComment('');
 			await fetchPostDetail();
 		} catch (error) {
@@ -159,18 +175,18 @@ function Page() {
 
 	const handleSubmitReply = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可回覆哦');
+			openModal('登入後才可回覆哦');
 			return;
 		}
 		const replyText = newReply[commentId];
 		if (!replyText.trim()) {
-			alert('回覆不能為空');
+			openModal('回覆不能為空');
 			return;
 		}
 
 		try {
 			await addReplyToComment(commentId, session.user.userId, replyText);
-			alert('回覆成功添加！');
+			openModal('回覆成功添加！');
 			setNewReply({ ...newReply, [commentId]: '' });
 			await fetchPostDetail();
 		} catch (error) {
@@ -179,7 +195,7 @@ function Page() {
 	};
 	const handleCommentUpvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -197,7 +213,7 @@ function Page() {
 
 	const handleCommentDownvote = async (commentId: number) => {
 		if (!session) {
-			alert('登入後才可使用此功能');
+			openModal('登入後才可使用此功能');
 			return;
 		}
 
@@ -270,11 +286,109 @@ function Page() {
 					<Typography
 						variant="h4"
 						component="div"
-						sx={{ marginTop: '10px', marginLeft: '5px' }}
+						sx={{ marginTop: '10px', marginLeft: '5px', marginBottom: '10px' }}
 					>
 						{post.postTitle}
 					</Typography>
 
+					{maxSteps > 0 && (
+						<Box>
+							<SwipeableViews
+								axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+								index={activeStep}
+								onChangeIndex={handleStepChange}
+								enableMouseEvents
+							>
+								{post.postImages.map((path, index) => (
+									<div key={index} className="flex justify-center">
+										{activeStep == index ? (
+											<Box
+												component="img"
+												sx={{
+													height: 303,
+													width: 540,
+													minHeight: 303,
+													minWidth: 540,
+													objectFit: 'cover',
+													objectPosition: 'center',
+													maxHeight: 303,
+													maxWidth: 540,
+												}}
+												src={path}
+												alt={'image '}
+											/>
+										) : null}
+									</div>
+								))}
+							</SwipeableViews>
+							<MobileStepper
+								steps={maxSteps}
+								position="static"
+								activeStep={activeStep}
+								sx={{
+									bgcolor: '#FFFFFF',
+									height: '25%',
+								}}
+								nextButton={
+									<Button
+										size="small"
+										onClick={handleNext}
+										disabled={activeStep === maxSteps - 1}
+									>
+										Next
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowLeft />
+										) : (
+											<KeyboardArrowRight />
+										)}
+									</Button>
+								}
+								backButton={
+									<Button
+										size="small"
+										onClick={handleBack}
+										disabled={activeStep === 0}
+									>
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowRight />
+										) : (
+											<KeyboardArrowLeft />
+										)}
+										Back
+									</Button>
+								}
+							/>
+						</Box>
+					)}
+					<Typography
+						variant="body1"
+						color="text.main"
+						component="div"
+						sx={{
+							lineHeight: '30px',
+							fontSize: '22px',
+							marginLeft: '10px',
+							whiteSpace: 'pre-line',
+							wordWrap: 'break-word',
+						}}
+					>
+						{post.postContext}
+					</Typography>
+					<Box
+						sx={{
+							display: 'flex',
+							gap: 0.5,
+							overflow: 'hidden',
+							flexWrap: 'wrap',
+							paddingLeft: '0px',
+							marginLeft: '10px',
+							marginTop: '10px',
+						}}
+					>
+						{post.tags.map((tag) => (
+							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
+						))}
+					</Box>
 					<Stack direction="row" spacing={1} alignItems="center">
 						<IconButton
 							onClick={handleUpvote}
@@ -302,109 +416,6 @@ function Page() {
 						</IconButton>
 						<Typography variant="body2">{post.favorites}</Typography>
 					</Stack>
-					<Divider
-						sx={{
-							borderWidth: 1,
-							borderStyle: 'solid',
-							borderRadius: '2px',
-							bgcolor: theme.palette.background.default,
-							my: 1,
-						}}
-					/>
-					<Box>
-						<SwipeableViews
-							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-							index={activeStep}
-							onChangeIndex={handleStepChange}
-							enableMouseEvents
-						>
-							{post.postImages.map((path, index) => (
-								<div key={index} className="flex justify-center">
-									{activeStep == index ? (
-										<Box
-											component="img"
-											sx={{
-												height: 303,
-												width: 540,
-												minHeight: 303,
-												minWidth: 540,
-												objectFit: 'cover',
-												objectPosition: 'center',
-												maxHeight: 303,
-												maxWidth: 540,
-											}}
-											src={path}
-											alt={'image '}
-										/>
-									) : null}
-								</div>
-							))}
-						</SwipeableViews>
-						<MobileStepper
-							steps={maxSteps}
-							position="static"
-							activeStep={activeStep}
-							sx={{
-								bgcolor: '#FFFFFF',
-								height: '25%',
-							}}
-							nextButton={
-								<Button
-									size="small"
-									onClick={handleNext}
-									disabled={activeStep === maxSteps - 1}
-								>
-									Next
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowLeft />
-									) : (
-										<KeyboardArrowRight />
-									)}
-								</Button>
-							}
-							backButton={
-								<Button
-									size="small"
-									onClick={handleBack}
-									disabled={activeStep === 0}
-								>
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowRight />
-									) : (
-										<KeyboardArrowLeft />
-									)}
-									Back
-								</Button>
-							}
-						/>
-					</Box>
-					<Typography
-						variant="body1"
-						color="text.main"
-						component="div"
-						sx={{
-							lineHeight: '30px',
-							fontSize: '22px',
-							marginLeft: '10px',
-						}}
-					>
-						{post.postContext}
-					</Typography>
-					<Box
-						sx={{
-							display: 'flex',
-							gap: 0.5,
-							overflow: 'hidden',
-							flexWrap: 'wrap',
-							paddingLeft: '0px',
-							marginLeft: '10px',
-							marginTop: '10px',
-						}}
-					>
-						{post.tags.map((tag) => (
-							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
-						))}
-					</Box>
 				</CardContent>
 
 				<CardContent sx={{ paddingTop: '5px' }}>
@@ -427,12 +438,12 @@ function Page() {
 										primary={comment.commenterName}
 										primaryTypographyProps={{ variant: 'body1' }}
 										secondaryTypographyProps={{
-											component: 'span', // Use a span to apply styles directly
+											component: 'span',
 											variant: 'body2',
 											color: 'text.secondary',
-											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' }, // Add whiteSpace style
+											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' },
 										}}
-										secondary={comment.text} // Pass the text as the secondary prop
+										secondary={comment.text}
 									/>
 
 									<Stack
@@ -629,6 +640,19 @@ function Page() {
 					</List>
 				</CardContent>
 			</Card>
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }

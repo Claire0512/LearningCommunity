@@ -54,13 +54,28 @@ function Page() {
 		setOpenSnackbar(false);
 	};
 	return (
-		<Box className="flex h-screen  w-screen justify-center bg-[#FCFAF5]">
+		<Box
+			sx={{
+				display: 'flex',
+				height: '100vh',
+				width: '100vw',
+				justifyContent: 'center',
+				backgroundColor: '#FCFAF5',
+			}}
+		>
 			<Card
-				className={`flex w-1/3  flex-col ${commonTextClass} rounded-none border-0 bg-[#FCFAF5]`}
+				sx={{
+					display: 'flex',
+					width: '33%',
+					flexDirection: 'column',
+					borderRadius: 0,
+					border: 0,
+					backgroundColor: '#FCFAF5',
+				}}
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '60px' }}>
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
 						<Image src="/images/logo.png" alt="Logo" width={80} height={80} />
 					</div>
 					<p
@@ -69,15 +84,18 @@ function Page() {
 							color: '#104b76',
 							fontSize: '30px',
 							textAlign: 'center',
-							marginBottom: '20px',
-							marginTop: '20px',
+							marginBottom: '10px',
+							marginTop: '10px',
 						}}
 					>
 						學習互助平台
 					</p>
 					<form onSubmit={handleSubmit}>
 						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
+							sx={{
+								marginBottom: 1.5,
+								width: '100%',
+							}}
 							label="帳號"
 							variant="outlined"
 							type="email"
@@ -87,7 +105,10 @@ function Page() {
 							}
 						/>
 						<TextField
-							className={`mb-4 w-full ${commonTextClass}`}
+							sx={{
+								marginBottom: 1.5,
+								width: '100%',
+							}}
 							label="密碼"
 							variant="outlined"
 							type="password"
@@ -98,18 +119,23 @@ function Page() {
 						/>
 						<Button
 							type="submit"
-							className={`mb-4 h-14 w-full bg-[#104b76] text-white ${commonTextClass}`}
+							sx={{
+								marginBottom: '1rem',
+								height: '3.5rem',
+								width: '100%',
+								backgroundColor: '#104b76',
+								color: 'white',
+							}}
 							variant="contained"
 							style={{ backgroundColor: '#104b76', color: 'white' }}
 						>
 							登入
 						</Button>
 					</form>
-					<div className={`flex flex-row items-center justify-center ${commonTextClass}`}>
+					<div className={`flex flex-row items-center justify-center`}>
 						<span className={`${commonTextClass}`}>還沒註冊嗎？</span>
 						<Button
-							className={`${commonTextClass} m-2 min-w-0 p-0`}
-							sx={{ color: '#104b76' }}
+							sx={{ color: '#104b76', m: 0.5, minWidth: 0, p: 0 }}
 							onClick={() => router.push('/sign-up')}
 						>
 							註冊

@@ -7,8 +7,13 @@ import { useSession } from 'next-auth/react';
 import Bar from '../components/AppBar';
 import { getUserInfo, dailySign } from '../lib/api/users/apiEndpoints';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import { Card, CardContent, Typography, CardMedia, Fab, useTheme } from '@mui/material';
+import { Card, CardContent, Typography, CardMedia, Fab, useTheme, Button } from '@mui/material';
 import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import type { UserInfoType } from '@/lib/types';
 
@@ -40,7 +45,17 @@ export default function Home() {
 	const theme = useTheme();
 	const { data: session } = useSession();
 	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalContent, setModalContent] = useState('');
 
+	const openModal = (content: string) => {
+		setModalContent(content);
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 	useEffect(() => {
 		if (session) {
 			getUserInfo(session.user.userId)
@@ -50,13 +65,12 @@ export default function Home() {
 	}, [session]);
 
 	const handleSignInClick = async () => {
-		console.log(userInfo);
 		if (userInfo?.hasSigned) {
-			alert('你今天已經簽到過了哦！');
+			openModal('你今天已經簽到過了哦！');
 		} else {
 			try {
 				await dailySign(session?.user.userId);
-				alert('簽到成功！獲得點數一點！');
+				openModal('簽到成功！獲得點數一點！');
 				getUserInfo(session?.user.userId)
 					.then((userInfo) => setUserInfo(userInfo))
 					.catch(console.error);
@@ -67,10 +81,25 @@ export default function Home() {
 	};
 
 	return (
-		<Box component="main" className="flex min-h-full flex-col ">
+		<Box
+			component="main"
+			sx={{
+				display: 'flex',
+				minHeight: '100%',
+				flexDirection: 'column',
+			}}
+		>
 			<Bar activeButton="首頁" />
 
-			<Box className="mt-[60px] flex flex-1 flex-col items-center">
+			<Box
+				sx={{
+					mt: '60px',
+					display: 'flex',
+					flex: 1,
+					flexDirection: 'column',
+					alignItems: 'center',
+				}}
+			>
 				<Box
 					sx={{
 						height: '80%',
@@ -82,12 +111,28 @@ export default function Home() {
 						padding: 10,
 					}}
 				>
-					<Box className="mt-16 flex h-full w-full justify-between ">
+					<Box
+						sx={{
+							mt: 10,
+							display: 'flex',
+							height: '100%',
+							width: '100%',
+							justifyContent: 'space-between',
+						}}
+					>
 						{cardData.map((card, index) => (
 							<Card
 								key={index}
-								className="relative mx-5 mb-1 h-[200px] flex-1 bg-[#FEFDFA]"
 								sx={{
+									position: 'relative',
+									mx: 1.25,
+									mb: 0.25,
+									height: '200px',
+									width: '400px',
+									maxWidth: '330px',
+									flex: 1,
+									backgroundColor: '#FEFDFA',
+
 									overflow: 'visible',
 									...(index === 0 && { marginRight: 'auto' }),
 									...(index === 1 && { marginX: 'auto' }),
@@ -110,8 +155,7 @@ export default function Home() {
 										gutterBottom
 										variant="h6"
 										component="div"
-										className="font-black"
-										sx={{ alignSelf: 'flex-start' }}
+										sx={{ alignSelf: 'flex-start', fontWeight: '900' }}
 									>
 										{card.title}
 									</Typography>
@@ -132,7 +176,9 @@ export default function Home() {
 													variant="body2"
 													color="text.secondary"
 													component="div"
-													className=" font-bold"
+													sx={{
+														fontWeight: 'bold',
+													}}
 												>
 													{line}
 												</Typography>
@@ -172,6 +218,20 @@ export default function Home() {
 					<EventAvailableIcon />
 				</Fab>
 			)}
+
+			<Dialog
+				open={modalOpen}
+				onClose={closeModal}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>提示</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{modalContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
 		</Box>
 	);
 }

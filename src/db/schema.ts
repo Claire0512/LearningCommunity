@@ -18,7 +18,7 @@ export const usersTable = pgTable('users', {
 	profilePicture: varchar('profile_picture'),
 	resumeFile: varchar('resume_file'),
 	points: integer('points').default(10),
-	lastSigned: timestamp('last_signed').default(sql`CURRENT_TIMESTAMP`),
+	lastSigned: timestamp('last_signed').default(sql`TIMESTAMP '1970-01-01 00:00:00'`),
 });
 
 export const usersRelations = relations(usersTable, ({ one, many }) => ({
@@ -85,6 +85,7 @@ export const questionsRelations = relations(questionsTable, ({ one, many }) => (
 	favorites: many(favoritesTable),
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const commentsTable: any = pgTable('comments', {
 	commentId: serial('comment_id').primaryKey(),
 	text: text('text').notNull(),
@@ -129,9 +130,6 @@ export const tagsTable = pgTable('tags', {
 	name: varchar('name').notNull(),
 	category: varchar('category'),
 });
-
-// defaultTags = ["數學","物理","化學","生物","地質","天文","環科","資訊","工程","材料","醫學","護理","藥學","公衛","心理","社會","人類","政治","法學","經濟","管理","會計","金融","語言","文學","歷史","哲學","音樂","戲劇","舞蹈","美術","傳播","圖資"]
-
 
 export const tagsRelations = relations(tagsTable, ({ many }) => ({
 	posts: many(postTagsTable),

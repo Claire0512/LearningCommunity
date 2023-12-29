@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import bcrypt from 'bcrypt';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
@@ -227,55 +227,51 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	try {
-		const updatedUsers = await db.transaction(async (tx) => {
-			const [user] = await tx
-				.select({ password: usersTable.password })
-				.from(usersTable)
-				.where(eq(usersTable.userId, newUser.userId));
+		const [user] = await db
+			.select({ password: usersTable.password })
+			.from(usersTable)
+			.where(eq(usersTable.userId, newUser.userId));
 
-			if (!user) return;
-			const isMatch = await bcrypt.compare(newUser.currentPassword, user.password);
-			if (!isMatch) {
-				tx.rollback();
-				return;
-			}
-			const updatedUser: {
-				userId: number;
-				name?: string;
-				profilePicture?: string;
-				password?: string;
-			} = {
-				userId: newUser.userId,
-			};
+		const isMatch = await bcrypt.compare(newUser.currentPassword, user.password);
+		if (!isMatch) {
+			return NextResponse.json({ error: 'Incorrect Password!' }, { status: 400 });
+		}
 
-			if (newUser.newPassword) {
-				const hashedPassword = await bcrypt.hash(newUser.newPassword, 10);
-				updatedUser.password = hashedPassword;
-			}
+		const updatedUser: {
+			userId: number;
+			name?: string;
+			profilePicture?: string;
+			password?: string;
+		} = {
+			userId: newUser.userId,
+		};
 
-			if (newUser.newName) {
-				updatedUser.name = newUser.newName;
-			}
+		if (newUser.newPassword) {
+			const hashedPassword = await bcrypt.hash(newUser.newPassword, 10);
+			updatedUser.password = hashedPassword;
+		}
 
-			if (newUser.newProfilePicture) {
-				updatedUser.profilePicture = newUser.newProfilePicture;
-			}
-			const results = await tx
-				.update(usersTable)
-				.set(updatedUser)
-				.where(eq(usersTable.userId, newUser.userId))
-				.returning({
-					userId: usersTable.userId,
-					name: usersTable.name,
-					profilePicture: usersTable.profilePicture,
-				});
-			return results;
-		});
-		if (!updatedUsers) {
-			return NextResponse.json({ error: 'User Not Found' }, { status: 404 });
+		if (newUser.newName) {
+			updatedUser.name = newUser.newName;
+		}
+
+		if (newUser.newProfilePicture) {
+			updatedUser.profilePicture = newUser.newProfilePicture;
+		}
+
+		const [dbUser] = await db
+			.update(usersTable)
+			.set(updatedUser)
+			.where(
+				and(eq(usersTable.userId, newUser.userId), eq(usersTable.password, user.password)),
+			)
+			.returning({ userId: usersTable.userId });
+
+		if (!dbUser) {
+			return NextResponse.json({ error: 'Race Condition' }, { status: 500 });
 		}
 	} catch (error) {
-		return NextResponse.json({ error: 'Incorrect Password!' }, { status: 400 });
+		return NextResponse.json({ error: 'Server Error!' }, { status: 500 });
 	}
 	return NextResponse.json({ success: true }, { status: 200 });
 }
