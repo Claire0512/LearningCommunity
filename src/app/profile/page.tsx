@@ -279,6 +279,8 @@ function Page() {
 							onChange={(e) => setNewProfilePicture(e.target.value)}
 						/>
 						<UploadButton
+							className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]
+						ut-button:focus-within:ring-offset-2 ut-button:ut-uploading:bg-[#BFD1ED] ut-button:ut-uploading:focus-within:ring-[#BFD1ED] "
 							endpoint="profileUploader"
 							onClientUploadComplete={(res) => {
 								setNewProfilePicture(res[0].url);
@@ -332,6 +334,7 @@ function Page() {
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						取消
@@ -347,6 +350,7 @@ function Page() {
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						儲存

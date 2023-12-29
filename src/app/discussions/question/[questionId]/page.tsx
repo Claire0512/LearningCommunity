@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
+import SwipeableViews from 'react-swipeable-views';
 
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
@@ -13,14 +14,27 @@ import {
 	addReplyToComment,
 	interactWithQuestion,
 	interactiWithQuestionComment,
+	updateQuestionStatus,
 } from '../../../../lib/api/discussions/apiEndpoints';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CommentIcon from '@mui/icons-material/Comment';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import { List, ListItem, ListItemText, ListItemAvatar } from '@mui/material';
+import {
+	List,
+	ListItem,
+	ListItemText,
+	ListItemAvatar,
+	Dialog,
+	DialogContent,
+	DialogActions,
+} from '@mui/material';
 import { Button, TextField } from '@mui/material';
 import {
 	useTheme,
@@ -34,6 +48,7 @@ import {
 	Divider,
 	IconButton,
 } from '@mui/material';
+import MobileStepper from '@mui/material/MobileStepper';
 
 import type { QuestionCardDetailType } from '@/lib/types';
 
@@ -48,12 +63,30 @@ function Page() {
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
 	const userId = session?.user?.userId;
+	const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+	const [selectedCommentId, setSelectedCommentId] = useState<number | null>(null);
+
+	const [activeStep, setActiveStep] = useState(0);
+	const [maxSteps, setMaxSteps] = useState(0);
+
+	const handleNext = () => {
+		setActiveStep((prevActiveStep) => prevActiveStep + 1);
+	};
+
+	const handleBack = () => {
+		setActiveStep((prevActiveStep) => prevActiveStep - 1);
+	};
+
+	const handleStepChange = (step: number) => {
+		setActiveStep(step);
+	};
 	const fetchQuestionDetail = async () => {
 		if (questionId) {
 			try {
 				const questionData = await getQuestionDetail(Number(questionId), userId);
 				setQuestion(questionData);
 				setFormattedTime(getTimeDifference(questionData.createdAt));
+				setMaxSteps(questionData.questionImages.length);
 			} catch (error) {
 				console.error('Error fetching question detail:', error);
 			}
@@ -64,6 +97,17 @@ function Page() {
 		const questionData = await getQuestionDetail(Number(questionId), userId);
 		setQuestion(questionData);
 	};
+	const markAsBestAnswer = async (commentId: number) => {
+		try {
+			await updateQuestionStatus(Number(questionId), undefined, commentId);
+			alert('留言已標記為最佳解答');
+			setOpenConfirmDialog(false);
+			fetchQuestionDetail();
+		} catch (error) {
+			console.error('Error marking best answer:', error);
+		}
+	};
+
 	const handleReplyChange = async (
 		commentId: number,
 		event: React.ChangeEvent<HTMLInputElement>,
@@ -73,17 +117,6 @@ function Page() {
 		setQuestion(questionData);
 	};
 	useEffect(() => {
-		const fetchQuestionDetail = async () => {
-			if (questionId) {
-				try {
-					const questionData = await getQuestionDetail(Number(questionId), userId);
-					setQuestion(questionData);
-					setFormattedTime(getTimeDifference(questionData.createdAt));
-				} catch (error) {
-					console.error('Error fetching question detail:', error);
-				}
-			}
-		};
 		fetchQuestionDetail();
 	}, [questionId]);
 	if (!question) {
@@ -129,10 +162,9 @@ function Page() {
 
 		try {
 			await addCommentToQuestion(Number(questionId), session.user.userId, newComment);
-			// 处理响应，例如更新评论列表
 			alert('評論成功添加！');
-			setNewComment(''); // 清空评论输入框
-			await fetchQuestionDetail(); // 重新获取帖子详情，更新评论
+			setNewComment('');
+			await fetchQuestionDetail();
 		} catch (error) {
 			console.error('添加評論失敗', error);
 		}
@@ -287,6 +319,73 @@ function Page() {
 						}}
 					/>
 
+					<Box>
+						<SwipeableViews
+							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+							index={activeStep}
+							onChangeIndex={handleStepChange}
+							enableMouseEvents
+						>
+							{question.questionImages.map((path, index) => (
+								<div key={index} className="flex justify-center">
+									{activeStep == index ? (
+										<Box
+											component="img"
+											sx={{
+												height: 303,
+												width: 540,
+												minHeight: 303,
+												minWidth: 540,
+												objectFit: 'cover',
+												objectPosition: 'center',
+												maxHeight: 303,
+												maxWidth: 540,
+											}}
+											src={path}
+											alt={'image '}
+										/>
+									) : null}
+								</div>
+							))}
+						</SwipeableViews>
+						<MobileStepper
+							steps={maxSteps}
+							position="static"
+							activeStep={activeStep}
+							sx={{
+								bgcolor: '#FFFFFF',
+								height: '25%',
+							}}
+							nextButton={
+								<Button
+									size="small"
+									onClick={handleNext}
+									disabled={activeStep === maxSteps - 1}
+								>
+									Next
+									{theme.direction === 'rtl' ? (
+										<KeyboardArrowLeft />
+									) : (
+										<KeyboardArrowRight />
+									)}
+								</Button>
+							}
+							backButton={
+								<Button
+									size="small"
+									onClick={handleBack}
+									disabled={activeStep === 0}
+								>
+									{theme.direction === 'rtl' ? (
+										<KeyboardArrowRight />
+									) : (
+										<KeyboardArrowLeft />
+									)}
+									Back
+								</Button>
+							}
+						/>
+					</Box>
 					<Typography
 						variant="body1"
 						color="text.main"
@@ -323,6 +422,13 @@ function Page() {
 							<React.Fragment key={comment.commentId}>
 								{index >= 0 && <Divider />}
 								<ListItem alignItems="flex-start">
+									{comment.isHelpful ? (
+										<CheckCircleIcon
+											sx={{ color: '#C0EDD4', marginRight: 2, marginTop: 2 }}
+										/>
+									) : (
+										<div style={{ width: 24, marginRight: 8 }} /> 
+									)}
 									<ListItemAvatar>
 										<Avatar
 											alt={comment.commenterName}
@@ -335,14 +441,16 @@ function Page() {
 									</ListItemAvatar>
 									<ListItemText
 										primary={comment.commenterName}
-										secondary={comment.text}
 										primaryTypographyProps={{ variant: 'body1' }}
 										secondaryTypographyProps={{
+											component: 'span',
 											variant: 'body2',
 											color: 'text.secondary',
-											sx: { wordBreak: 'break-word' },
+											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' },
 										}}
+										secondary={comment.text}
 									/>
+
 									<Stack
 										direction="row"
 										alignItems="center"
@@ -363,6 +471,16 @@ function Page() {
 											<ThumbDownAltIcon />
 										</IconButton>
 										<Typography variant="body2">{comment.downvotes}</Typography>
+										{session?.user.userId === question.questionerId && (
+											<IconButton
+												onClick={() => {
+													setOpenConfirmDialog(true);
+													setSelectedCommentId(comment.commentId);
+												}}
+											>
+												<MoreVertIcon />
+											</IconButton>
+										)}
 									</Stack>
 								</ListItem>
 
@@ -372,7 +490,18 @@ function Page() {
 											{replyIndex >= 0 && (
 												<Divider variant="inset" component="li" />
 											)}
-											<ListItem alignItems="flex-start" sx={{ pl: 4 }}>
+											<ListItem alignItems="flex-start" sx={{ pl: 8 }}>
+												{reply.isHelpful ? (
+													<CheckCircleIcon
+														sx={{
+															color: '#C0EDD4',
+															marginRight: 2,
+															marginTop: 2,
+														}}
+													/>
+												) : (
+													<div style={{ width: 24, marginRight: 8 }} />
+												)}
 												<ListItemAvatar>
 													<Avatar
 														alt={reply.commenterName}
@@ -385,14 +514,22 @@ function Page() {
 												</ListItemAvatar>
 												<ListItemText
 													primary={reply.commenterName}
-													secondary={reply.text}
 													primaryTypographyProps={{ variant: 'body1' }}
-													secondaryTypographyProps={{
-														variant: 'body2',
-														color: 'text.secondary',
-														sx: { wordBreak: 'break-word' },
-													}}
+													secondary={
+														<Typography
+															component="span"
+															variant="body2"
+															color="text.secondary"
+															sx={{
+																whiteSpace: 'pre-line',
+																wordBreak: 'break-word',
+															}}
+														>
+															{reply.text}
+														</Typography>
+													}
 												/>
+
 												<Stack
 													direction="row"
 													alignItems="center"
@@ -429,6 +566,19 @@ function Page() {
 													<Typography variant="body2">
 														{reply.downvotes}
 													</Typography>
+													{session?.user.userId ===
+														question.questionerId && (
+														<IconButton
+															onClick={() => {
+																setOpenConfirmDialog(true);
+																setSelectedCommentId(
+																	reply.commentId,
+																);
+															}}
+														>
+															<MoreVertIcon />
+														</IconButton>
+													)}
 												</Stack>
 											</ListItem>
 										</React.Fragment>
@@ -440,7 +590,7 @@ function Page() {
 												direction="row"
 												spacing={1}
 												alignItems="center"
-												sx={{ ml: 4 }}
+												sx={{ ml: 6 }}
 											>
 												<TextField
 													fullWidth
@@ -453,6 +603,7 @@ function Page() {
 															e as ChangeEvent<HTMLInputElement>,
 														)
 													}
+													multiline
 													color="secondary"
 													sx={{
 														'& .MuiOutlinedInput-root': {
@@ -469,8 +620,9 @@ function Page() {
 													sx={{
 														mt: 2,
 														bgcolor: `${theme.palette.secondary.main} !important`,
-														height: '40px', // Adjust the height as needed
+														height: '40px',
 														borderRadius: '20px',
+														color: 'white',
 													}}
 													color="secondary"
 												>
@@ -495,6 +647,7 @@ function Page() {
 											value={newComment}
 											onChange={handleCommentChange}
 											color="secondary"
+											multiline
 											sx={{
 												'& .MuiOutlinedInput-root': {
 													borderRadius: '20px',
@@ -513,6 +666,7 @@ function Page() {
 												bgcolor: `${theme.palette.secondary.main} !important`,
 												height: '40px',
 												borderRadius: '20px',
+												color: 'white',
 											}}
 											color="secondary"
 										>
@@ -525,6 +679,23 @@ function Page() {
 					</List>
 				</CardContent>
 			</Card>
+			<Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+				<DialogContent>
+					<Typography>是否將這則留言標記為最佳解答？標記後不能再更改。</Typography>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setOpenConfirmDialog(false)}>取消</Button>
+					<Button
+						onClick={() => {
+							if (selectedCommentId !== null) {
+								markAsBestAnswer(selectedCommentId);
+							}
+						}}
+					>
+						確認
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }

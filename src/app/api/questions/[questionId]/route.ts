@@ -246,7 +246,9 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 }
 
 export async function PUT(req: NextRequest) {
+	// console.log("req: "+req)
 	const data = await req.json();
+	console.log('data: ' + JSON.stringify(data));
 	try {
 		PutRequestSchema.parse(data);
 	} catch (error) {

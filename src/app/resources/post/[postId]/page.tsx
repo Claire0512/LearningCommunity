@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
+import SwipeableViews from 'react-swipeable-views';
 
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
@@ -17,6 +18,8 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CommentIcon from '@mui/icons-material/Comment';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import { List, ListItem, ListItemText, ListItemAvatar } from '@mui/material';
@@ -33,6 +36,7 @@ import {
 	Divider,
 	IconButton,
 } from '@mui/material';
+import MobileStepper from '@mui/material/MobileStepper';
 
 import type { PostCardDetailType } from '@/lib/types';
 
@@ -46,6 +50,20 @@ function Page() {
 	const [formattedTime, setFormattedTime] = useState('');
 	const { data: session } = useSession();
 	const userId = session?.user?.userId;
+	const [activeStep, setActiveStep] = useState(0);
+	const [maxSteps, setMaxSteps] = useState(0);
+
+	const handleNext = () => {
+		setActiveStep((prevActiveStep) => prevActiveStep + 1);
+	};
+
+	const handleBack = () => {
+		setActiveStep((prevActiveStep) => prevActiveStep - 1);
+	};
+
+	const handleStepChange = (step: number) => {
+		setActiveStep(step);
+	};
 	const handleCommentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
 		const postData = await getPostDetail(Number(postId), userId);
@@ -57,6 +75,7 @@ function Page() {
 				const postData = await getPostDetail(Number(postId), userId);
 				setPost(postData);
 				setFormattedTime(getTimeDifference(postData.createdAt));
+				setMaxSteps(postData.postImages.length);
 			} catch (error) {
 				console.error('Error fetching post detail:', error);
 			}
@@ -71,17 +90,6 @@ function Page() {
 		setPost(postData);
 	};
 	useEffect(() => {
-		const fetchPostDetail = async () => {
-			if (postId) {
-				try {
-					const postData = await getPostDetail(Number(postId), userId);
-					setPost(postData);
-					setFormattedTime(getTimeDifference(postData.createdAt));
-				} catch (error) {
-					console.error('Error fetching post detail:', error);
-				}
-			}
-		};
 		fetchPostDetail();
 	}, [postId]);
 	if (!post) {
@@ -303,7 +311,73 @@ function Page() {
 							my: 1,
 						}}
 					/>
-
+					<Box>
+						<SwipeableViews
+							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+							index={activeStep}
+							onChangeIndex={handleStepChange}
+							enableMouseEvents
+						>
+							{post.postImages.map((path, index) => (
+								<div key={index} className="flex justify-center">
+									{activeStep == index ? (
+										<Box
+											component="img"
+											sx={{
+												height: 303,
+												width: 540,
+												minHeight: 303,
+												minWidth: 540,
+												objectFit: 'cover',
+												objectPosition: 'center',
+												maxHeight: 303,
+												maxWidth: 540,
+											}}
+											src={path}
+											alt={'image '}
+										/>
+									) : null}
+								</div>
+							))}
+						</SwipeableViews>
+						<MobileStepper
+							steps={maxSteps}
+							position="static"
+							activeStep={activeStep}
+							sx={{
+								bgcolor: '#FFFFFF',
+								height: '25%',
+							}}
+							nextButton={
+								<Button
+									size="small"
+									onClick={handleNext}
+									disabled={activeStep === maxSteps - 1}
+								>
+									Next
+									{theme.direction === 'rtl' ? (
+										<KeyboardArrowLeft />
+									) : (
+										<KeyboardArrowRight />
+									)}
+								</Button>
+							}
+							backButton={
+								<Button
+									size="small"
+									onClick={handleBack}
+									disabled={activeStep === 0}
+								>
+									{theme.direction === 'rtl' ? (
+										<KeyboardArrowRight />
+									) : (
+										<KeyboardArrowLeft />
+									)}
+									Back
+								</Button>
+							}
+						/>
+					</Box>
 					<Typography
 						variant="body1"
 						color="text.main"
@@ -351,14 +425,16 @@ function Page() {
 									</ListItemAvatar>
 									<ListItemText
 										primary={comment.commenterName}
-										secondary={comment.text}
 										primaryTypographyProps={{ variant: 'body1' }}
 										secondaryTypographyProps={{
+											component: 'span', // Use a span to apply styles directly
 											variant: 'body2',
 											color: 'text.secondary',
-											sx: { wordBreak: 'break-word' },
+											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' }, // Add whiteSpace style
 										}}
+										secondary={comment.text} // Pass the text as the secondary prop
 									/>
+
 									<Stack
 										direction="row"
 										alignItems="center"
@@ -388,7 +464,7 @@ function Page() {
 											{replyIndex >= 0 && (
 												<Divider variant="inset" component="li" />
 											)}
-											<ListItem alignItems="flex-start" sx={{ pl: 4 }}>
+											<ListItem alignItems="flex-start" sx={{ pl: 8 }}>
 												<ListItemAvatar>
 													<Avatar
 														alt={reply.commenterName}
@@ -401,14 +477,22 @@ function Page() {
 												</ListItemAvatar>
 												<ListItemText
 													primary={reply.commenterName}
-													secondary={reply.text}
 													primaryTypographyProps={{ variant: 'body1' }}
-													secondaryTypographyProps={{
-														variant: 'body2',
-														color: 'text.secondary',
-														sx: { wordBreak: 'break-word' },
-													}}
+													secondary={
+														<Typography
+															component="span"
+															variant="body2"
+															color="text.secondary"
+															sx={{
+																whiteSpace: 'pre-line',
+																wordBreak: 'break-word',
+															}}
+														>
+															{reply.text}
+														</Typography>
+													}
 												/>
+
 												<Stack
 													direction="row"
 													alignItems="center"
@@ -456,12 +540,13 @@ function Page() {
 												direction="row"
 												spacing={1}
 												alignItems="center"
-												sx={{ pl: 4 }}
+												sx={{ pl: 6 }}
 											>
 												<TextField
 													fullWidth
 													variant="outlined"
 													label="Add a reply"
+													multiline
 													value={newReply[comment.commentId] || ''}
 													onChange={(e) =>
 														handleReplyChange(
@@ -487,6 +572,7 @@ function Page() {
 														bgcolor: `${theme.palette.secondary.main} !important`,
 														height: '40px',
 														borderRadius: '20px',
+														color: 'white',
 													}}
 													color="secondary"
 												>
@@ -505,6 +591,7 @@ function Page() {
 								<ListItemText>
 									<Stack direction="row" spacing={1} alignItems="center">
 										<TextField
+											multiline
 											fullWidth
 											variant="outlined"
 											label="Add a comment"
@@ -529,6 +616,7 @@ function Page() {
 												bgcolor: `${theme.palette.secondary.main} !important`,
 												height: '40px',
 												borderRadius: '20px',
+												color: 'white',
 											}}
 											color="secondary"
 										>

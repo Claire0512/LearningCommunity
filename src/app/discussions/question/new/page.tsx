@@ -222,6 +222,7 @@ function Page() {
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						送出
