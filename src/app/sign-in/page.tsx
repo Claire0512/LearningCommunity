@@ -75,7 +75,7 @@ function Page() {
 				elevation={0}
 			>
 				<CardContent>
-					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
+					<div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 						<Image src="/images/logo.png" alt="Logo" width={80} height={80} />
 					</div>
 					<p
