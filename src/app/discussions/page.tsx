@@ -8,18 +8,19 @@ import QuestionCard from '../../components/QuestionCard';
 import TagsSelector from '../../components/TagsSelector';
 import { getAllQuestions, getTop3HotQuestions } from '../../lib/api/discussions/apiEndpoints';
 import { getAllTags } from '../../lib/api/tags/apiEndpoints';
+import { getUserInfo } from '../../lib/api/users/apiEndpoints';
 import ArticleIcon from '@mui/icons-material/Article';
 import CreateIcon from '@mui/icons-material/Create';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { Box, Button, Dialog, TextField, Chip, Typography, Fab, useTheme } from '@mui/material';
 
-import type { QuestionCardType } from '@/lib/types';
+import type { QuestionCardType, UserInfoType } from '@/lib/types';
 
 function Page() {
 	const theme = useTheme();
 	const { data: session } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedTags, setSelectedTags] = useState<string[]>([]); // 更新狀態類型
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [filteredQuestions, setFilteredQuestions] = useState<QuestionCardType[]>([]);
 	const [questions, setQuestions] = useState<QuestionCardType[]>([]);
 	const [hotQuestions, setHotQuestions] = useState<QuestionCardType[]>([]);
@@ -34,9 +35,22 @@ function Page() {
 		console.log('Selected tags:', selected);
 	};
 
-	const handleCreateQuestionClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+	const handleCreateQuestionClick = async (event: React.MouseEvent<HTMLAnchorElement>) => {
 		if (!session) {
 			alert('登入後才可發問哦');
+			event.preventDefault();
+			return;
+		}
+
+		try {
+			const userInfo: UserInfoType = await getUserInfo(session.user.userId);
+			if (userInfo.points < 3) {
+				alert('點數不足三點，幫忙回答別人問題或分享技術文章來獲取點數吧！');
+				event.preventDefault();
+			}
+		} catch (error) {
+			console.error('Error fetching user info:', error);
+			alert('無法獲取用戶信息，請稍後重試。');
 			event.preventDefault();
 		}
 	};
@@ -154,13 +168,13 @@ function Page() {
 					color="secondary"
 					sx={{
 						bgcolor: `${theme.palette.secondary.main} !important`,
-						borderRadius: '20px',
-						height: '40px',
-						width: '115px',
-						minWidth: '115px',
+						borderRadius: '10px',
+						height: '35px',
+						width: '105px',
+						minWidth: '105px',
 					}}
 				>
-					<Typography variant="body1" style={{ fontSize: '20px' }}>
+					<Typography variant="body1" style={{ fontSize: '18px' }}>
 						{selectedTags.length > 0 ? '所選分類' : '選擇分類'}
 					</Typography>
 				</Button>

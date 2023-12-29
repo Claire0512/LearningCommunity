@@ -275,6 +275,113 @@ function Page() {
 						{post.postTitle}
 					</Typography>
 
+					<Divider
+						sx={{
+							borderWidth: 1,
+							borderStyle: 'solid',
+							borderRadius: '2px',
+							bgcolor: theme.palette.background.default,
+							my: 1,
+						}}
+					/>
+					{maxSteps > 0 && (
+						<Box>
+							<SwipeableViews
+								axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+								index={activeStep}
+								onChangeIndex={handleStepChange}
+								enableMouseEvents
+							>
+								{post.postImages.map((path, index) => (
+									<div key={index} className="flex justify-center">
+										{activeStep == index ? (
+											<Box
+												component="img"
+												sx={{
+													height: 303,
+													width: 540,
+													minHeight: 303,
+													minWidth: 540,
+													objectFit: 'cover',
+													objectPosition: 'center',
+													maxHeight: 303,
+													maxWidth: 540,
+												}}
+												src={path}
+												alt={'image '}
+											/>
+										) : null}
+									</div>
+								))}
+							</SwipeableViews>
+							<MobileStepper
+								steps={maxSteps}
+								position="static"
+								activeStep={activeStep}
+								sx={{
+									bgcolor: '#FFFFFF',
+									height: '25%',
+								}}
+								nextButton={
+									<Button
+										size="small"
+										onClick={handleNext}
+										disabled={activeStep === maxSteps - 1}
+									>
+										Next
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowLeft />
+										) : (
+											<KeyboardArrowRight />
+										)}
+									</Button>
+								}
+								backButton={
+									<Button
+										size="small"
+										onClick={handleBack}
+										disabled={activeStep === 0}
+									>
+										{theme.direction === 'rtl' ? (
+											<KeyboardArrowRight />
+										) : (
+											<KeyboardArrowLeft />
+										)}
+										Back
+									</Button>
+								}
+							/>
+						</Box>
+					)}
+					<Typography
+						variant="body1"
+						color="text.main"
+						component="div"
+						sx={{
+							lineHeight: '30px',
+							fontSize: '22px',
+							marginLeft: '10px',
+							whiteSpace: 'pre-line',
+							wordWrap: 'break-word',
+						}}
+					>
+						{post.postContext}
+					</Typography>
+					<Box
+						sx={{
+							display: 'flex',
+							gap: 0.5,
+							overflow: 'hidden',
+							flexWrap: 'wrap',
+							paddingLeft: '0px',
+							marginLeft: '10px',
+							marginTop: '10px',
+						}}
+					>
+						{post.tags.map((tag) => (
+							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
+						))}
+					</Box>
 					<Stack direction="row" spacing={1} alignItems="center">
 						<IconButton
 							onClick={handleUpvote}
@@ -302,109 +409,6 @@ function Page() {
 						</IconButton>
 						<Typography variant="body2">{post.favorites}</Typography>
 					</Stack>
-					<Divider
-						sx={{
-							borderWidth: 1,
-							borderStyle: 'solid',
-							borderRadius: '2px',
-							bgcolor: theme.palette.background.default,
-							my: 1,
-						}}
-					/>
-					<Box>
-						<SwipeableViews
-							axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-							index={activeStep}
-							onChangeIndex={handleStepChange}
-							enableMouseEvents
-						>
-							{post.postImages.map((path, index) => (
-								<div key={index} className="flex justify-center">
-									{activeStep == index ? (
-										<Box
-											component="img"
-											sx={{
-												height: 303,
-												width: 540,
-												minHeight: 303,
-												minWidth: 540,
-												objectFit: 'cover',
-												objectPosition: 'center',
-												maxHeight: 303,
-												maxWidth: 540,
-											}}
-											src={path}
-											alt={'image '}
-										/>
-									) : null}
-								</div>
-							))}
-						</SwipeableViews>
-						<MobileStepper
-							steps={maxSteps}
-							position="static"
-							activeStep={activeStep}
-							sx={{
-								bgcolor: '#FFFFFF',
-								height: '25%',
-							}}
-							nextButton={
-								<Button
-									size="small"
-									onClick={handleNext}
-									disabled={activeStep === maxSteps - 1}
-								>
-									Next
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowLeft />
-									) : (
-										<KeyboardArrowRight />
-									)}
-								</Button>
-							}
-							backButton={
-								<Button
-									size="small"
-									onClick={handleBack}
-									disabled={activeStep === 0}
-								>
-									{theme.direction === 'rtl' ? (
-										<KeyboardArrowRight />
-									) : (
-										<KeyboardArrowLeft />
-									)}
-									Back
-								</Button>
-							}
-						/>
-					</Box>
-					<Typography
-						variant="body1"
-						color="text.main"
-						component="div"
-						sx={{
-							lineHeight: '30px',
-							fontSize: '22px',
-							marginLeft: '10px',
-						}}
-					>
-						{post.postContext}
-					</Typography>
-					<Box
-						sx={{
-							display: 'flex',
-							gap: 0.5,
-							overflow: 'hidden',
-							flexWrap: 'wrap',
-							paddingLeft: '0px',
-							marginLeft: '10px',
-							marginTop: '10px',
-						}}
-					>
-						{post.tags.map((tag) => (
-							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
-						))}
-					</Box>
 				</CardContent>
 
 				<CardContent sx={{ paddingTop: '5px' }}>
@@ -427,12 +431,12 @@ function Page() {
 										primary={comment.commenterName}
 										primaryTypographyProps={{ variant: 'body1' }}
 										secondaryTypographyProps={{
-											component: 'span', // Use a span to apply styles directly
+											component: 'span',
 											variant: 'body2',
 											color: 'text.secondary',
-											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' }, // Add whiteSpace style
+											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' },
 										}}
-										secondary={comment.text} // Pass the text as the secondary prop
+										secondary={comment.text}
 									/>
 
 									<Stack
