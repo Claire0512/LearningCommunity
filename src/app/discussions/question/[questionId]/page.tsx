@@ -66,7 +66,7 @@ function Page() {
 	const userId = session?.user?.userId;
 	const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 	const [selectedCommentId, setSelectedCommentId] = useState<number | null>(null);
-
+	const [selectedCommenterId, setSelectedCommenterId] = useState<number | null>(null);
 	const [activeStep, setActiveStep] = useState(0);
 	const [maxSteps, setMaxSteps] = useState(0);
 	const [isSolved, setIsSolved] = useState(false);
@@ -399,10 +399,13 @@ function Page() {
 							lineHeight: '30px',
 							fontSize: '22px',
 							marginLeft: '10px',
+							whiteSpace: 'pre-line',
+							wordWrap: 'break-word',
 						}}
 					>
 						{question.questionContext}
 					</Typography>
+
 					<Box
 						sx={{
 							display: 'flex',
@@ -412,34 +415,41 @@ function Page() {
 							paddingLeft: '0px',
 							marginLeft: '10px',
 							marginTop: '10px',
+							marginBottom: '10px',
 						}}
 					>
 						{question.tags.map((tag) => (
 							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
 						))}
 					</Box>
-				</CardContent>
-				<Stack direction="row" spacing={1} alignItems="center">
-					<IconButton
-						onClick={handleUpvote}
-						color={question.hasUpvote ? 'secondary' : 'default'}
+					{/* <Divider /> */}
+					<Stack
+						direction="row"
+						spacing={1}
+						alignItems="center"
+						sx={{ marginTop: '10px' }}
 					>
-						<FavoriteIcon />
-					</IconButton>
-					<Typography variant="body2">{question.upvotes}</Typography>
+						<IconButton
+							onClick={handleUpvote}
+							color={question.hasUpvote ? 'secondary' : 'default'}
+						>
+							<FavoriteIcon />
+						</IconButton>
+						<Typography variant="body2">{question.upvotes}</Typography>
 
-					<IconButton color={question.hasComment ? 'secondary' : 'default'}>
-						<CommentIcon />
-					</IconButton>
-					<Typography variant="body2">{question.commentsCount}</Typography>
-					<IconButton
-						onClick={handleFavorite}
-						color={question.hasFavorite ? 'secondary' : 'default'}
-					>
-						<BookmarkIcon />
-					</IconButton>
-					<Typography variant="body2">{question.favorites}</Typography>
-				</Stack>
+						<IconButton color={question.hasComment ? 'secondary' : 'default'}>
+							<CommentIcon />
+						</IconButton>
+						<Typography variant="body2">{question.commentsCount}</Typography>
+						<IconButton
+							onClick={handleFavorite}
+							color={question.hasFavorite ? 'secondary' : 'default'}
+						>
+							<BookmarkIcon />
+						</IconButton>
+						<Typography variant="body2">{question.favorites}</Typography>
+					</Stack>
+				</CardContent>
 				<CardContent sx={{ paddingTop: '5px' }}>
 					<List sx={{ borderRadius: '30px' }}>
 						{question.comments.map((comment, index) => (
@@ -449,7 +459,11 @@ function Page() {
 									<Box sx={{ display: 'flex', alignItems: 'center' }}>
 										{comment.isHelpful ? (
 											<CheckCircleIcon
-												sx={{ color: '#C0EDD4', marginRight: 2 }}
+												sx={{
+													color: '#C0EDD4',
+													marginRight: 2,
+													marginTop: '8px',
+												}}
 											/>
 										) : (
 											<div style={{ width: 24, marginRight: 15 }} />
@@ -503,6 +517,7 @@ function Page() {
 													onClick={() => {
 														setOpenConfirmDialog(true);
 														setSelectedCommentId(comment.commentId);
+														setSelectedCommenterId(comment.commenterId);
 													}}
 												>
 													<MoreVertIcon />
@@ -524,6 +539,7 @@ function Page() {
 															sx={{
 																color: '#C0EDD4',
 																marginRight: 2,
+																marginTop: '8px',
 															}}
 														/>
 													) : (
@@ -604,6 +620,9 @@ function Page() {
 																	setOpenConfirmDialog(true);
 																	setSelectedCommentId(
 																		reply.commentId,
+																	);
+																	setSelectedCommenterId(
+																		reply.commenterId,
 																	);
 																}}
 															>
@@ -711,21 +730,37 @@ function Page() {
 				</CardContent>
 			</Card>
 			<Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
-				<DialogContent>
-					<Typography>是否將這則留言標記為最佳解答？標記後不能再更改。</Typography>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={() => setOpenConfirmDialog(false)}>取消</Button>
-					<Button
-						onClick={() => {
-							if (selectedCommentId !== null) {
-								markAsBestAnswer(selectedCommentId);
-							}
-						}}
-					>
-						確認
-					</Button>
-				</DialogActions>
+				{session?.user.userId !== selectedCommenterId && (
+					<>
+						<DialogContent>
+							<Typography>
+								是否將這則留言標記為最佳解答？標記後不能再更改。
+							</Typography>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={() => setOpenConfirmDialog(false)}>取消</Button>
+							<Button
+								onClick={() => {
+									if (selectedCommentId !== null) {
+										markAsBestAnswer(selectedCommentId);
+									}
+								}}
+							>
+								確認
+							</Button>
+						</DialogActions>
+					</>
+				)}
+				{session?.user.userId === selectedCommenterId && (
+					<>
+						<DialogContent>
+							<Typography>不能將自己的留言標記為最佳解答哦！</Typography>
+						</DialogContent>
+						<DialogActions>
+							<Button onClick={() => setOpenConfirmDialog(false)}>關閉</Button>
+						</DialogActions>
+					</>
+				)}
 			</Dialog>
 			<Dialog open={openSolvedDialog} onClose={() => setOpenSolvedDialog(false)}>
 				<DialogContent>

@@ -275,33 +275,6 @@ function Page() {
 						{post.postTitle}
 					</Typography>
 
-					<Stack direction="row" spacing={1} alignItems="center">
-						<IconButton
-							onClick={handleUpvote}
-							color={post.hasUpvote ? 'secondary' : 'default'}
-						>
-							<ThumbUpAltIcon />
-						</IconButton>
-						<Typography variant="body2">{post.upvotes}</Typography>
-						<IconButton
-							onClick={handleDownvote}
-							color={post.hasDownvote ? 'secondary' : 'default'}
-						>
-							<ThumbDownAltIcon />
-						</IconButton>
-						<Typography variant="body2">{post.downvotes}</Typography>
-						<IconButton color={post.hasComment ? 'secondary' : 'default'}>
-							<CommentIcon />
-						</IconButton>
-						<Typography variant="body2">{post.commentsCount}</Typography>
-						<IconButton
-							onClick={handleFavorite}
-							color={post.hasFavorite ? 'secondary' : 'default'}
-						>
-							<BookmarkIcon />
-						</IconButton>
-						<Typography variant="body2">{post.favorites}</Typography>
-					</Stack>
 					<Divider
 						sx={{
 							borderWidth: 1,
@@ -388,6 +361,8 @@ function Page() {
 							lineHeight: '30px',
 							fontSize: '22px',
 							marginLeft: '10px',
+							whiteSpace: 'pre-line',
+							wordWrap: 'break-word',
 						}}
 					>
 						{post.postContext}
@@ -407,6 +382,33 @@ function Page() {
 							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
 						))}
 					</Box>
+					<Stack direction="row" spacing={1} alignItems="center">
+						<IconButton
+							onClick={handleUpvote}
+							color={post.hasUpvote ? 'secondary' : 'default'}
+						>
+							<ThumbUpAltIcon />
+						</IconButton>
+						<Typography variant="body2">{post.upvotes}</Typography>
+						<IconButton
+							onClick={handleDownvote}
+							color={post.hasDownvote ? 'secondary' : 'default'}
+						>
+							<ThumbDownAltIcon />
+						</IconButton>
+						<Typography variant="body2">{post.downvotes}</Typography>
+						<IconButton color={post.hasComment ? 'secondary' : 'default'}>
+							<CommentIcon />
+						</IconButton>
+						<Typography variant="body2">{post.commentsCount}</Typography>
+						<IconButton
+							onClick={handleFavorite}
+							color={post.hasFavorite ? 'secondary' : 'default'}
+						>
+							<BookmarkIcon />
+						</IconButton>
+						<Typography variant="body2">{post.favorites}</Typography>
+					</Stack>
 				</CardContent>
 
 				<CardContent sx={{ paddingTop: '5px' }}>
@@ -429,12 +431,12 @@ function Page() {
 										primary={comment.commenterName}
 										primaryTypographyProps={{ variant: 'body1' }}
 										secondaryTypographyProps={{
-											component: 'span', // Use a span to apply styles directly
+											component: 'span',
 											variant: 'body2',
 											color: 'text.secondary',
-											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' }, // Add whiteSpace style
+											sx: { wordBreak: 'break-word', whiteSpace: 'pre-line' },
 										}}
-										secondary={comment.text} // Pass the text as the secondary prop
+										secondary={comment.text}
 									/>
 
 									<Stack

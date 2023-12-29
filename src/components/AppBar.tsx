@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { getNotifications } from '../lib/api/users/apiEndpoints';
 import type { NotificationType } from '../lib/types';
 import MailIcon from '@mui/icons-material/Mail';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { Button } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Badge from '@mui/material/Badge';
@@ -59,8 +58,8 @@ function renderNotification(notification: NotificationType) {
 
 						transition: 'background-color 0.3s',
 					}}
-					onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')} // 懸停時背景變為淺灰色
-					onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')} // 不懸停時背景恢復為白色
+					onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
+					onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
 				>
 					{textContent}
 				</Button>
@@ -106,7 +105,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 	};
 	const handleClick = (event: React.SyntheticEvent, type: string) => {
 		if (!session) {
-			window.alert(`登入後才可察看${type === 'profile' ? '個人檔案' : '通知'}哦！`);
+			window.alert(`登入後才可查看${type === 'profile' ? '個人檔案' : '通知'}哦！`);
 			event.preventDefault();
 		} else {
 			if (type === 'notifications') {
@@ -190,11 +189,32 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 						</Button>
 					</Link>
 
-					<IconButton>
-						<Badge badgeContent={unreadNotificationsCount} color="primary" max={99}>
-							<MailIcon onClick={(e) => handleClick(e, 'notifications')} />
+					<Button
+						style={{
+							fontSize: '20px',
+							color: activeButton === '通知' ? '#104b76' : '#000000',
+							position: 'relative',
+						}}
+						onClick={(e) => handleClick(e, 'notifications')}
+					>
+						<Badge
+							badgeContent={unreadNotificationsCount}
+							color="primary"
+							max={99}
+							sx={{
+								'.MuiBadge-badge': {
+									height: '15px',
+									width: '15px',
+									minWidth: '15px',
+									fontSize: '0.6em',
+									top: '10%',
+									right: '-10%',
+								},
+							}}
+						>
+							通知
 						</Badge>
-					</IconButton>
+					</Button>
 
 					{isNotificationsOpen && (
 						<ClickAwayListener onClickAway={handleCloseNotifications}>

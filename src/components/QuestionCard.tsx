@@ -121,7 +121,7 @@ function QuestionCard(question: QuestionCardType) {
 						WebkitBoxOrient: 'vertical',
 						overflow: 'hidden',
 						lineHeight: '20px',
-						height: '30px',
+						height: '25px',
 						paddingLeft: '1px',
 						paddingTop: '5px',
 					}}

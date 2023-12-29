@@ -20,7 +20,7 @@ function Page() {
 	const theme = useTheme();
 	const { data: session } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedTags, setSelectedTags] = useState<string[]>([]); // 更新狀態類型
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [filteredQuestions, setFilteredQuestions] = useState<QuestionCardType[]>([]);
 	const [questions, setQuestions] = useState<QuestionCardType[]>([]);
 	const [hotQuestions, setHotQuestions] = useState<QuestionCardType[]>([]);
