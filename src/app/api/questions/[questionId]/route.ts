@@ -205,6 +205,13 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 			});
 			return false;
 		}),
+		hasHelpfulComment: parsedDetail.comments.some((comment) => {
+			if (comment.isHelpful) return true;
+			comment.replies.forEach((reply) => {
+				if (reply.isHelpful) return true;
+			});
+			return false;
+		}),
 		comments: parsedDetail.comments.map((comment) => ({
 			commentId: comment.commentId,
 			commenterId: comment.commenterId,

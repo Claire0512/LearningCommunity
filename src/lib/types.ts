@@ -97,6 +97,7 @@ export type QuestionCardDetailType = {
 	commentsCount: number;
 	comments: Comment[];
 	hasComment: boolean;
+	hasHelpfulComment: boolean;
 };
 export type NotificationType = {
 	notificationId: number;
