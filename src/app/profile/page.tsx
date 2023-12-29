@@ -82,7 +82,7 @@ function Page() {
 
 	useEffect(() => {
 		fetchData();
-	}, [userId]);
+	}, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const handleSave = async () => {
 		if (!userInfo) return;

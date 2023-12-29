@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/utils/authOptions';
 import Provider from '@/app/context/client-provider';
 import { theme } from '@/theme/Theme';
 
