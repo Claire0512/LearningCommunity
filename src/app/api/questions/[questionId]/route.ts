@@ -4,8 +4,9 @@ import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
-import { questionsTable, commentsTable, notificationsTable } from '@/db/schema';
+import { questionsTable, commentsTable, notificationsTable, usersTable } from '@/db/schema';
 import { getSessionUserId } from '@/utils/apiAuthentication';
+import { answerReward } from '@/lib/constants';
 
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
@@ -305,10 +306,25 @@ export async function PUT(req: NextRequest) {
 
 	if (request.helpfulCommentId) {
 		try {
-			await db
+			const [comment] = await db
 				.update(commentsTable)
 				.set({ isHelpful: true })
-				.where(eq(commentsTable.commentId, request.helpfulCommentId));
+				.where(eq(commentsTable.commentId, request.helpfulCommentId))
+				.returning({commenterId: commentsTable.commenterId})
+			if (comment) {
+				const user = await db.query.usersTable.findFirst({
+					columns: {
+						points: true
+					},
+					where: (user, { eq }) => eq(user.userId, comment.commenterId)
+				})
+				if (user) {
+					const userPoints = user.points || 0;
+					await db.update(usersTable)
+						.set({points: userPoints + answerReward})
+						.where(eq(usersTable.userId, comment.commenterId));
+				}
+			}
 		} catch (error) {
 			console.error('Error updating helpful');
 			return NextResponse.json({ error: 'server error updating helpful' }, { status: 500 });
