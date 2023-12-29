@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
@@ -20,42 +20,45 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	try {
-		const updatedUsers = await db.transaction(async (tx) => {
-			const [user] = await tx
-				.select({
-					lastSigned: usersTable.lastSigned,
-					points: usersTable.points,
-				})
-				.from(usersTable)
-				.where(eq(usersTable.userId, sessionUserId));
+		const [user] = await db
+			.select({
+				lastSigned: usersTable.lastSigned,
+				points: usersTable.points,
+			})
+			.from(usersTable)
+			.where(eq(usersTable.userId, sessionUserId));
 
-			if (!user) return;
-			if (!user.points) user.points = 0;
+		if (!user || !user.points) {
+			return NextResponse.json({ error: 'User not found!' }, { status: 404 });
+		}
 
-			const currentDate = new Date();
-			if (isSameDateInUTC8(user.lastSigned as Date, currentDate)) {
-				tx.rollback();
-				return;
-			}
+		const currentDate = new Date();
+		if (isSameDateInUTC8(user.lastSigned as Date, currentDate)) {
+			return NextResponse.json({ error: 'Already Signed!' }, { status: 400 });
+		}
 
-			const results = await tx
-				.update(usersTable)
-				.set({
-					lastSigned: currentDate,
-					points: user.points + 1,
-				})
-				.where(eq(usersTable.userId, sessionUserId))
-				.returning({
-					userId: usersTable.userId,
-					lastSigned: usersTable.lastSigned,
-				});
-			return results;
-		});
-		if (!updatedUsers) {
-			return NextResponse.json({ error: 'User Not Found' }, { status: 404 });
+		const [updatedUser] = await db
+			.update(usersTable)
+			.set({
+				lastSigned: currentDate,
+				points: user.points + 1,
+			})
+			.where(
+				and(
+					eq(usersTable.userId, sessionUserId),
+					eq(usersTable.points, user.points)
+				)
+			)
+			.returning({
+				userId: usersTable.userId,
+				lastSigned: usersTable.lastSigned,
+			});
+		
+		if (!updatedUser) {
+			return NextResponse.json({ error: 'Race Condition' }, { status: 500 });
 		}
 	} catch (error) {
-		return NextResponse.json({ error: 'Already Signed!' }, { status: 400 });
+		return NextResponse.json({ error: 'Server Error' }, { status: 500 });
 	}
 	return NextResponse.json({ success: true }, { status: 200 });
 }
