@@ -28,8 +28,12 @@ function renderNotification(notification: NotificationType) {
 		? `/resources/post/${notification.postId}`
 		: `/discussions/question/${notification.questionId}`;
 	const textContent = notification.postId
-		? `${notification.lastNotifyUsername} 於 ${formattedTime} 回應了你的文章「${notification.postTitle}」`
-		: `${notification.lastNotifyUsername} 於 ${formattedTime} 回應了你的問題「${notification.questionTitle}」`;
+		? notification.notificationType === 'interaction'
+			? `${notification.lastNotifyUsername} 於 ${formattedTime} 對你的文章「${notification.postTitle}」傳達了心情`
+			: `${notification.lastNotifyUsername} 於 ${formattedTime} 回應了你的文章「${notification.postTitle}」`
+		: notification.notificationType === 'interaction'
+			? `${notification.lastNotifyUsername} 於 ${formattedTime} 對你的問題「${notification.questionTitle}」傳達了心情`
+			: `${notification.lastNotifyUsername} 於 ${formattedTime} 回應了你的問題「${notification.questionTitle}」`;
 
 	return (
 		<div

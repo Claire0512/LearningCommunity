@@ -5,8 +5,8 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { questionsTable, commentsTable, notificationsTable, usersTable } from '@/db/schema';
-import { getSessionUserId } from '@/utils/apiAuthentication';
 import { answerReward } from '@/lib/constants';
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
@@ -310,18 +310,19 @@ export async function PUT(req: NextRequest) {
 				.update(commentsTable)
 				.set({ isHelpful: true })
 				.where(eq(commentsTable.commentId, request.helpfulCommentId))
-				.returning({commenterId: commentsTable.commenterId})
+				.returning({ commenterId: commentsTable.commenterId });
 			if (comment) {
 				const user = await db.query.usersTable.findFirst({
 					columns: {
-						points: true
+						points: true,
 					},
-					where: (user, { eq }) => eq(user.userId, comment.commenterId)
-				})
+					where: (user, { eq }) => eq(user.userId, comment.commenterId),
+				});
 				if (user) {
 					const userPoints = user.points || 0;
-					await db.update(usersTable)
-						.set({points: userPoints + answerReward})
+					await db
+						.update(usersTable)
+						.set({ points: userPoints + answerReward })
 						.where(eq(usersTable.userId, comment.commenterId));
 				}
 			}
