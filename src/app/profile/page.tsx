@@ -116,7 +116,7 @@ function Page() {
 			}
 		}
 	};
-	const createStatCard = (label, IconComponent, iconColor, quantity) => (
+	const createStatCard = (label: string, IconComponent: React.ElementType, iconColor: string, quantity: number) => (
 		<Card
 			sx={{
 				display: 'flex',
