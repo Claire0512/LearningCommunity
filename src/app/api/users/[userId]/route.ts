@@ -263,10 +263,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 			.update(usersTable)
 			.set(updatedUser)
 			.where(
-				and(
-					eq(usersTable.userId, newUser.userId),
-					eq(usersTable.password, user.password)
-				)
+				and(eq(usersTable.userId, newUser.userId), eq(usersTable.password, user.password)),
 			)
 			.returning({ userId: usersTable.userId });
 

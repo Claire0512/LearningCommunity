@@ -43,17 +43,12 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 				lastSigned: currentDate,
 				points: user.points + 1,
 			})
-			.where(
-				and(
-					eq(usersTable.userId, sessionUserId),
-					eq(usersTable.points, user.points)
-				)
-			)
+			.where(and(eq(usersTable.userId, sessionUserId), eq(usersTable.points, user.points)))
 			.returning({
 				userId: usersTable.userId,
 				lastSigned: usersTable.lastSigned,
 			});
-		
+
 		if (!updatedUser) {
 			return NextResponse.json({ error: 'Race Condition' }, { status: 500 });
 		}

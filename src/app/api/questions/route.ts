@@ -159,25 +159,25 @@ export async function POST(req: NextRequest) {
 			.select({ points: usersTable.points })
 			.from(usersTable)
 			.where(eq(usersTable.userId, sessionUserId));
-		
+
 		if (!user || !user.points) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
 		if (user.points < questionCost) {
-			return NextResponse.json({ error: 'Points not enough!' }, { status: 400 }); 
+			return NextResponse.json({ error: 'Points not enough!' }, { status: 400 });
 		}
 
 		const [updatedUser] = await db
 			.update(usersTable)
-			.set( {points: user.points - questionCost} )
+			.set({ points: user.points - questionCost })
 			.where(
 				and(
 					eq(usersTable.userId, sessionUserId),
-					eq(usersTable.points, user.points) // avoid race condition
-				)
+					eq(usersTable.points, user.points), // avoid race condition
+				),
 			)
-			.returning({userId: usersTable.userId})
+			.returning({ userId: usersTable.userId });
 		if (!updatedUser) {
 			return NextResponse.json({ error: 'Race condition' }, { status: 500 });
 		}
