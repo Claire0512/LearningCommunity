@@ -42,11 +42,8 @@ export const authOptions: AuthOptions = {
 				const dbUser = await db.query.usersTable.findFirst({
 					where: (user, { eq }) => eq(user.email, email),
 				});
-
 				if (!dbUser) return null;
-
 				const isMatch = await bcrypt.compare(password, dbUser.password);
-
 				if (isMatch) {
 					return {
 						id: dbUser.userId.toString(),

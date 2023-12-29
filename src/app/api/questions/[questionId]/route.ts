@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
 import { questionsTable, commentsTable, notificationsTable } from '@/db/schema';
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
@@ -102,9 +103,13 @@ type GetRequest = z.infer<typeof GetRequestSchema>;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 type PutRequest = z.infer<typeof PutRequestSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
+	const sessionUserId = await getSessionUserId();
+	if (!sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const questionId = parseInt(params.questionId);
-	const searchParams = req.nextUrl.searchParams;
-	const userId = parseInt(searchParams.get('userId') || '');
+	const userId = sessionUserId;
 
 	if (!questionId) {
 		return NextResponse.json({ error: 'question id invalid' }, { status: 400 });
@@ -242,6 +247,11 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 }
 
 export async function PUT(req: NextRequest) {
+	const sessionUserId = await getSessionUserId();
+	if (!sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const data = await req.json();
 	try {
 		PutRequestSchema.parse(data);
@@ -249,15 +259,33 @@ export async function PUT(req: NextRequest) {
 		console.error('Error parsing out request in api/questions/[questionId]/route.ts');
 		return NextResponse.json({ error: 'put request invalid' }, { status: 400 });
 	}
-
 	const request = data as unknown as PutRequest;
+
+	try {
+		const question = await db.query.questionsTable.findFirst({
+			where: (question, { eq }) => eq(question.questionId, request.questionId),
+		})
+		if (!question) {
+			return NextResponse.json({ error: 'question not found' }, { status: 404 });
+		}
+		if (question.questionerId !== sessionUserId) {
+			return NextResponse.json({ error: "You are not the owner of the question"}, {status: 401});
+		}
+	} catch (error) {
+		return NextResponse.json({ error: 'database error' }, { status: 500 });
+	}
 
 	if (request.isSolved) {
 		try {
 			await db
 				.update(questionsTable)
 				.set({ isSolved: request.isSolved })
-				.where(eq(questionsTable.questionId, request.questionId));
+				.where(
+					and(
+						eq(questionsTable.questionId, request.questionId),
+						eq(questionsTable.questionerId, sessionUserId),
+					)
+				)
 		} catch (error) {
 			console.error('Error updating question');
 			return NextResponse.json({ error: 'server error updating question' }, { status: 500 });

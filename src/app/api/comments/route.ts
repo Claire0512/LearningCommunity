@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
-
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { getServerSession } from "next-auth/next"
 import { z } from 'zod';
-
 import { db } from '@/db';
 import { commentsTable, notificationsTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { getSessionUserId } from '@/utils/apiAuthentication';
+
 const PostRequestSchema = z.object({
 	postId: z.number().optional(),
 	questionId: z.number().optional(),
@@ -16,6 +18,11 @@ const PostRequestSchema = z.object({
 type PostRequestType = z.infer<typeof PostRequestSchema>;
 
 export async function POST(req: NextRequest) {
+	const sessionUserId = await getSessionUserId();
+	if (!sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const data = await req.json();
 	try {
 		PostRequestSchema.parse(data);
@@ -24,6 +31,10 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const newComment = data as PostRequestType;
+
+	if (newComment.commenterId !== sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	if (!newComment.postId && !newComment.questionId && !newComment.parentCommentId) {
 		return NextResponse.json(

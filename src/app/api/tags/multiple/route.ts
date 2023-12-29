@@ -4,6 +4,9 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { tagsTable } from '@/db/schema';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { getServerSession } from "next-auth/next"
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const PostRequestSchema = z.object({
 	names: z.array(z.string()),
@@ -12,6 +15,11 @@ const PostRequestSchema = z.object({
 type PostRequestType = z.infer<typeof PostRequestSchema>;
 
 export async function POST(req: NextRequest) {
+    const userId = await getSessionUserId();
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const data = await req.json();
 	try {
 		PostRequestSchema.parse(data);
@@ -20,8 +28,6 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const { names } = data as PostRequestType;
-
-
     const response = names.map(async name => {
         const tagExists = await db.query.tagsTable.findFirst({
             where: (existTag, { eq }) => eq(existTag.name, name),

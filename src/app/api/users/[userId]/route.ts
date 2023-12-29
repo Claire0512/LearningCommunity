@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
 import { isSameDateInUTC8 } from '@/lib/utils';
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const GetRequestSchema = z.number().min(1);
 
@@ -197,6 +198,11 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
+	const sessionUserId = await getSessionUserId();
+	if (!sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const userId = parseInt(params.userId);
 	try {
 		GetRequestSchema.parse(userId);
@@ -215,6 +221,10 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 	}
 
 	const newUser = data as PutRequestType;
+
+	if (newUser.userId !== userId || newUser.userId !== sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	try {
 		const updatedUsers = await db.transaction(async (tx) => {
