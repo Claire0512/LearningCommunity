@@ -5,7 +5,7 @@ import * as schema from './schema';
 
 const client = new Client({
 	connectionString: process.env.POSTGRES_URL,
-	connectionTimeoutMillis: 5000,
+	connectionTimeoutMillis: 10000,
 });
 
 (async () => {
