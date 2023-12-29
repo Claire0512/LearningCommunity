@@ -48,13 +48,13 @@ function Page() {
 	const userId = session?.user?.userId;
 	const handleCommentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
-		const postData = await getPostDetail(Number(postId), userId);
+		const postData = await getPostDetail(Number(postId));
 		setPost(postData);
 	};
 	const fetchPostDetail = async () => {
 		if (postId) {
 			try {
-				const postData = await getPostDetail(Number(postId), userId);
+				const postData = await getPostDetail(Number(postId));
 				setPost(postData);
 				setFormattedTime(getTimeDifference(postData.createdAt));
 			} catch (error) {
@@ -67,14 +67,14 @@ function Page() {
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
-		const postData = await getPostDetail(Number(postId), userId);
+		const postData = await getPostDetail(Number(postId));
 		setPost(postData);
 	};
 	useEffect(() => {
 		const fetchPostDetail = async () => {
 			if (postId) {
 				try {
-					const postData = await getPostDetail(Number(postId), userId);
+					const postData = await getPostDetail(Number(postId));
 					setPost(postData);
 					setFormattedTime(getTimeDifference(postData.createdAt));
 				} catch (error) {

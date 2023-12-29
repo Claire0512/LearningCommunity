@@ -1,6 +1,4 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { getServerSession } from "next-auth/next"
 import { z } from 'zod';
 import { db } from '@/db';
 import { commentsTable, notificationsTable } from '@/db/schema';

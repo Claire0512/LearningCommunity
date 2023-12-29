@@ -51,7 +51,7 @@ function Page() {
 	const fetchQuestionDetail = async () => {
 		if (questionId) {
 			try {
-				const questionData = await getQuestionDetail(Number(questionId), userId);
+				const questionData = await getQuestionDetail(Number(questionId));
 				setQuestion(questionData);
 				setFormattedTime(getTimeDifference(questionData.createdAt));
 			} catch (error) {
@@ -61,7 +61,7 @@ function Page() {
 	};
 	const handleCommentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		setNewComment(event.target.value);
-		const questionData = await getQuestionDetail(Number(questionId), userId);
+		const questionData = await getQuestionDetail(Number(questionId));
 		setQuestion(questionData);
 	};
 	const handleReplyChange = async (
@@ -69,14 +69,14 @@ function Page() {
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		setNewReply({ ...newReply, [commentId]: event.target.value });
-		const questionData = await getQuestionDetail(Number(questionId), userId);
+		const questionData = await getQuestionDetail(Number(questionId));
 		setQuestion(questionData);
 	};
 	useEffect(() => {
 		const fetchQuestionDetail = async () => {
 			if (questionId) {
 				try {
-					const questionData = await getQuestionDetail(Number(questionId), userId);
+					const questionData = await getQuestionDetail(Number(questionId));
 					setQuestion(questionData);
 					setFormattedTime(getTimeDifference(questionData.createdAt));
 				} catch (error) {
