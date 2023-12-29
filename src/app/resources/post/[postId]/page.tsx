@@ -587,7 +587,7 @@ function Page() {
 													}}
 													color="secondary"
 												>
-													Submit
+													留言
 												</Button>
 											</Stack>
 										</ListItemText>
@@ -631,7 +631,7 @@ function Page() {
 											}}
 											color="secondary"
 										>
-											Submit
+											留言
 										</Button>
 									</Stack>
 								</ListItemText>

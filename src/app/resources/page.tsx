@@ -279,24 +279,26 @@ function Page() {
 					<PostCard key={index} {...post} />
 				))}
 			</Box>
-			<a
-				href="/resources/post/new"
-				style={{ textDecoration: 'none' }}
-				onClick={handleCreatePostClick}
-			>
-				<Fab
-					color="secondary"
-					aria-label="我要發文"
-					style={{
-						position: 'fixed',
-						bottom: 20,
-						right: 20,
-						backgroundColor: `${theme.palette.secondary.main} !important`,
-					}}
+			{session && (
+				<a
+					href="/resources/post/new"
+					style={{ textDecoration: 'none' }}
+					onClick={handleCreatePostClick}
 				>
-					<CreateIcon />
-				</Fab>
-			</a>
+					<Fab
+						color="secondary"
+						aria-label="我要發文"
+						style={{
+							position: 'fixed',
+							bottom: 20,
+							right: 20,
+							backgroundColor: `${theme.palette.secondary.main} !important`,
+						}}
+					>
+						<CreateIcon />
+					</Fab>
+				</a>
+			)}
 			<Dialog
 				open={modalOpen}
 				onClose={closeModal}
