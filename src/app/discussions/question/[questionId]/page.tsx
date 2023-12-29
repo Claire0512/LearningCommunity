@@ -427,7 +427,7 @@ function Page() {
 											sx={{ color: '#C0EDD4', marginRight: 2, marginTop: 2 }}
 										/>
 									) : (
-										<div style={{ width: 24, marginRight: 8 }} /> 
+										<div style={{ width: 24, marginRight: 8 }} />
 									)}
 									<ListItemAvatar>
 										<Avatar

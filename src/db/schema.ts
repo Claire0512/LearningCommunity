@@ -132,7 +132,6 @@ export const tagsTable = pgTable('tags', {
 
 // defaultTags = ["數學","物理","化學","生物","地質","天文","環科","資訊","工程","材料","醫學","護理","藥學","公衛","心理","社會","人類","政治","法學","經濟","管理","會計","金融","語言","文學","歷史","哲學","音樂","戲劇","舞蹈","美術","傳播","圖資"]
 
-
 export const tagsRelations = relations(tagsTable, ({ many }) => ({
 	posts: many(postTagsTable),
 	questions: many(questionTagsTable),
