@@ -496,7 +496,7 @@ function Page() {
 											<ThumbDownAltIcon />
 										</IconButton>
 										<Typography variant="body2">{comment.downvotes}</Typography>
-										{session?.user.userId === question.questionerId && (
+										{session?.user.userId === question.questionerId && !question.hasHelpfulComment&&(
 											<IconButton
 												onClick={() => {
 													setOpenConfirmDialog(true);
@@ -595,7 +595,7 @@ function Page() {
 														{reply.downvotes}
 													</Typography>
 													{session?.user.userId ===
-														question.questionerId && (
+														question.questionerId && !question.hasHelpfulComment && (
 														<IconButton
 															onClick={() => {
 																setOpenConfirmDialog(true);
