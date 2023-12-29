@@ -1,9 +1,7 @@
-import { getServerSession } from 'next-auth/next';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { z } from 'zod';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/db';
 import { tagsTable } from '@/db/schema';
 import { getSessionUserId } from '@/utils/apiAuthentication';

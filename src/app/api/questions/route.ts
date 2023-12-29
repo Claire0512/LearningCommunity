@@ -42,11 +42,9 @@ const questionRequestSchema = z.object({
 	tags: z.array(z.string()).optional(),
 });
 
-type GetResponse = z.infer<typeof GetResponseSchema>;
-
 type questionRequest = z.infer<typeof questionRequestSchema>;
 
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
 	const upvotesSubQuery = db
 		.select({
 			questionId: upvotesTable.questionId,

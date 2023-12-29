@@ -1,5 +1,5 @@
 import type { AuthOptions } from 'next-auth';
-import NextAuth, { NextAuthOptions, User, Session } from 'next-auth';
+import NextAuth, { type User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import bcrypt from 'bcrypt';
@@ -36,7 +36,7 @@ export const authOptions: AuthOptions = {
 				email: { label: 'email', type: 'text' },
 				password: { label: 'password', type: 'password' },
 			},
-			async authorize(credentials, req) {
+			async authorize(credentials, _) {
 				if (!credentials) return null;
 				const { email, password } = credentials;
 				const dbUser = await db.query.usersTable.findFirst({

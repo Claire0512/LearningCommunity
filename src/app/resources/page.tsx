@@ -71,7 +71,7 @@ function Page() {
 			selectedTags.length > 0
 				? (post: PostCardType) =>
 						selectedTags.every((tagName) => post.tags.includes(tagName))
-				: (post: PostCardType) => true;
+				: (_: PostCardType) => true;
 		const filterBySearch = (post: PostCardType) =>
 			post.postTitle.toLowerCase().startsWith(searchInput.toLowerCase());
 
@@ -110,8 +110,8 @@ function Page() {
 					width: '100%',
 				}}
 			>
-				{hotPosts.map((post) => (
-					<PostCard {...post} />
+				{hotPosts.map((post, index) => (
+					<PostCard key={index} {...post} />
 				))}
 			</Box>
 			<Box
@@ -190,8 +190,8 @@ function Page() {
 					width: '100%',
 				}}
 			>
-				{filteredPosts.map((post) => (
-					<PostCard {...post} />
+				{filteredPosts.map((post, index) => (
+					<PostCard key={index} {...post} />
 				))}
 			</Box>
 			<a
