@@ -12,6 +12,8 @@ import {
 	upvotesTable,
 } from '@/db/schema';
 
+export const dynamic = 'force-dynamic';
+
 const GetResponseSchema = z.array(
 	z.object({
 		questionId: z.number().min(1),
