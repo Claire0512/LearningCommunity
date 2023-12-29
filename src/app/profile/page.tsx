@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 
 import { useSession } from 'next-auth/react';
-import { UploadButton } from "@/utils/uploadthing";
 
 import { ExpandableSection } from '../../components/ExpandableSection';
 import PostCard from '../../components/PostCard';
@@ -30,6 +29,7 @@ import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import type { AxiosError } from 'axios';
 
 import type { PostCardType, QuestionCardType, NewUserInfoType, UserInfoType } from '@/lib/types';
+import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
@@ -279,7 +279,9 @@ function Page() {
 							onChange={(e) => setNewProfilePicture(e.target.value)}
 						/>
 						<UploadButton
-							endpoint="imageUploader"
+							className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]
+						ut-button:focus-within:ring-offset-2 ut-button:ut-uploading:bg-[#BFD1ED] ut-button:ut-uploading:focus-within:ring-[#BFD1ED] "
+							endpoint="profileUploader"
 							onClientUploadComplete={(res) => {
 								setNewProfilePicture(res[0].url);
 							}}
@@ -332,6 +334,7 @@ function Page() {
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						取消
@@ -347,6 +350,7 @@ function Page() {
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						儲存

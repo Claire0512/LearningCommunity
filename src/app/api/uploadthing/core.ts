@@ -20,11 +20,24 @@ export const ourFileRouter = {
             // This code RUNS ON YOUR SERVER after upload
             console.log("Upload complete for userId:", metadata.userId);
 
-            console.log("file url", file.url);
+			console.log('file url', file.url);
 
-            // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-            return { uploadedBy: metadata.userId };
-        }),
+			return { uploadedBy: metadata.userId };
+		}),
+
+	profileUploader: f({ image: { maxFileSize: '4MB' } })
+		.middleware(async ({ req }) => {
+            const userId = await getSessionUserId();
+			if (!userId) throw new Error('Unauthorized');
+			return { userId: userId };
+		})
+		.onUploadComplete(async ({ metadata, file }) => {
+			console.log('Upload complete for userId:', metadata.userId);
+
+			console.log('file url', file.url);
+
+			return { uploadedBy: metadata.userId };
+		}),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

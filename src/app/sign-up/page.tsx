@@ -32,18 +32,18 @@ function Page() {
 
 	const handleSignUp = async () => {
 		if (password !== confirmPassword) {
-			showSnackbar('Passwords do not match', 'error');
+			showSnackbar('密碼不一致', 'error');
 			return;
 		}
 
 		if (password.length < 8) {
-			showSnackbar('Password must be at least 8 characters long', 'error');
+			showSnackbar('密碼至少要 8 位數', 'error');
 			return;
 		}
 
 		const success = await signUp(email, username, password);
 		if (!success) {
-			showSnackbar('User already exists', 'error');
+			showSnackbar('使用者已存在', 'error');
 			return;
 		}
 
@@ -51,8 +51,11 @@ function Page() {
 		if (!loginSuccess) {
 			return;
 		}
-		showSnackbar('Sign up success!', 'success');
-		router.push('/');
+
+		showSnackbar('註冊成功！ 獲得初始點數 10 點！', 'success');
+		setTimeout(() => {
+			router.push('/');
+		}, 3000);
 	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

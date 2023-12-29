@@ -193,8 +193,7 @@ export async function POST(req: NextRequest) {
 	try {
 		if (tags) {
 			tagIds = await getTagIds(tags);
-		}
-		else {
+		} else {
 			tagIds = [];
 		}
 	} catch (error) {

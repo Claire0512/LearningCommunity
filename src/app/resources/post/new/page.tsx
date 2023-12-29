@@ -18,12 +18,12 @@ import {
 	Typography,
 	TextField,
 	Dialog,
-	Avatar,
 	Chip,
-	Stack,
 	Box,
 	useTheme,
 } from '@mui/material';
+
+import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
@@ -34,6 +34,7 @@ function Page() {
 	const [content, setContent] = useState('');
 	const [tags, setTags] = useState<string[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [images, setImages] = useState<string[]>([]);
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
 		handleCloseModal();
@@ -41,7 +42,7 @@ function Page() {
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
-	const posterName = 'Claire';
+
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
@@ -62,6 +63,7 @@ function Page() {
 			postContext: content,
 			tags: selectedTags,
 			posterId: posterId,
+			postImages: images,
 		};
 
 		try {
@@ -98,11 +100,11 @@ function Page() {
 			}}
 		>
 			<a
-				href="/resources"
+				href="/discussions"
 				style={{
 					position: 'absolute',
-					top: '-30px',
-					left: '-30px',
+					top: '-50px',
+					left: '-130px',
 					margin: '10px',
 					zIndex: 1000,
 					textDecoration: 'none',
@@ -114,7 +116,7 @@ function Page() {
 			</a>
 			<Card
 				sx={{
-					width: '80%',
+					width: '100%',
 					height: 'auto',
 					m: 2,
 					display: 'flex',
@@ -123,24 +125,16 @@ function Page() {
 					backgroundColor: '#FEFDFA',
 					position: 'relative',
 					margin: 'auto',
+					mt: '10px',
 				}}
 			>
 				<CardContent sx={{ flex: '1 0 auto' }}>
-					<Stack
-						direction="row"
-						spacing={2}
-						alignItems="center"
-						sx={{ flexWrap: 'wrap', overflow: 'hidden', paddingBottom: '10px' }}
-					>
-						<Avatar alt={posterName} src="" />
-						<Typography variant="subtitle1" component="div">
-							{posterName}
-						</Typography>
-					</Stack>
+					<Typography variant="h5" align="center" gutterBottom sx={{ mt: '10px' }}>
+						發佈文章
+					</Typography>
 					<TextField
-						fullWidth
 						label="標題"
-						variant="outlined"
+						variant="standard"
 						value={title}
 						color="secondary"
 						onChange={handleTitleChange}
@@ -151,7 +145,11 @@ function Page() {
 									borderRadius: '20px',
 								},
 							},
-							paddingBottom: '10px',
+							paddingBottom: '30px',
+							paddingLeft: '13px',
+							'& .MuiInputLabel-root': {
+								left: '13px',
+							},
 						}}
 					/>
 
@@ -160,6 +158,7 @@ function Page() {
 						label="內文"
 						variant="outlined"
 						multiline
+						minRows={4}
 						value={content}
 						color="secondary"
 						onChange={handleContentChange}
@@ -170,14 +169,29 @@ function Page() {
 									borderRadius: '20px',
 								},
 							},
-							paddingBottom: '10px',
+							'& .MuiInputLabel-root': {
+								left: '10px',
+							},
+							paddingBottom: '30px',
+							paddingLeft: '10px',
+							paddingRight: '10px',
 						}}
 					/>
 
-					<Box display="flex" alignItems="center" gap={1}>
-						<Button onClick={handleOpenModal}>
-							<Typography variant="body1" style={{ fontSize: '16px' }}>
-								{selectedTags.length > 0 ? '所選分類：' : '選擇分類'}
+					<Box display="flex" alignItems="center" gap={1} sx={{ paddingBottom: '30px' }}>
+						<Button
+							onClick={handleOpenModal}
+							variant="text"
+							color="secondary"
+							sx={{
+								borderRadius: '10px',
+								height: '40px',
+								width: '100px',
+								minWidth: '100px',
+							}}
+						>
+							<Typography style={{ fontSize: '16px', color: 'grey' }}>
+								{selectedTags.length > 0 ? '所選標籤' : '選擇標籤'}
 							</Typography>
 						</Button>
 						{selectedTags.map((tag) => (
@@ -187,6 +201,19 @@ function Page() {
 							/>
 						))}
 					</Box>
+
+					<UploadButton
+						className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]
+						ut-button:focus-within:ring-offset-2 ut-button:ut-uploading:bg-[#BFD1ED] ut-button:ut-uploading:focus-within:ring-[#BFD1ED] "
+						endpoint="imageUploader"
+						onClientUploadComplete={(res) => {
+							const imageUrls = res.map((item) => item.url);
+							setImages(imageUrls);
+						}}
+						onUploadError={(error: Error) => {
+							alert(`ERROR! ${error.message}`);
+						}}
+					/>
 				</CardContent>
 				<Box
 					sx={{
@@ -197,13 +224,14 @@ function Page() {
 				>
 					<Button
 						variant="contained"
-						onClick={handleSubmit}
 						color="secondary"
+						onClick={handleSubmit}
 						sx={{
 							mt: 2,
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						送出

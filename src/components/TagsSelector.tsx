@@ -43,7 +43,7 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 				color="primary"
 				sx={{
 					fontWeight: 'bold',
-					fontSize: '30px',
+					fontSize: '26px',
 					textAlign: 'center',
 				}}
 			>

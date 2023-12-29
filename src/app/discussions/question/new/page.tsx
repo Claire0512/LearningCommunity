@@ -12,7 +12,9 @@ import { getAllTags } from '../../../../lib/api/tags/apiEndpoints';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button } from '@mui/material';
 import { Card, CardContent, Typography, TextField, Dialog, useTheme } from '@mui/material';
-import { Avatar, Chip, Stack, Box } from '@mui/material';
+import { Chip, Box } from '@mui/material';
+
+import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
@@ -22,6 +24,7 @@ function Page() {
 	const [content, setContent] = useState('');
 	const { data: session } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [images, setImages] = useState<string[]>([]);
 	const router = useRouter();
 	const handleSave = (selected: string[]) => {
 		setSelectedTags(selected);
@@ -30,7 +33,6 @@ function Page() {
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
-	// const session?.user.username = 'Claire';
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};
@@ -38,7 +40,7 @@ function Page() {
 		const fetchTags = async () => {
 			try {
 				const fetchedTags = await getAllTags();
-				setTags(fetchedTags); // Assuming fetchedTags is an array of Tag objects
+				setTags(fetchedTags);
 			} catch (error) {
 				console.error('Failed to fetch tags:', error);
 			}
@@ -55,7 +57,6 @@ function Page() {
 			return;
 		}
 
-		// Assuming the user ID is available in the session object
 		const questionerId = session?.user.userId;
 
 		const newQuestion = {
@@ -63,21 +64,19 @@ function Page() {
 			questionContext: content,
 			questionerId: questionerId,
 			tags: selectedTags,
-			// Add 'questionImage' if you are handling images
+			questionImages: images,
 		};
 
 		try {
 			await addNewQuestion(newQuestion);
-			// Handle success, e.g., show a success message or redirect
+
 			alert('問題已成功提交！');
-			// Optionally reset form fields
 			setTitle('');
 			setContent('');
 			setSelectedTags([]);
 			router.push('/discussions');
 		} catch (error) {
 			console.error('添加問題失敗:', error);
-			// Handle errors, e.g., show an error message
 			alert('提交問題時出現錯誤！');
 		}
 	};
@@ -95,7 +94,7 @@ function Page() {
 				href="/discussions"
 				style={{
 					position: 'absolute',
-					top: '-30px',
+					top: '-50px',
 					left: '-130px',
 					margin: '10px',
 					zIndex: 1000,
@@ -117,25 +116,16 @@ function Page() {
 					backgroundColor: '#FEFDFA',
 					position: 'relative',
 					margin: 'auto',
-					mt: '30px',
+					mt: '10px',
 				}}
 			>
 				<CardContent sx={{ flex: '1 0 auto' }}>
-					<Stack
-						direction="row"
-						spacing={2}
-						alignItems="center"
-						sx={{ flexWrap: 'wrap', overflow: 'hidden', paddingBottom: '10px' }}
-					>
-						<Avatar alt={session?.user.name} src="" />
-						<Typography variant="subtitle1" component="div">
-							{session?.user.name}
-						</Typography>
-					</Stack>
+					<Typography variant="h5" align="center" gutterBottom sx={{ mt: '10px' }}>
+						發佈問題
+					</Typography>
 					<TextField
-						fullWidth
 						label="標題"
-						variant="outlined"
+						variant="standard"
 						value={title}
 						color="secondary"
 						onChange={handleTitleChange}
@@ -146,7 +136,11 @@ function Page() {
 									borderRadius: '20px',
 								},
 							},
-							paddingBottom: '10px',
+							paddingBottom: '30px',
+							paddingLeft: '13px',
+							'& .MuiInputLabel-root': {
+								left: '13px',
+							},
 						}}
 					/>
 
@@ -155,6 +149,7 @@ function Page() {
 						label="內文"
 						variant="outlined"
 						multiline
+						minRows={4}
 						value={content}
 						color="secondary"
 						onChange={handleContentChange}
@@ -165,14 +160,29 @@ function Page() {
 									borderRadius: '20px',
 								},
 							},
-							paddingBottom: '10px',
+							'& .MuiInputLabel-root': {
+								left: '10px',
+							},
+							paddingBottom: '30px',
+							paddingLeft: '10px',
+							paddingRight: '10px',
 						}}
 					/>
 
-					<Box display="flex" alignItems="center" gap={1}>
-						<Button onClick={handleOpenModal}>
-							<Typography variant="body1" style={{ fontSize: '16px' }}>
-								{selectedTags.length > 0 ? '所選分類：' : '選擇分類'}
+					<Box display="flex" alignItems="center" gap={1} sx={{ paddingBottom: '30px' }}>
+						<Button
+							onClick={handleOpenModal}
+							variant="text"
+							color="secondary"
+							sx={{
+								borderRadius: '10px',
+								height: '40px',
+								width: '100px',
+								minWidth: '100px',
+							}}
+						>
+							<Typography style={{ fontSize: '16px', color: 'grey' }}>
+								{selectedTags.length > 0 ? '所選標籤' : '選擇標籤'}
 							</Typography>
 						</Button>
 						{selectedTags.map((tag) => (
@@ -182,6 +192,19 @@ function Page() {
 							/>
 						))}
 					</Box>
+
+					<UploadButton
+						className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]
+						ut-button:focus-within:ring-offset-2 ut-button:ut-uploading:bg-[#BFD1ED] ut-button:ut-uploading:focus-within:ring-[#BFD1ED] "
+						endpoint="imageUploader"
+						onClientUploadComplete={(res) => {
+							const imageUrls = res.map((item) => item.url);
+							setImages(imageUrls);
+						}}
+						onUploadError={(error: Error) => {
+							alert(`ERROR! ${error.message}`);
+						}}
+					/>
 				</CardContent>
 				<Box
 					sx={{
@@ -199,6 +222,7 @@ function Page() {
 							bgcolor: `${theme.palette.secondary.main} !important`,
 							height: '40px',
 							borderRadius: '20px',
+							color: 'white',
 						}}
 					>
 						送出

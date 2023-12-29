@@ -108,3 +108,22 @@ export const addNewQuestion = async (newQuestion: NewQuestionType) => {
 		throw error;
 	}
 };
+
+export const updateQuestionStatus = async (
+	questionId: number,
+	isSolved?: boolean,
+	helpfulCommentId?: number,
+) => {
+	try {
+		const body = {
+			questionId: questionId,
+			isSolved: isSolved || undefined,
+			helpfulCommentId: helpfulCommentId || undefined,
+		};
+		const response = await api.put(`/api/questions/${questionId}`, body);
+		return response.data;
+	} catch (error) {
+		console.error('Error updating question status:', error);
+		throw error;
+	}
+};
