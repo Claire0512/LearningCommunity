@@ -496,16 +496,17 @@ function Page() {
 											<ThumbDownAltIcon />
 										</IconButton>
 										<Typography variant="body2">{comment.downvotes}</Typography>
-										{session?.user.userId === question.questionerId && !question.hasHelpfulComment&&(
-											<IconButton
-												onClick={() => {
-													setOpenConfirmDialog(true);
-													setSelectedCommentId(comment.commentId);
-												}}
-											>
-												<MoreVertIcon />
-											</IconButton>
-										)}
+										{session?.user.userId === question.questionerId &&
+											!question.hasHelpfulComment && (
+												<IconButton
+													onClick={() => {
+														setOpenConfirmDialog(true);
+														setSelectedCommentId(comment.commentId);
+													}}
+												>
+													<MoreVertIcon />
+												</IconButton>
+											)}
 									</Stack>
 								</ListItem>
 
@@ -595,18 +596,19 @@ function Page() {
 														{reply.downvotes}
 													</Typography>
 													{session?.user.userId ===
-														question.questionerId && !question.hasHelpfulComment && (
-														<IconButton
-															onClick={() => {
-																setOpenConfirmDialog(true);
-																setSelectedCommentId(
-																	reply.commentId,
-																);
-															}}
-														>
-															<MoreVertIcon />
-														</IconButton>
-													)}
+														question.questionerId &&
+														!question.hasHelpfulComment && (
+															<IconButton
+																onClick={() => {
+																	setOpenConfirmDialog(true);
+																	setSelectedCommentId(
+																		reply.commentId,
+																	);
+																}}
+															>
+																<MoreVertIcon />
+															</IconButton>
+														)}
 												</Stack>
 											</ListItem>
 										</React.Fragment>
