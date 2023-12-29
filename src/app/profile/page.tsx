@@ -82,7 +82,7 @@ function Page() {
 
 	useEffect(() => {
 		fetchData();
-	}, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [userId]);
 
 	const handleSave = async () => {
 		if (!userInfo) return;
@@ -128,8 +128,8 @@ function Page() {
 				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
-				width: '33%', // Adjust as needed for spacing
-				height: '100%', // Adjust as needed
+				width: '33%',
+				height: '100%',
 				boxShadow: 'none',
 				backgroundColor: 'transparent',
 			}}
@@ -177,8 +177,6 @@ function Page() {
 						position: 'relative',
 						margin: 'auto',
 						flexDirection: 'row',
-						// 			backgroundColor: 'transparent',
-						// boxShadow: 'none',
 					}}
 				>
 					<Card
@@ -191,8 +189,7 @@ function Page() {
 							justifyContent: 'center',
 							borderRadius: '10px',
 							backgroundColor: 'transparent',
-							// backgroundColor: '#FEFDFA', // Set the background color as needed
-							boxShadow: 'none', // Remove shadow if not needed
+							boxShadow: 'none',
 						}}
 					>
 						<Avatar

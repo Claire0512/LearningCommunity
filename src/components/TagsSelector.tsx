@@ -4,7 +4,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Chip } from 
 import { Box } from '@mui/system';
 
 interface TagsSelectorProps {
-	tags: string[]; // 現在 tags 只是一個字串陣列
+	tags: string[];
 	onSave: (selected: string[]) => void;
 	onCancel: () => void;
 }
@@ -14,13 +14,10 @@ function TagsSelector({ tags, onSave, onCancel }: TagsSelectorProps) {
 
 	const toggleTag = (tagName: string) => {
 		if (selectedTags.includes(tagName)) {
-			// Remove the tag if it's already selected
 			setSelectedTags(selectedTags.filter((tag) => tag !== tagName));
 		} else if (selectedTags.length < 5) {
-			// Add the tag if less than 3 tags are already selected
 			setSelectedTags([...selectedTags, tagName]);
 		}
-		// If there are already 3 tags selected, do nothing
 	};
 
 	const isTagSelected = (tagName: string) => {
