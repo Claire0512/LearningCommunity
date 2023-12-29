@@ -275,12 +275,15 @@ export async function PUT(req: NextRequest) {
 	try {
 		const question = await db.query.questionsTable.findFirst({
 			where: (question, { eq }) => eq(question.questionId, request.questionId),
-		})
+		});
 		if (!question) {
 			return NextResponse.json({ error: 'question not found' }, { status: 404 });
 		}
 		if (question.questionerId !== sessionUserId) {
-			return NextResponse.json({ error: "You are not the owner of the question"}, {status: 401});
+			return NextResponse.json(
+				{ error: 'You are not the owner of the question' },
+				{ status: 401 },
+			);
 		}
 	} catch (error) {
 		return NextResponse.json({ error: 'database error' }, { status: 500 });
@@ -295,8 +298,8 @@ export async function PUT(req: NextRequest) {
 					and(
 						eq(questionsTable.questionId, request.questionId),
 						eq(questionsTable.questionerId, sessionUserId),
-					)
-				)
+					),
+				);
 		} catch (error) {
 			console.error('Error updating question');
 			return NextResponse.json({ error: 'server error updating question' }, { status: 500 });
