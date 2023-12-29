@@ -20,6 +20,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CommentIcon from '@mui/icons-material/Comment';
+import DoneIcon from '@mui/icons-material/Done';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
@@ -68,6 +69,8 @@ function Page() {
 
 	const [activeStep, setActiveStep] = useState(0);
 	const [maxSteps, setMaxSteps] = useState(0);
+	const [isSolved, setIsSolved] = useState(false);
+	const [openSolvedDialog, setOpenSolvedDialog] = useState(false);
 
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -85,6 +88,7 @@ function Page() {
 			try {
 				const questionData = await getQuestionDetail(Number(questionId));
 				setQuestion(questionData);
+				setIsSolved(questionData.isSolved);
 				setFormattedTime(getTimeDifference(questionData.createdAt));
 				setMaxSteps(questionData.questionImages.length);
 			} catch (error) {
@@ -225,6 +229,15 @@ function Page() {
 			console.error('按倒讚出错', error);
 		}
 	};
+	const handleMarkAsSolved = async () => {
+		try {
+			await updateQuestionStatus(question.questionId, true);
+			setIsSolved(true);
+			setOpenSolvedDialog(false);
+		} catch (error) {
+			console.error('Error marking question as solved:', error);
+		}
+	};
 
 	return (
 		<div
@@ -262,6 +275,17 @@ function Page() {
 					position: 'relative',
 				}}
 			>
+				{session?.user.userId === question.questionerId && (
+					<IconButton
+						sx={{ position: 'absolute', top: 8, right: 8 }}
+						onClick={() => setOpenSolvedDialog(true)}
+						disabled={isSolved}
+					>
+						<DoneIcon
+							sx={{ color: isSolved ? theme.palette.secondary.main : 'grey' }}
+						/>
+					</IconButton>
+				)}
 				<CardContent sx={{ flex: '1 0 auto', paddingBottom: '0px' }}>
 					<Stack
 						direction="row"
@@ -404,7 +428,6 @@ function Page() {
 							gap: 0.5,
 							overflow: 'hidden',
 							flexWrap: 'wrap',
-							// padding: '30px',
 							paddingLeft: '0px',
 							marginLeft: '10px',
 							marginTop: '10px',
@@ -422,23 +445,25 @@ function Page() {
 							<React.Fragment key={comment.commentId}>
 								{index >= 0 && <Divider />}
 								<ListItem alignItems="flex-start">
-									{comment.isHelpful ? (
-										<CheckCircleIcon
-											sx={{ color: '#C0EDD4', marginRight: 2, marginTop: 2 }}
-										/>
-									) : (
-										<div style={{ width: 24, marginRight: 8 }} />
-									)}
-									<ListItemAvatar>
-										<Avatar
-											alt={comment.commenterName}
-											src={
-												comment.commenterProfilePicture
-													? comment.commenterProfilePicture
-													: ''
-											}
-										/>
-									</ListItemAvatar>
+									<Box sx={{ display: 'flex', alignItems: 'center' }}>
+										{comment.isHelpful ? (
+											<CheckCircleIcon
+												sx={{ color: '#C0EDD4', marginRight: 2 }}
+											/>
+										) : (
+											<div style={{ width: 24, marginRight: 15 }} />
+										)}
+										<ListItemAvatar>
+											<Avatar
+												alt={comment.commenterName}
+												src={
+													comment.commenterProfilePicture
+														? comment.commenterProfilePicture
+														: ''
+												}
+											/>
+										</ListItemAvatar>
+									</Box>
 									<ListItemText
 										primary={comment.commenterName}
 										primaryTypographyProps={{ variant: 'body1' }}
@@ -471,7 +496,7 @@ function Page() {
 											<ThumbDownAltIcon />
 										</IconButton>
 										<Typography variant="body2">{comment.downvotes}</Typography>
-										{session?.user.userId === question.questionerId && (
+										{session?.user.userId === question.questionerId && !question.hasHelpfulComment&&(
 											<IconButton
 												onClick={() => {
 													setOpenConfirmDialog(true);
@@ -491,27 +516,30 @@ function Page() {
 												<Divider variant="inset" component="li" />
 											)}
 											<ListItem alignItems="flex-start" sx={{ pl: 8 }}>
-												{reply.isHelpful ? (
-													<CheckCircleIcon
-														sx={{
-															color: '#C0EDD4',
-															marginRight: 2,
-															marginTop: 2,
-														}}
-													/>
-												) : (
-													<div style={{ width: 24, marginRight: 8 }} />
-												)}
-												<ListItemAvatar>
-													<Avatar
-														alt={reply.commenterName}
-														src={
-															reply.commenterProfilePicture
-																? reply.commenterProfilePicture
-																: ''
-														}
-													/>
-												</ListItemAvatar>
+												<Box sx={{ display: 'flex', alignItems: 'center' }}>
+													{reply.isHelpful ? (
+														<CheckCircleIcon
+															sx={{
+																color: '#C0EDD4',
+																marginRight: 2,
+															}}
+														/>
+													) : (
+														<div
+															style={{ width: 24, marginRight: 16 }}
+														/>
+													)}
+													<ListItemAvatar>
+														<Avatar
+															alt={reply.commenterName}
+															src={
+																reply.commenterProfilePicture
+																	? reply.commenterProfilePicture
+																	: ''
+															}
+														/>
+													</ListItemAvatar>
+												</Box>
 												<ListItemText
 													primary={reply.commenterName}
 													primaryTypographyProps={{ variant: 'body1' }}
@@ -567,7 +595,7 @@ function Page() {
 														{reply.downvotes}
 													</Typography>
 													{session?.user.userId ===
-														question.questionerId && (
+														question.questionerId && !question.hasHelpfulComment && (
 														<IconButton
 															onClick={() => {
 																setOpenConfirmDialog(true);
@@ -694,6 +722,15 @@ function Page() {
 					>
 						確認
 					</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog open={openSolvedDialog} onClose={() => setOpenSolvedDialog(false)}>
+				<DialogContent>
+					<Typography>是否將這個問題標記為已解決？標記後不能再更改。</Typography>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setOpenSolvedDialog(false)}>取消</Button>
+					<Button onClick={() => handleMarkAsSolved()}>確認</Button>
 				</DialogActions>
 			</Dialog>
 		</div>
