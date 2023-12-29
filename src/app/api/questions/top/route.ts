@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { sql, eq, desc } from 'drizzle-orm';
+import { sql, eq, desc, gt } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
@@ -68,6 +68,8 @@ export async function GET(req: NextRequest) {
 		.groupBy(favoritesTable.questionId)
 		.as('favoritesSubQuery');
 
+	const oneDayAgo = new Date(Date.now() - 24 * 3600 * 1000)
+
 	const questionDetails = db
 		.select({
 			questionId: questionsTable.questionId,
@@ -84,12 +86,16 @@ export async function GET(req: NextRequest) {
 			favorites: favoritesSubQuery.favoritesCount,
 		})
 		.from(questionsTable)
+		.where(gt(
+			questionsTable.createdAt,
+			oneDayAgo
+		))
 		.leftJoin(upvotesSubQuery, eq(upvotesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(commentsSubQuery, eq(commentsSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
 		.orderBy(desc(questionsTable.createdAt));
-
+	
 	const questionTags = db.query.questionsTable.findMany({
 		columns: {
 			questionId: true,
@@ -105,6 +111,7 @@ export async function GET(req: NextRequest) {
 				},
 			},
 		},
+		where: (question, { gt }) => gt(question.createdAt, oneDayAgo),
 		orderBy: [desc(questionsTable.createdAt)],
 	});
 
@@ -128,8 +135,8 @@ export async function GET(req: NextRequest) {
 	}
 
 	const sorted = combined.sort((a, b) => {
-		const popularityA = a.upvotes + a.favorites;
-		const popularityB = b.upvotes + b.favorites;
+		const popularityA = a.upvotes + a.favorites + a.commentsCount * 5;
+		const popularityB = b.upvotes + b.favorites + b.commentsCount * 5;
 		return popularityB - popularityA;
 	});
 
