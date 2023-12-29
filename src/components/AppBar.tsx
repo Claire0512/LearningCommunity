@@ -75,7 +75,6 @@ function formatNotificationTime(createdAt: string) {
 
 export default function Bar({ activeButton }: { activeButton: string }) {
 	const { data: session } = useSession();
-	console.log(session);
 	const theme = useTheme();
 	const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 	const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);

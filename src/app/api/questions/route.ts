@@ -175,7 +175,6 @@ export async function POST(req: NextRequest) {
 				},
 				where: (tagsTable, { eq }) => eq(tagsTable.name, tag),
 			});
-
 			if (exist) {
 				return exist.tagId;
 			} else {
