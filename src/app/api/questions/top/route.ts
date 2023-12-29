@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
 		.groupBy(favoritesTable.questionId)
 		.as('favoritesSubQuery');
 
-	const oneDayAgo = new Date(Date.now() - 24 * 3600 * 1000)
+	const oneDayAgo = new Date(Date.now() - 24 * 3600 * 1000);
 
 	const questionDetails = db
 		.select({
@@ -86,16 +86,13 @@ export async function GET(req: NextRequest) {
 			favorites: favoritesSubQuery.favoritesCount,
 		})
 		.from(questionsTable)
-		.where(gt(
-			questionsTable.createdAt,
-			oneDayAgo
-		))
+		.where(gt(questionsTable.createdAt, oneDayAgo))
 		.leftJoin(upvotesSubQuery, eq(upvotesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(commentsSubQuery, eq(commentsSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(favoritesSubQuery, eq(favoritesSubQuery.questionId, questionsTable.questionId))
 		.leftJoin(usersTable, eq(usersTable.userId, questionsTable.questionerId))
 		.orderBy(desc(questionsTable.createdAt));
-	
+
 	const questionTags = db.query.questionsTable.findMany({
 		columns: {
 			questionId: true,
