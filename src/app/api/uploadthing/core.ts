@@ -1,10 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { getServerSession } from "next-auth/next"
 import { getSessionUserId } from "@/utils/apiAuthentication";
 const f = createUploadthing();
-
-const auth = () => ({ id: "fakeId" }); // Fake auth function
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
