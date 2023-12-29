@@ -28,9 +28,7 @@ const GetResponseSchema = z.array(
 	}),
 );
 
-type GetResponse = z.infer<typeof GetResponseSchema>;
-
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
 	const upvotesSubQuery = db
 		.select({
 			postId: upvotesTable.postId,

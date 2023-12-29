@@ -63,7 +63,6 @@ function Page() {
 	const [newComment, setNewComment] = useState('');
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
-	const userId = session?.user?.userId;
 	const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 	const [selectedCommentId, setSelectedCommentId] = useState<number | null>(null);
 	const [selectedCommenterId, setSelectedCommenterId] = useState<number | null>(null);
@@ -122,7 +121,7 @@ function Page() {
 	};
 	useEffect(() => {
 		fetchQuestionDetail();
-	}, [questionId]);
+	}, [questionId]); // eslint-disable-line react-hooks/exhaustive-deps
 	if (!question) {
 		return <div>Loading...</div>;
 	}

@@ -49,7 +49,6 @@ function Page() {
 	const [newReply, setNewReply] = useState<{ [commentId: number]: string }>({});
 	const [formattedTime, setFormattedTime] = useState('');
 	const { data: session } = useSession();
-	const userId = session?.user?.userId;
 	const [activeStep, setActiveStep] = useState(0);
 	const [maxSteps, setMaxSteps] = useState(0);
 
@@ -91,7 +90,7 @@ function Page() {
 	};
 	useEffect(() => {
 		fetchPostDetail();
-	}, [postId]);
+	}, [postId]); // eslint-disable-line react-hooks/exhaustive-deps
 	if (!post) {
 		return <div>Loading...</div>;
 	}

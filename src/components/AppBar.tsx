@@ -8,12 +8,10 @@ import Link from 'next/link';
 
 import { getNotifications } from '../lib/api/users/apiEndpoints';
 import type { NotificationType } from '../lib/types';
-import MailIcon from '@mui/icons-material/Mail';
 import { Button } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Badge from '@mui/material/Badge';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import { useTheme } from '@mui/material/styles';
 
@@ -76,7 +74,6 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 	const { data: session } = useSession();
 	const theme = useTheme();
 	const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-	const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 	const [notifications, setNotifications] = useState<NotificationType[]>([]);
 	const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
 
@@ -86,9 +83,6 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 			getNotifications(userId)
 				.then((data) => {
 					setNotifications(data);
-					setHasUnreadNotifications(
-						data.some((notification: NotificationType) => !notification.isRead),
-					);
 					setUnreadNotificationsCount(
 						data.filter((notification: NotificationType) => !notification.isRead)
 							.length,

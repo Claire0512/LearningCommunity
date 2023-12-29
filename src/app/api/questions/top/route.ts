@@ -30,17 +30,7 @@ const GetResponseSchema = z.array(
 	}),
 );
 
-const questionRequestSchema = z.object({
-	questionTitle: z.string().min(1),
-	questionContext: z.string().min(1),
-	questionerId: z.number(),
-	questionImage: z.string().optional(),
-	tags: z.array(z.string()),
-});
-
-type GetResponse = z.infer<typeof GetResponseSchema>;
-
-export async function GET(req: NextRequest) {
+export async function GET(_: NextRequest) {
 	const upvotesSubQuery = db
 		.select({
 			questionId: upvotesTable.questionId,

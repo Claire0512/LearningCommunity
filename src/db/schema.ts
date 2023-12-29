@@ -85,6 +85,8 @@ export const questionsRelations = relations(questionsTable, ({ one, many }) => (
 	favorites: many(favoritesTable),
 }));
 
+// Due to circular dependency issues, the type can't be inferred directly
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const commentsTable: any = pgTable('comments', {
 	commentId: serial('comment_id').primaryKey(),
 	text: text('text').notNull(),

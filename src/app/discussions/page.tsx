@@ -77,7 +77,7 @@ function Page() {
 			selectedTags.length > 0
 				? (question: QuestionCardType) =>
 						selectedTags.every((tagName) => question.tags.includes(tagName))
-				: (question: QuestionCardType) => true;
+				: (_: QuestionCardType) => true;
 
 		const filterBySearch = (question: QuestionCardType) =>
 			searchInput === '' ||
