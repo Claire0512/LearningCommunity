@@ -13,6 +13,8 @@ import {
 	downvotesTable,
 } from '@/db/schema';
 
+export const dynamic = 'force-dynamic';
+
 const GetResponseSchema = z.array(
 	z.object({
 		postId: z.number().min(1),
