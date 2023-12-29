@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { upvotesTable, downvotesTable, favoritesTable, notificationsTable } from '@/db/schema';
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const PostRequestSchema = z.object({
 	postId: z.number().optional(),
@@ -24,6 +25,10 @@ const PostRequestSchema = z.object({
 type PostRequestType = z.infer<typeof PostRequestSchema>;
 
 export async function POST(req: NextRequest) {
+	const sessionUserId = await getSessionUserId();
+	if (!sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 	const data = await req.json();
 	try {
 		PostRequestSchema.parse(data);
@@ -32,6 +37,10 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const newInteraction = data as PostRequestType;
+
+	if (newInteraction.userId !== sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	if (!newInteraction.postId && !newInteraction.questionId && !newInteraction.commentId) {
 		return NextResponse.json(

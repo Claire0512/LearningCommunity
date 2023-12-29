@@ -13,6 +13,7 @@ import {
 	tagsTable,
 	questionTagsTable,
 } from '@/db/schema';
+import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const GetResponseSchema = z.array(
 	z.object({
@@ -136,6 +137,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+
+	const sessionUserId = await getSessionUserId();
+	if (!sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const data = await req.json();
 	try {
 		questionRequestSchema.parse(data);
@@ -144,6 +151,10 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 	}
 	const { tags, ...newQuestion } = data as questionRequest;
+
+	if (newQuestion.questionerId !== sessionUserId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	let questionId = -1;
 	try {
