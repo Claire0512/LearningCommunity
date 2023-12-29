@@ -4,8 +4,6 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { tagsTable } from '@/db/schema';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { getServerSession } from "next-auth/next"
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
 const PostRequestSchema = z.object({
