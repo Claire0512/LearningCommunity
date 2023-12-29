@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Edushare
 
-## Getting Started
+## 環境設定
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- POSTGRES_URL
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    取得一個空的 PostgreSQL 資料庫並將其網址填入。
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+    本專案使用與上課相同的 neon。
 
-## Learn More
+- NEXTAUTH_URL
 
-To learn more about Next.js, take a look at the following resources:
+    預設為 http://localhost:3000，如有更改請自行設定為專案網址。
 
--   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
--   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- NEXTAUTH_SECRET
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+    英文 + 數字任意組合即可。建議可使用
 
-## Deploy on Vercel
+    ```
+    openssl rand -base64 32
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    指令生成。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+- UPLOADTHING_SECRET
+
+    我們使用了 Uploadthing 這個平台來上傳及儲存圖片。
+
+    如要使用的話需要先到這個網站註冊並創建一個 App。
+    
+    https://uploadthing.com/
+
+    創建完成後，在
+
+    https://uploadthing.com/dashboard/YOUR_APP_ID/api-keys
+
+    可生成 API KEY，將生成的 UPLOADTHING_SECRET 與 UPLOADTHING_APP_ID 填入即可。
+
+    若需協助可 email: b10902086@ntu.edu.tw
+
+- UPLOADTHING_APP_ID
+
+    同上
+
+## 安裝所需 package
+
+```
+yarn
+```
+
+## 資料庫初始設定
+
+```
+yarn migrate
+```
+
+## 啟動專案
+
+```
+yarn dev
+```
+

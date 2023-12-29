@@ -105,7 +105,6 @@ type GetResponse = z.infer<typeof GetResponseSchema>;
 type PutRequest = z.infer<typeof PutRequestSchema>;
 export async function GET(req: NextRequest, { params }: { params: GetRequest }) {
 	const sessionUserId = await getSessionUserId();
-
 	const questionId = parseInt(params.questionId);
 	const userId = sessionUserId;
 
