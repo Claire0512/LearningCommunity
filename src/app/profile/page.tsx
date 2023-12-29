@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 import { ExpandableSection } from '../../components/ExpandableSection';
@@ -310,7 +310,14 @@ function Page() {
 							onChange={(e) => setNewProfilePicture(e.target.value)}
 						/>
 						<Box className="flex justify-center">
-							{newProfilePicture && <Image src={newProfilePicture} alt="Profile picture" width={100} height={100}/>}
+							{newProfilePicture && (
+								<Image
+									src={newProfilePicture}
+									alt="Profile picture"
+									width={100}
+									height={100}
+								/>
+							)}
 						</Box>
 						<UploadButton
 							className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]

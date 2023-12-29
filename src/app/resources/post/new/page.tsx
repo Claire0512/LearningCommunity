@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-import Image from 'next/image';
+
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { redirect } from 'next/navigation';
 
@@ -231,7 +232,6 @@ function Page() {
 							/>
 						))}
 					</Box>
-
 
 					<UploadButton
 						className="* mt-2 ut-button:rounded-lg ut-button:bg-[#BFD1ED] ut-button:after:bg-[#BFD1ED] ut-button:focus-within:ring-[#BFD1ED]

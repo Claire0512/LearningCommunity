@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-import Image from 'next/image';
+
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { redirect, useRouter } from 'next/navigation';
 
 import TagsSelector from '../../../../components/TagsSelector';
