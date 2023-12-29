@@ -6,7 +6,6 @@ import type { ChangeEvent } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-import { UploadButton } from '@/utils/uploadthing';
 import TagsSelector from '../../../../components/TagsSelector';
 import { addNewPost } from '../../../../lib/api/resources/apiEndpoints';
 import { getAllTags } from '../../../../lib/api/tags/apiEndpoints';
@@ -19,12 +18,12 @@ import {
 	Typography,
 	TextField,
 	Dialog,
-	
 	Chip,
-
 	Box,
 	useTheme,
 } from '@mui/material';
+
+import { UploadButton } from '@/utils/uploadthing';
 
 function Page() {
 	const theme = useTheme();
@@ -43,7 +42,7 @@ function Page() {
 	};
 	const handleOpenModal = () => setIsModalOpen(true);
 	const handleCloseModal = () => setIsModalOpen(false);
-	
+
 	const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setTitle(event.target.value);
 	};

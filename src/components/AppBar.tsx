@@ -5,10 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import LoginIcon from '@mui/icons-material/Login';
-import LogoutIcon from '@mui/icons-material/Logout';
+
 import { getNotifications } from '../lib/api/users/apiEndpoints';
 import type { NotificationType } from '../lib/types';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { Button } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -231,7 +232,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 						</ClickAwayListener>
 					)}
 
-{session ? (
+					{session ? (
 						<Button
 							style={{
 								fontSize: '20px',
@@ -253,7 +254,6 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 							</Button>
 						</Link>
 					)}
-
 				</div>
 			</Toolbar>
 		</AppBar>

@@ -154,9 +154,9 @@ function PostCard(post: PostCardType) {
 			>
 				<ThumbUpAltIcon sx={{ color: '#BFD1ED' }} />
 				<Typography variant="body2">{post.upvotes}</Typography>
-				<ThumbDownAltIcon sx={{ color: '#EDD9C0' }}/>
+				<ThumbDownAltIcon sx={{ color: '#EDD9C0' }} />
 				<Typography variant="body2">{post.downvotes}</Typography>
-				<CommentIcon sx={{ color: "#C0DCED" }} />
+				<CommentIcon sx={{ color: '#C0DCED' }} />
 				<Typography variant="body2">{post.commentsCount}</Typography>
 				<BookmarkIcon sx={{ color: '#D2C0ED' }} />
 				<Typography variant="body2">{post.favorites}</Typography>
