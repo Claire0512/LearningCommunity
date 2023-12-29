@@ -279,24 +279,26 @@ function Page() {
 					<QuestionCard key={question.questionId} {...question} />
 				))}
 			</Box>
-			<a
-				href="/discussions/question/new"
-				style={{ textDecoration: 'none' }}
-				onClick={handleCreateQuestionClick}
-			>
-				<Fab
-					color="secondary"
-					aria-label="我要發問"
-					style={{
-						position: 'fixed',
-						bottom: 20,
-						right: 20,
-						backgroundColor: `${theme.palette.secondary.main} !important`,
-					}}
+			{session && (
+				<a
+					href="/discussions/question/new"
+					style={{ textDecoration: 'none' }}
+					onClick={handleCreateQuestionClick}
 				>
-					<CreateIcon />
-				</Fab>
-			</a>
+					<Fab
+						color="secondary"
+						aria-label="我要發問"
+						style={{
+							position: 'fixed',
+							bottom: 20,
+							right: 20,
+							backgroundColor: `${theme.palette.secondary.main} !important`,
+						}}
+					>
+						<CreateIcon />
+					</Fab>
+				</a>
+			)}
 			<Dialog
 				open={modalOpen}
 				onClose={closeModal}
