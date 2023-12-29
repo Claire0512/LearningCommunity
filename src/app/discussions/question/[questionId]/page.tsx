@@ -421,7 +421,6 @@ function Page() {
 							<Chip key={tag} label={tag} size="medium" data-tag={tag} />
 						))}
 					</Box>
-					{/* <Divider /> */}
 					<Stack
 						direction="row"
 						spacing={1}
