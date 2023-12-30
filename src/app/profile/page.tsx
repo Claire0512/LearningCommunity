@@ -225,7 +225,7 @@ function Page() {
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								marginLeft: '10px',
+								marginLeft: '15px',
 							}}
 						>
 							<Typography variant="h5" component="div">
