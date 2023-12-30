@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 import Bar from '../components/AppBar';
 import { getUserInfo, dailySign } from '../lib/api/users/apiEndpoints';
@@ -24,6 +25,7 @@ const cardData = [
 			'加入討論，豐富知識之旅！\n 在這裡，回答問題不僅能幫助他人，還能賺取點數。\n有疑問？使用點數提問，讓專家來助你一臂之力！',
 
 		image: '/images/1.png',
+		path: '/discussions',
 	},
 	{
 		title: '學習資源 - 知識的寶庫',
@@ -31,6 +33,7 @@ const cardData = [
 			'探索知識的海洋！\n這裡有各式各樣的知識分享型文章~\n按類別尋找感興趣的內容，或是分享專業文章來獲得點數吧！',
 
 		image: '/images/2.png',
+		path: 'resources',
 	},
 	{
 		title: '個人檔案 - 你的成長軌跡',
@@ -38,6 +41,7 @@ const cardData = [
 			'在這裡，你可以編輯個人資訊，\n以及追蹤自己發布和收藏的問題與文章！\n另外還可以查看你的成就，包括獲得的讚數、愛心等~\n見證自己的成長！',
 
 		image: '/images/3.png',
+		path: '/profile',
 	},
 ];
 
@@ -47,6 +51,7 @@ export default function Home() {
 	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalContent, setModalContent] = useState('');
+	const router = useRouter();
 
 	const openModal = (content: string) => {
 		setModalContent(content);
@@ -133,7 +138,13 @@ export default function Home() {
 									borderRadius: '20px',
 									overflow: 'hidden',
 									backgroundColor: '#fdfdf9',
+									cursor: 'pointer',
+									'&:hover': {
+										boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+										transform: 'scale(1.03)',
+									},
 								}}
+								onClick={() => router.push(card.path)}
 							>
 								<Box
 									sx={{
