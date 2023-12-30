@@ -11,6 +11,7 @@ const PostRequestSchema = z.object({
 });
 
 type PostRequestType = z.infer<typeof PostRequestSchema>;
+export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
 	const userId = await getSessionUserId();

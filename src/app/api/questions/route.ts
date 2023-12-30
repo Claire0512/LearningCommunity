@@ -16,6 +16,8 @@ import {
 import { questionCost } from '@/lib/constants';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
+export const revalidate = 0;
+
 const GetResponseSchema = z.array(
 	z.object({
 		questionId: z.number().min(1),

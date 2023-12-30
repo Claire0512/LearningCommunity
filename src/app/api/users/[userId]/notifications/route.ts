@@ -32,9 +32,10 @@ const GetResponseSchema = z.array(
 	}),
 );
 
+export const revalidate = 0;
 type GetResponse = z.infer<typeof GetResponseSchema>;
 
-export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function GET(_: NextRequest, { params }: { params: { userId: string } }) {
 	const userId = parseInt(params.userId);
 	try {
 		GetRequestSchema.parse(userId);

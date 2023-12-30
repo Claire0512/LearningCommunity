@@ -11,6 +11,7 @@ const PostRequestSchema = z.object({
 	name: z.string().min(1),
 	password: z.string().min(1),
 });
+export const revalidate = 0;
 
 type PostRequestType = z.infer<typeof PostRequestSchema>;
 

@@ -7,6 +7,8 @@ import { usersTable } from '@/db/schema';
 import { isSameDateInUTC8 } from '@/lib/utils';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
+export const revalidate = 0;
+
 export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
 	const sessionUserId = await getSessionUserId();
 	if (!sessionUserId) {

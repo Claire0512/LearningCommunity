@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 
 const GetRequestSchema = z.number().min(1);
+export const revalidate = 0;
 
 const GetResponseSchema = z.array(
 	z.object({

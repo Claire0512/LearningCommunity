@@ -43,6 +43,7 @@ const PostRequestSchema = z.object({
 });
 
 type PostRequest = z.infer<typeof PostRequestSchema>;
+export const revalidate = 0;
 
 export async function GET(_: NextRequest) {
 	const upvotesSubQuery = db

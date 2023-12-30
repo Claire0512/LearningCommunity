@@ -9,6 +9,8 @@ import { usersTable } from '@/db/schema';
 import { isSameDateInUTC8 } from '@/lib/utils';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
+export const revalidate = 0;
+
 const GetRequestSchema = z.number().min(1);
 
 const GetResponseSchema = z.object({

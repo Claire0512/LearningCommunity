@@ -13,6 +13,7 @@ import {
 	downvotesTable,
 } from '@/db/schema';
 
+export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 const GetResponseSchema = z.array(

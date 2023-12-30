@@ -7,6 +7,8 @@ import { db } from '@/db';
 import { commentsTable, notificationsTable } from '@/db/schema';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
+export const revalidate = 0;
+
 const PostRequestSchema = z.object({
 	postId: z.number().optional(),
 	questionId: z.number().optional(),

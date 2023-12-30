@@ -8,6 +8,8 @@ import { questionsTable, commentsTable, notificationsTable, usersTable } from '@
 import { answerReward } from '@/lib/constants';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
+export const revalidate = 0;
+
 const GetRequestSchema = z.object({
 	questionId: z.string().min(1),
 });

@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
 
+export const revalidate = 0;
+
 const PutRequestSchema = z.object({
 	userId: z.number().min(1),
 	pointsDiff: z.number(),

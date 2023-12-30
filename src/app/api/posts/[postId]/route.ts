@@ -7,6 +7,8 @@ import { db } from '@/db';
 import { notificationsTable } from '@/db/schema';
 import { getSessionUserId } from '@/utils/apiAuthentication';
 
+export const revalidate = 0;
+
 const GetRequestSchema = z.object({
 	postId: z.string().min(1),
 });
