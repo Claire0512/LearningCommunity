@@ -205,7 +205,7 @@ function Page() {
 				>
 					<Card
 						sx={{
-							width: '35%',
+							width: '40%',
 							height: '100%',
 							display: 'flex',
 							flexDirection: 'row',
@@ -219,7 +219,7 @@ function Page() {
 						<Avatar
 							alt={userInfo.name}
 							src={userInfo.profilePicture || ''}
-							sx={{ width: 60, height: 60 }}
+							sx={{ width: 75, height: 75, marginLeft: '20px' }}
 						/>
 						<Box
 							sx={{
@@ -239,7 +239,7 @@ function Page() {
 
 					<Box
 						sx={{
-							width: '65%',
+							width: '60%',
 							height: '100%',
 							display: 'flex',
 							flexDirection: 'column',
@@ -427,11 +427,11 @@ function Page() {
 			<Fab
 				color="secondary"
 				aria-label="我要發文"
-				style={{
+				sx={{
 					position: 'fixed',
 					bottom: 20,
 					right: 20,
-					backgroundColor: `${theme.palette.secondary.main} !important`,
+					backgroundColor: '#BFD1ED !important',
 				}}
 				onClick={handleOpenDialog}
 			>

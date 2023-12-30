@@ -168,6 +168,7 @@ function Page() {
 							}}
 							type="submit"
 							variant="contained"
+							style={{ backgroundColor: '#104b76', color: 'white' }}
 						>
 							註冊
 						</Button>
