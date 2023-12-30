@@ -248,7 +248,7 @@ function Page() {
 					>
 						<Stack direction="row" alignItems="center">
 							{createStatCard(
-								'文章獲得愛心',
+								'問題獲得愛心',
 								FavoriteIcon,
 								'#EDC0C0',
 								userInfo.hearts,

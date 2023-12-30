@@ -496,7 +496,7 @@ function Page() {
 										direction="row"
 										alignItems="center"
 										spacing={1}
-										sx={{ marginLeft: 'auto', minWidth: '100px' }}
+										sx={{ marginLeft: 'auto' }}
 									>
 										<IconButton
 											onClick={() => handleCommentUpvote(comment.commentId)}
