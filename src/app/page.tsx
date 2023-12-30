@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import Bar from '../components/AppBar';
 import { getUserInfo, dailySign } from '../lib/api/users/apiEndpoints';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import { Card, Typography, CardMedia, Fab, useTheme, Button } from '@mui/material';
+import { Card, Typography, CardMedia, Fab, Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -46,7 +46,6 @@ const cardData = [
 ];
 
 export default function Home() {
-	const theme = useTheme();
 	const { data: session } = useSession();
 	const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
