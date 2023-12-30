@@ -199,13 +199,13 @@ export default function Home() {
 				<Fab
 					color="secondary"
 					aria-label="我要簽到"
-					style={{
+					sx={{
 						position: 'fixed',
 						bottom: 20,
 						right: 20,
 						backgroundColor: userInfo?.hasSigned
-							? '#EBEBEB'
-							: '#BFD1ED',
+							? '#EBEBEB !important'
+							: '#BFD1ED !important',
 					}}
 					onClick={handleSignInClick}
 				>

@@ -288,11 +288,11 @@ function Page() {
 					<Fab
 						color="secondary"
 						aria-label="我要發文"
-						style={{
+						sx={{
 							position: 'fixed',
 							bottom: 20,
 							right: 20,
-							backgroundColor: '#BFD1ED',
+							backgroundColor: '#BFD1ED !important',
 						}}
 					>
 						<CreateIcon />
