@@ -162,6 +162,7 @@ export async function GET(req: NextRequest, { params }: { params: GetRequest }) 
 					upvotes: true,
 					downvotes: true,
 				},
+				orderBy: (comments, { asc }) => [asc(comments.createdAt)],
 			},
 		},
 		where: (question, { eq }) => eq(question.questionId, questionId),
