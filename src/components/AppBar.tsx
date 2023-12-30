@@ -103,7 +103,20 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 	}, [session]);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalContent, setModalContent] = useState('');
+	const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
+	const handleLogout = async () => {
+		setLogoutModalOpen(true);
+	};
+
+	const confirmLogout = async () => {
+		await logOut();
+		setLogoutModalOpen(false);
+	};
+
+	const cancelLogout = () => {
+		setLogoutModalOpen(false);
+	};
 	const openModal = (content: string) => {
 		setModalContent(content);
 		setModalOpen(true);
@@ -126,11 +139,7 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 			}
 		}
 	};
-	const handleLogout = async () => {
-		if (window.confirm('確定要登出嗎？')) {
-			await logOut();
-		}
-	};
+
 	return (
 		<AppBar sx={{ height: '80px', bgcolor: `${theme.palette.secondary.main} !important` }}>
 			<Toolbar
@@ -286,6 +295,17 @@ export default function Bar({ activeButton }: { activeButton: string }) {
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={closeModal}>確定</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog
+				open={logoutModalOpen}
+				onClose={cancelLogout}
+				PaperProps={{ sx: { borderRadius: '10px', backgroundColor: '#FEFDFA' } }}
+			>
+				<DialogTitle>確定要登出嗎？</DialogTitle>
+				<DialogActions>
+					<Button onClick={confirmLogout}>確定</Button>
+					<Button onClick={cancelLogout}>取消</Button>
 				</DialogActions>
 			</Dialog>
 		</AppBar>

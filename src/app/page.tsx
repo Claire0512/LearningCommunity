@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import Bar from '../components/AppBar';
 import { getUserInfo, dailySign } from '../lib/api/users/apiEndpoints';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import { Card, CardContent, Typography, CardMedia, Fab, useTheme, Button } from '@mui/material';
+import { Card, Typography, CardMedia, Fab, useTheme, Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -21,21 +21,21 @@ const cardData = [
 	{
 		title: '討論專區 - 互助共成長',
 		description:
-			'加入討論，豐富知識之旅！在這裡，回答問題不僅能幫助他人，還能賺取點數。有疑問？使用點數提問，讓專家來助你一臂之力！',
+			'加入討論，豐富知識之旅！\n 在這裡，回答問題不僅能幫助他人，還能賺取點數。\n有疑問？使用點數提問，讓專家來助你一臂之力！',
 
 		image: '/images/1.png',
 	},
 	{
 		title: '學習資源 - 知識的寶庫',
 		description:
-			'探索知識的海洋！這裡有各種知識分享型文章，按類別尋找你感興趣的內容，或是分享自己的專業文章來獲得點數！',
+			'探索知識的海洋！\n這裡有各式各樣的知識分享型文章~\n按類別尋找感興趣的內容，或是分享專業文章來獲得點數吧！',
 
 		image: '/images/2.png',
 	},
 	{
 		title: '個人檔案 - 你的成長軌跡',
 		description:
-			'在這裡，你可以編輯個人資訊，追蹤自己發布和收藏的問題與文章。查看你的成就，包括獲得的讚數、愛心等，見證自己的成長！',
+			'在這裡，你可以編輯個人資訊，\n以及追蹤自己發布和收藏的問題與文章！\n另外還可以查看你的成就，包括獲得的讚數、愛心等~\n見證自己的成長！',
 
 		image: '/images/3.png',
 	},
@@ -93,7 +93,7 @@ export default function Home() {
 
 			<Box
 				sx={{
-					mt: '60px',
+					marginTop: '10px',
 					display: 'flex',
 					flex: 1,
 					flexDirection: 'column',
@@ -113,89 +113,72 @@ export default function Home() {
 				>
 					<Box
 						sx={{
-							mt: 10,
 							display: 'flex',
-							height: '100%',
+							flexDirection: 'column',
+							alignItems: 'center',
 							width: '100%',
-							justifyContent: 'space-between',
 						}}
 					>
 						{cardData.map((card, index) => (
 							<Card
 								key={index}
 								sx={{
-									position: 'relative',
-									mx: 1.25,
-									mb: 0.25,
-									height: '200px',
-									width: '400px',
-									maxWidth: '330px',
-									flex: 1,
-									backgroundColor: '#FEFDFA',
-
-									overflow: 'visible',
-									...(index === 0 && { marginRight: 'auto' }),
-									...(index === 1 && { marginX: 'auto' }),
-									...(index === 2 && { marginLeft: 'auto' }),
-									borderRadius: '10px',
+									display: 'flex',
+									flexDirection: index % 2 === 1 ? 'row' : 'row-reverse',
+									alignItems: 'center',
+									justifyContent: 'space-between',
+									height: '70vh',
+									width: '90%',
+									my: 4,
+									borderRadius: '20px',
+									overflow: 'hidden',
+									backgroundColor: '#fdfdf9',
 								}}
 							>
 								<Box
 									sx={{
-										bgcolor: '#BFD1ED',
-										height: '15%',
-										position: 'relative',
-										borderTopLeftRadius: '10px',
-										borderTopRightRadius: '10px',
+										width: '50%',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
 									}}
-								></Box>
-
-								<CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
+								>
+									<CardMedia
+										component="img"
+										sx={{ maxWidth: '70%', maxHeight: '70%' }}
+										image={card.image}
+										alt={card.title}
+									/>
+								</Box>
+								<Box
+									sx={{
+										width: '50%',
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'center',
+										p: 2,
+									}}
+								>
 									<Typography
 										gutterBottom
-										variant="h6"
+										variant="h5"
 										component="div"
-										sx={{ alignSelf: 'flex-start', fontWeight: '900' }}
+										sx={{ fontWeight: 'bold', mb: 2 }}
 									>
 										{card.title}
 									</Typography>
-
-									<Box
-										sx={{
-											display: 'flex',
-											flexDirection: 'row',
-											justifyContent: 'space-between',
-											alignItems: 'center',
-											width: '100%',
-										}}
-									>
-										<Box sx={{ flex: '1 1 auto' }}>
-											{card.description.split('\n').map((line, index) => (
-												<Typography
-													key={index}
-													variant="body2"
-													color="text.secondary"
-													component="div"
-													sx={{
-														fontWeight: 'bold',
-													}}
-												>
-													{line}
-												</Typography>
-											))}
-										</Box>
-										<CardMedia
-											component="img"
-											sx={{
-												width: '110px',
-												height: '90px',
-												alignSelf: 'center',
-											}}
-											image={card.image}
-											alt={card.title}
-										/>
-									</Box>
-								</CardContent>
+									{card.description.split('\n').map((line, lineIndex) => (
+										<Typography
+											key={lineIndex}
+											variant="body1"
+											color="text.secondary"
+											component="div"
+										>
+											{line}
+										</Typography>
+									))}
+								</Box>
 							</Card>
 						))}
 					</Box>
