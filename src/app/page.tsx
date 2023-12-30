@@ -205,7 +205,7 @@ export default function Home() {
 						right: 20,
 						backgroundColor: userInfo?.hasSigned
 							? '#EBEBEB'
-							: `${theme.palette.secondary.main} !important`,
+							: '#BFD1ED',
 					}}
 					onClick={handleSignInClick}
 				>

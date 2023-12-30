@@ -292,7 +292,7 @@ function Page() {
 							position: 'fixed',
 							bottom: 20,
 							right: 20,
-							backgroundColor: `${theme.palette.secondary.main} !important`,
+							backgroundColor: '#BFD1ED',
 						}}
 					>
 						<CreateIcon />
