@@ -205,7 +205,7 @@ function Page() {
 				>
 					<Card
 						sx={{
-							width: '35%',
+							width: '40%',
 							height: '100%',
 							display: 'flex',
 							flexDirection: 'row',
@@ -219,13 +219,13 @@ function Page() {
 						<Avatar
 							alt={userInfo.name}
 							src={userInfo.profilePicture || ''}
-							sx={{ width: 60, height: 60 }}
+							sx={{ width: 75, height: 75, marginLeft: '20px' }}
 						/>
 						<Box
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								marginLeft: '15px',
+								marginLeft: '10px',
 							}}
 						>
 							<Typography variant="h5" component="div">
@@ -239,7 +239,7 @@ function Page() {
 
 					<Box
 						sx={{
-							width: '65%',
+							width: '60%',
 							height: '100%',
 							display: 'flex',
 							flexDirection: 'column',
