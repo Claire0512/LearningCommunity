@@ -199,9 +199,15 @@ function Page() {
 			return;
 		}
 
-		const actionType = post.comments.find((c) => c.commentId === commentId)?.hasUpvote
-			? 'remove_upvote'
-			: 'add_upvote';
+		const hasUpvoted = post.comments.some((comment) => {
+			if (comment.commentId === commentId && comment.hasUpvote) return true;
+			const isReply = comment.replies.some((reply) => {
+				if (reply.commentId === commentId && reply.hasUpvote) return true;
+			});
+			return isReply;
+		});
+
+		const actionType = hasUpvoted ? 'remove_upvote' : 'add_upvote';
 
 		try {
 			await interactiWithPostComment(session.user.userId, commentId, actionType);
@@ -217,9 +223,15 @@ function Page() {
 			return;
 		}
 
-		const actionType = post.comments.find((c) => c.commentId === commentId)?.hasDownvote
-			? 'remove_downvote'
-			: 'add_downvote';
+		const hasDownvoted = post.comments.some((comment) => {
+			if (comment.commentId === commentId && comment.hasDownvote) return true;
+			const isReply = comment.replies.some((reply) => {
+				if (reply.commentId === commentId && reply.hasDownvote) return true;
+			});
+			return isReply;
+		});
+
+		const actionType = hasDownvoted ? 'remove_downvote' : 'add_downvote';
 
 		try {
 			await interactiWithPostComment(session.user.userId, commentId, actionType);
